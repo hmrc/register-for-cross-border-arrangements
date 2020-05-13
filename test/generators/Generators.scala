@@ -17,9 +17,9 @@
 package generators
 
 import java.time.{Instant, LocalDate, ZoneOffset}
-import org.scalacheck.Arbitrary._
+
+import org.scalacheck.Arbitrary.{arbitrary, _}
 import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Gen, Shrink}
 
 trait Generators extends ModelGenerators {

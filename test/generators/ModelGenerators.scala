@@ -19,9 +19,9 @@ package generators
 import java.time.LocalDate
 
 import models.{Individual, IndividualMatchingSubmission, Name}
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
-import org.scalacheck.Arbitrary.arbitrary
 
 trait ModelGenerators {
  self: Generators =>

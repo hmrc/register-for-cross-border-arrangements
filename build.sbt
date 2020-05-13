@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
   .settings(
     name := appName,
     RoutesKeys.routesImport ++= Seq("uk.gov.hmrc.domain.Nino", "binders.NinoBinder._"),
-    PlayKeys.playDefaultPort := 9000,
+    PlayKeys.playDefaultPort := 9756,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*repositories.*;" +
       ".*BuildInfo.*;.*javascript.*;.*Routes.*;.*GuiceInjector;" +
       ".*ControllerConfiguration;.*LanguageSwitchController",

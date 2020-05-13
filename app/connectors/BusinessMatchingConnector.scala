@@ -16,7 +16,6 @@
 
 package connectors
 
-import java.time.OffsetDateTime
 import java.util.UUID
 
 import config.AppConfig
@@ -24,7 +23,7 @@ import javax.inject.Inject
 import models.IndividualMatchingSubmission
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}

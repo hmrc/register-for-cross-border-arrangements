@@ -19,7 +19,7 @@ package controllers
 import connectors.BusinessMatchingConnector
 import javax.inject.Inject
 import models.IndividualMatchingSubmission
-import play.api.libs.json.{JsResult, JsValue, Json}
+import play.api.libs.json.{JsResult, JsValue}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpResponse

@@ -78,6 +78,51 @@ class BusinessMatchingControllerSpec extends SpecBase
           status(result) mustEqual NOT_FOUND
       }
     }
+
+    "should return authorisation errors when one is encountered" in {
+      when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(401, responseJson = Some(Json.obj()))))
+
+      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
+        (nino, individualMatchingSubmission) =>
+          val request =
+            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+              .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+          val result  = route(application, request).value
+          status(result) mustEqual UNAUTHORIZED
+      }
+    }
+
+    "should return bad request when one is encountered" in {
+      when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(400, responseJson = Some(Json.obj()))))
+
+      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
+        (nino, individualMatchingSubmission) =>
+          val request =
+            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+              .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+          val result  = route(application, request).value
+          status(result) mustEqual BAD_REQUEST
+      }
+    }
+
+    "should return gateway timeout when one is encountered" in {
+      when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(504, responseJson = Some(Json.obj()))))
+
+      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
+        (nino, individualMatchingSubmission) =>
+          val request =
+            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+              .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+          val result  = route(application, request).value
+          status(result) mustEqual GATEWAY_TIMEOUT
+      }
+    }
   }
 
 }

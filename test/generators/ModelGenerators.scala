@@ -18,10 +18,11 @@ package generators
 
 import java.time.LocalDate
 
-import models.{Individual, IndividualMatchingSubmission, Name}
+import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
+import wolfendale.scalacheck.regexp.RegexpGen
 
 trait ModelGenerators {
  self: Generators =>
@@ -50,9 +51,22 @@ trait ModelGenerators {
       name <- arbitrary[Name]
       dob <- arbitrary[LocalDate]
     } yield
-      IndividualMatchingSubmission("Don't know",
+      IndividualMatchingSubmission("DACSIX",
         requiresNameMatch = true,
         isAnAgent = false,
         Individual(name, dob))
   }
+
+  implicit val arbitraryBusinessMatchingSubmission: Arbitrary[BusinessMatchingSubmission] = Arbitrary {
+    for {
+      organisationName <- RegexpGen.from("^[a-zA-Z0-9 '&\\\\/]{1,105}$")
+      organisationType <- Gen.oneOf(partnerShip, limitedLiability, corporateBody, unIncorporatedBody, other)
+    } yield
+      BusinessMatchingSubmission("DACSIX",
+        requiresNameMatch = true,
+        isAnAgent = false,
+        Organisation(organisationName, organisationType))
+  }
+
+
 }

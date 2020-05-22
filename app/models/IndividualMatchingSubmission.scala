@@ -18,25 +18,19 @@ package models
 
 import java.time.LocalDate
 
-import play.api.libs.json.{Json, OWrites, Reads, __}
+import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
 
-trait BusinessMatchingSubmission
+trait IndividualAndBusinessMatchingSubmission
 
 case class IndividualMatchingSubmission(regime: String,
                                         requiresNameMatch: Boolean,
                                         isAnAgent: Boolean,
-                                        individual: Individual) extends BusinessMatchingSubmission
+                                        individual: Individual) extends IndividualAndBusinessMatchingSubmission
 
 object IndividualMatchingSubmission {
   implicit val format = Json.format[IndividualMatchingSubmission]
 }
 
-/*
-  case class OrganisationMatchingSubmission(regime: String,
-                                            requiresNameMatch: Boolean,
-                                            isAnAgent: Boolean,
-                                            organisation: Organisation) extends BusinessMatchingSubmission
-*/
 
 case class Individual(name: Name, dateOfBirth: LocalDate)
 object Individual {
@@ -59,17 +53,32 @@ object Individual {
   }
 }
 
+//orgName between 1 and 105 "^[a-zA-Z0-9 '&\\/]{1,105}$"
+case class Organisation(organisationName: String, organisationType: BusinessType)
+object Organisation {
+  implicit lazy val writes: OWrites[Organisation] = OWrites[Organisation] {
+    organisation =>
+      Json.obj(
+        "organisationName" -> organisation.organisationName,
+        "organisationType" -> organisation.organisationType
+      )
+  }
 
-/*
-  //orgName between 1 and 105 "^[a-zA-Z0-9 '&\\/]{1,105}$"
-  case class Organisation(organisationName: String, organisationType: BusinessType)
-  object OrganisationMatchingSubmission {
-    def apply(userAnswers: UserAnswers): Option[OrganisationMatchingSubmission] =
-      for {
-        name <- userAnswers.get(NamePage)
-        dob <- userAnswers.get(DateOfBirthPage)
-      } yield IndividualMatchingSubmission("Don't know",
-        requiresNameMatch = true,
-        isAnAgent = false,
-        Individual( name, dob))
-  }*/
+  implicit lazy val reads: Reads[Organisation] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "organisationName").read[String] and
+        (__ \ "organisationType").read[BusinessType]
+      )((organisationName, organisationType) => Organisation(organisationName, organisationType))
+  }
+}
+
+case class BusinessMatchingSubmission(regime: String,
+                                      requiresNameMatch: Boolean,
+                                      isAnAgent: Boolean,
+                                      organisation: Organisation) extends IndividualAndBusinessMatchingSubmission
+
+
+object BusinessMatchingSubmission {
+  implicit val format: OFormat[BusinessMatchingSubmission] = Json.format[BusinessMatchingSubmission]
+}

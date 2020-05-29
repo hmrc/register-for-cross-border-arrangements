@@ -45,13 +45,11 @@ object BusinessType {
   }
 
   implicit lazy val reads: Reads[BusinessType] = {
-    a => a.toString() match {
-      case "partnerShip" => JsSuccess(partnerShip)
-      case "limitedLiability" => JsSuccess(limitedLiability)
-      case "corporateBody" => JsSuccess(corporateBody)
-      case "unIncorporatedBody" => JsSuccess(unIncorporatedBody)
-      case "other" => JsSuccess(other)
-      case _ => JsError()
-    }
+    case JsString("partnerShip") => JsSuccess(partnerShip)
+    case JsString("limitedLiability") => JsSuccess(limitedLiability)
+    case JsString("corporateBody") => JsSuccess(corporateBody)
+    case JsString("unIncorporatedBody") => JsSuccess(unIncorporatedBody)
+    case JsString("other") => JsSuccess(other)
+    case _ => JsError()
   }
 }

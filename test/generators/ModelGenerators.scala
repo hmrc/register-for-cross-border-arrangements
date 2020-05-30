@@ -42,6 +42,12 @@ trait ModelGenerators {
     } yield Nino(f"$prefix$number%06d$suffix")
   }
 
+  implicit val arbitraryUtr: Arbitrary[Utr] = Arbitrary {
+    for {
+      value <- Gen.listOfN(10, Gen.chooseNum(0, 9)).map(_.mkString)
+    } yield Utr(value)
+  }
+
   implicit lazy val arbitraryLocalDate: Arbitrary[LocalDate] = Arbitrary {
     datesBetween(LocalDate.of(1900, 1, 1), LocalDate.of(2100, 1, 1))
   }

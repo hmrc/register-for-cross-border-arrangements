@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsError, JsString, JsSuccess, Json, OFormat, OWrites, Reads, __}
+import play.api.libs.json._
 
 sealed trait BusinessType {
   val value:String
@@ -39,17 +39,16 @@ case object other extends BusinessType {
 }
 
 object BusinessType {
-  implicit lazy val writes: OWrites[BusinessType] = OWrites[BusinessType] {
-    businessType =>
-      Json.obj( ("organisationType", JsString(businessType.value)))
+  implicit lazy val writes: Writes[BusinessType] = Writes {
+    businessType => JsString(businessType.value)
   }
 
   implicit lazy val reads: Reads[BusinessType] = {
-    case JsString("partnerShip") => JsSuccess(partnerShip)
-    case JsString("limitedLiability") => JsSuccess(limitedLiability)
-    case JsString("corporateBody") => JsSuccess(corporateBody)
-    case JsString("unIncorporatedBody") => JsSuccess(unIncorporatedBody)
-    case JsString("other") => JsSuccess(other)
+    case JsString("Partnership") => JsSuccess(partnerShip)
+    case JsString("LLP") => JsSuccess(limitedLiability)
+    case JsString("Corporate Body") => JsSuccess(corporateBody)
+    case JsString("Unincorporated Body") => JsSuccess(unIncorporatedBody)
+    case JsString("Not Specified") => JsSuccess(other)
     case _ => JsError()
   }
 }

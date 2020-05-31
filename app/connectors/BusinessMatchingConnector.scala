@@ -60,6 +60,7 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
       },
+      "Environment" -> config.desEnvironment,
       "Content-Type"     -> "application/json",
       "Accept"           -> "application/json"
     )

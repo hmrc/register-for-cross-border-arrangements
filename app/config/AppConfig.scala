@@ -23,4 +23,5 @@ import play.api.Configuration
 class AppConfig @Inject()(config: Configuration) {
   lazy val businessMatchingUrl: String = s"${config.get[Service]("microservice.services.business-matching").baseUrl}${config.get[String]("microservice.services.business-matching.startUrl")}"
   lazy val desBearerToken: String = config.get[String]("microservice.services.business-matching.bearer-token")
+  lazy val desEnvironment: String = config.get[String]("microservice.services.business-matching.environment")
 }

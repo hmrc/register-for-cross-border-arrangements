@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.BusinessMatchingConnector
 import generators.Generators
-import models.IndividualMatchingSubmission
+import models.{BusinessMatchingSubmission, IndividualMatchingSubmission, Utr}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -49,78 +49,97 @@ class BusinessMatchingControllerSpec extends SpecBase
       ).build()
 
   "Business Matching Controller" - {
-    "should return a found business partner match when one is found" in {
+    "for an individual match" - {
+      "should return a found business partner match when one is found" in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(200, responseJson = Some(Json.obj()))))
 
-        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, individualMatchingSubmission) =>
-          val request =
-            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
-              .withJsonBody(Json.toJson(individualMatchingSubmission))
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+                .withJsonBody(Json.toJson(individualMatchingSubmission))
 
-          val result  = route(application, request).value
-          status(result) mustEqual OK
+            val result = route(application, request).value
+            status(result) mustEqual OK
         }
-    }
+      }
 
-    "should return not found when one is not found" in {
-      when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(404, responseJson = Some(Json.obj()))))
+      "should return not found when one is not found" in {
+        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(404, responseJson = Some(Json.obj()))))
 
-      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
-        (nino, individualMatchingSubmission) =>
-          val request =
-            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
-              .withJsonBody(Json.toJson(individualMatchingSubmission))
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, individualMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+                .withJsonBody(Json.toJson(individualMatchingSubmission))
 
-          val result  = route(application, request).value
-          status(result) mustEqual NOT_FOUND
+            val result = route(application, request).value
+            status(result) mustEqual NOT_FOUND
+        }
+      }
+
+      "should return authorisation errors when one is encountered" in {
+        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(401, responseJson = Some(Json.obj()))))
+
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, individualMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+                .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual UNAUTHORIZED
+        }
+      }
+
+      "should return bad request when one is encountered" in {
+        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(400, responseJson = Some(Json.obj()))))
+
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, individualMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+                .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
+        }
+      }
+
+      "should return gateway timeout when one is encountered" in {
+        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(504, responseJson = Some(Json.obj()))))
+
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, individualMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+                .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual GATEWAY_TIMEOUT
+        }
       }
     }
 
-    "should return authorisation errors when one is encountered" in {
-      when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(401, responseJson = Some(Json.obj()))))
+    "for a business match" - {
+      "should return a found business partner match when one is found" in {
+        when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(200, responseJson = Some(Json.obj()))))
 
-      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
-        (nino, individualMatchingSubmission) =>
-          val request =
-            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
-              .withJsonBody(Json.toJson(individualMatchingSubmission))
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.businessMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
 
-          val result  = route(application, request).value
-          status(result) mustEqual UNAUTHORIZED
-      }
-    }
-
-    "should return bad request when one is encountered" in {
-      when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(400, responseJson = Some(Json.obj()))))
-
-      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
-        (nino, individualMatchingSubmission) =>
-          val request =
-            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
-              .withJsonBody(Json.toJson(individualMatchingSubmission))
-
-          val result  = route(application, request).value
-          status(result) mustEqual BAD_REQUEST
-      }
-    }
-
-    "should return gateway timeout when one is encountered" in {
-      when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(504, responseJson = Some(Json.obj()))))
-
-      forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]){
-        (nino, individualMatchingSubmission) =>
-          val request =
-            FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
-              .withJsonBody(Json.toJson(individualMatchingSubmission))
-
-          val result  = route(application, request).value
-          status(result) mustEqual GATEWAY_TIMEOUT
+            val result = route(application, request).value
+            status(result) mustEqual OK
+        }
       }
     }
   }

@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+case class Utr(value: String)
 
-@Singleton
-class AppConfig @Inject()(config: Configuration) {
-  lazy val businessMatchingUrl: String = s"${config.get[Service]("microservice.services.business-matching").baseUrl}${config.get[String]("microservice.services.business-matching.startUrl")}"
-  lazy val desBearerToken: String = config.get[String]("microservice.services.business-matching.bearer-token")
-  lazy val desEnvironment: String = config.get[String]("microservice.services.business-matching.environment")
+object Utr {
+  val regex:String = "^[0-9]{10}$"
 }

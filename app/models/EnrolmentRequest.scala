@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites, Reads, __}
 
 sealed trait NameValue {
   def key: String
@@ -28,16 +28,48 @@ case class Identifier(key: String, value: String) extends NameValue
 
 object Identifier {
   implicit val format = Json.format[Identifier]
+
+  implicit lazy val writes: OWrites[Identifier] = OWrites[Identifier] {
+    identifier =>
+      Json.obj(
+        "key" -> identifier.key,
+        "value" -> identifier.value
+      )
+  }
 }
 
 case class Verifier(key: String, value: String) extends NameValue
 
 object Verifier {
   implicit val format = Json.format[Verifier]
+
+  implicit lazy val writes: OWrites[Verifier] = OWrites[Verifier] {
+    verifier =>
+      Json.obj(
+        "key" -> verifier.key,
+        "value" -> verifier.value
+      )
+  }
 }
 
 case class EnrolmentRequest(identifiers: Seq[Identifier], verifiers: Seq[Verifier])
 
 object EnrolmentRequest {
   implicit val format = Json.format[EnrolmentRequest]
+
+  implicit lazy val writes: OWrites[EnrolmentRequest] = OWrites[EnrolmentRequest] {
+    enrolmentRequest =>
+      Json.obj(
+        "identifiers" -> enrolmentRequest.identifiers,
+        "verifiers" -> enrolmentRequest.verifiers
+      )
+  }
+
+  case class EnrolmentInfo(phoneNumber: String)
+
+  object EnrolmentInfo {
+    implicit val format = Json.format[EnrolmentInfo]
+
+  }
+
 }

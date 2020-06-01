@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxEnrolmentsConnector @Inject()(val config: AppConfig, val http: HttpClient) {
 
   def createEnrolment(isInd: Boolean, postCode: String, utr: String, etmpSubscriptionId: String, isNiSource: Boolean)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Int] = {
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val url = s"${config.taxEnrolmentsUrl}"
    // def utrType = if (isInd) SaUtrTypeKey else CtUtrTypeKey
@@ -42,15 +42,6 @@ class TaxEnrolmentsConnector @Inject()(val config: AppConfig, val http: HttpClie
       identifiers = Seq(Identifier(DAC6SubIdKey, etmpSubscriptionId)),
       verifiers = Seq(/*Verifier(utrType, utr), */Verifier(PostCodeKey, postCode))
     ))
-
-
-    http.PUT[JsValue, HttpResponse](url, json) map { response =>
-      val logMsg = s"Response status: ${response.status} and response body: ${response.body} received from tax-enrolments"
-      response.status match {
-        case OK | NO_CONTENT => Logger.info(logMsg)
-        case _ => Logger.error(logMsg)
-      }
-      response.status
-    }
+    http.PUT[JsValue, HttpResponse](url, json)
   }
 }

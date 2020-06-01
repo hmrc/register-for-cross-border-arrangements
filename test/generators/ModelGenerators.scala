@@ -18,7 +18,8 @@ package generators
 
 import java.time.LocalDate
 
-import models.{Individual, IndividualMatchingSubmission, Name}
+import models.EnrolmentRequest.EnrolmentInfo
+import models.{EnrolmentRequest, Individual, IndividualMatchingSubmission, Name}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
@@ -54,5 +55,13 @@ trait ModelGenerators {
         requiresNameMatch = true,
         isAnAgent = false,
         Individual(name, dob))
+  }
+
+  implicit val arbitraryEnrolmentRequest: Arbitrary[EnrolmentRequest] = Arbitrary {
+           EnrolmentRequest(Seq(), Seq())
+  }
+
+  implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {
+    EnrolmentInfo("nivrn")
   }
 }

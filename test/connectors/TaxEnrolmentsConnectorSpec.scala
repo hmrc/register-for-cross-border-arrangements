@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package connectors
 
 import base.SpecBase
@@ -36,7 +52,29 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
           val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
             utr = "", isNiSource = true)
-          result.futureValue mustBe NO_CONTENT
+          result.futureValue.status mustBe NO_CONTENT
+    }
+
+    "must return status as 401 for unauthorized request" in {
+
+      val enrolmentRequest = EnrolmentRequest(Seq(), Seq())
+
+         stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", UNAUTHORIZED)
+
+          val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
+            utr = "", isNiSource = true)
+          result.futureValue.status mustBe UNAUTHORIZED
+    }
+
+    "must return status as 400 for a bad request" in {
+
+      val enrolmentRequest = EnrolmentRequest(Seq(), Seq())
+
+         stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", BAD_REQUEST)
+
+          val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
+            utr = "", isNiSource = true)
+          result.futureValue.status mustBe BAD_REQUEST
     }
 
     "must return status as 503 for unsuccessful Tax Enrolment call" in {
@@ -47,7 +85,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
           val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
             utr = "", isNiSource = true)
-          result.futureValue mustBe SERVICE_UNAVAILABLE
+          result.futureValue.status mustBe SERVICE_UNAVAILABLE
     }
 
    }

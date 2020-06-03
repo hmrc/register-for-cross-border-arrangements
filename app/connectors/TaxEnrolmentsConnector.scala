@@ -37,37 +37,34 @@ class TaxEnrolmentsConnector @Inject()(val config: AppConfig, val http: HttpClie
     http.PUT[JsValue, HttpResponse](url, json)
   }
 
-  def createEnrolmentRequest(enrolmentInfo: EnrolmentInfo):EnrolmentRequest = {
+  def createEnrolmentRequest(enrolmentInfo: EnrolmentInfo): EnrolmentRequest = {
 
     EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", enrolmentInfo.dac6UserID)),
-                                       verifiers = buildVerifiers(enrolmentInfo))
+      verifiers = buildVerifiers(enrolmentInfo))
   }
 
 
   private def buildVerifiers(enrolmentInfo: EnrolmentInfo): Seq[Verifier] = {
 
-   val mandatoryVerifiers = Seq(Verifier("CONTACTNAME", enrolmentInfo.primaryContactName),
-                                Verifier("EMAIL", enrolmentInfo.primaryEmailAddress))
+    val mandatoryVerifiers = Seq(Verifier("CONTACTNAME", enrolmentInfo.primaryContactName),
+      Verifier("EMAIL", enrolmentInfo.primaryEmailAddress))
 
-      mandatoryVerifiers ++
+    mandatoryVerifiers ++
       buildOptionalVerifier(enrolmentInfo.primaryTelephoneNumber, "TELEPHONE") ++
       buildOptionalVerifier(enrolmentInfo.secondaryContactName, "SECCONTACTNAME") ++
       buildOptionalVerifier(enrolmentInfo.secondaryEmailAddress, "SECEMAIL") ++
       buildOptionalVerifier(enrolmentInfo.secondaryTelephoneNumber, "SECNUMBER") ++
       buildOptionalVerifier(enrolmentInfo.businessName, "BUSINESSNAME")
 
-    }
+  }
 
-  private def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] ={
-    if(optionalInfo.isDefined) {
+  private def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] = {
+    if (optionalInfo.isDefined) {
       Seq(Verifier(key, optionalInfo.get))
-    }else Seq()
-
- }
-
-
+    } else Seq()
 
   }
+}
 
 
 

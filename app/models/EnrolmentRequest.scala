@@ -18,13 +18,7 @@ package models
 
 import play.api.libs.json.{Json, OWrites, Reads, __}
 
-sealed trait NameValue {
-  def key: String
-
-  def value: String
-}
-
-case class Identifier(key: String, value: String) extends NameValue
+case class Identifier(key: String, value: String)
 
 object Identifier {
   implicit val format = Json.format[Identifier]
@@ -38,7 +32,7 @@ object Identifier {
   }
 }
 
-case class Verifier(key: String, value: String) extends NameValue
+case class Verifier(key: String, value: String)
 
 object Verifier {
   implicit val format = Json.format[Verifier]

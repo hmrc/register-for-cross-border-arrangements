@@ -20,7 +20,7 @@ import java.util.UUID
 
 import config.AppConfig
 import javax.inject.Inject
-import models.IndividualMatchingSubmission
+import models.{BusinessMatchingSubmission, IndividualMatchingSubmission}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -41,6 +41,17 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
     http.POST[IndividualMatchingSubmission, HttpResponse](submissionUrl, individualSubmission)(wts = IndividualMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
   }
 
+  def sendBusinessMatchingInformation(utr: String, businessSubmission: BusinessMatchingSubmission)
+                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+    val submissionUrl = s"${config.businessMatchingUrl}/registration/organisation/utr/$utr"
+
+    val newHeaders = hc
+      .copy(authorization = Some(Authorization(s"Bearer ${config.desBearerToken}")))
+      .withExtraHeaders(addHeaders(): _*)
+
+    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission)(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
+  }
+
   private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
     Seq(
       "X-Forwarded-Host" -> "mdtp",
@@ -49,6 +60,7 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
       },
+      "Environment" -> config.desEnvironment,
       "Content-Type"     -> "application/json",
       "Accept"           -> "application/json"
     )

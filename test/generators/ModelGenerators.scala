@@ -19,10 +19,11 @@ package generators
 import java.time.LocalDate
 
 import models.EnrolmentRequest.EnrolmentInfo
-import models.{EnrolmentRequest, Individual, IndividualMatchingSubmission, Name}
+import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
+import wolfendale.scalacheck.regexp.RegexpGen
 
 trait ModelGenerators {
  self: Generators =>
@@ -42,6 +43,12 @@ trait ModelGenerators {
     } yield Nino(f"$prefix$number%06d$suffix")
   }
 
+  implicit val arbitraryUtr: Arbitrary[Utr] = Arbitrary {
+    for {
+      value <- Gen.listOfN(10, Gen.chooseNum(0, 9)).map(_.mkString)
+    } yield Utr(value)
+  }
+
   implicit lazy val arbitraryLocalDate: Arbitrary[LocalDate] = Arbitrary {
     datesBetween(LocalDate.of(1900, 1, 1), LocalDate.of(2100, 1, 1))
   }
@@ -51,11 +58,24 @@ trait ModelGenerators {
       name <- arbitrary[Name]
       dob <- arbitrary[LocalDate]
     } yield
-      IndividualMatchingSubmission("Don't know",
+      IndividualMatchingSubmission("DACSIX",
         requiresNameMatch = true,
         isAnAgent = false,
         Individual(name, dob))
   }
+
+  implicit val arbitraryBusinessMatchingSubmission: Arbitrary[BusinessMatchingSubmission] = Arbitrary {
+    for {
+      organisationName <- RegexpGen.from("^[a-zA-Z0-9 '&\\\\/]{1,105}$")
+      organisationType <- Gen.oneOf(partnerShip, limitedLiability, corporateBody, unIncorporatedBody, other)
+    } yield
+      BusinessMatchingSubmission("DACSIX",
+        requiresNameMatch = true,
+        isAnAgent = false,
+        Organisation(organisationName, organisationType))
+  }
+
+
 
   implicit val arbitraryEnrolmentRequest: Arbitrary[EnrolmentRequest] = Arbitrary {
            EnrolmentRequest(Seq(), Seq())

@@ -18,7 +18,7 @@ package controllers
 
 import connectors.BusinessMatchingConnector
 import javax.inject.Inject
-import models.IndividualMatchingSubmission
+import models.{BusinessMatchingSubmission, IndividualMatchingSubmission}
 import play.api.libs.json.{JsResult, JsValue}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.domain.Nino
@@ -43,6 +43,21 @@ class BusinessMatchingController @Inject()(
         valid = ims =>
           for {
             response <- businessMatchingConnector.sendIndividualMatchingInformation(nino, ims)
+            result = convertToResult(response)
+          } yield result
+      )
+  }
+
+  def businessMatchingSubmission(utr: String): Action[JsValue] = Action(parse.json).async {
+    implicit request =>
+      val businessMatchingSubmissionResult: JsResult[BusinessMatchingSubmission] =
+        request.body.validate[BusinessMatchingSubmission]
+
+      businessMatchingSubmissionResult.fold(
+        invalid = _ => Future.successful(BadRequest("")),
+        valid = bms =>
+          for {
+            response <- businessMatchingConnector.sendBusinessMatchingInformation(utr, bms)
             result = convertToResult(response)
           } yield result
       )

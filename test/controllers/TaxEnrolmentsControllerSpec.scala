@@ -17,10 +17,9 @@
 package controllers
 
 import base.SpecBase
-import connectors.{BusinessMatchingConnector, TaxEnrolmentsConnector}
+import connectors.TaxEnrolmentsConnector
 import generators.Generators
 import models.EnrolmentRequest.EnrolmentInfo
-import models.{EnrolmentRequest, IndividualMatchingSubmission}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -30,9 +29,8 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{POST, route, status, _}
+import play.api.test.Helpers.{route, status, _}
 import play.api.{Application, Configuration}
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
@@ -51,7 +49,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
 
   "Business Matching Controller" - {
     "should return a found business partner match when one is found" in {
-      when(mockTaxEnrolmentsConnector.createEnrolment(any(), any(), any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(200, responseJson = Some(Json.obj()))))
 
       forAll(arbitrary[EnrolmentInfo]){
@@ -67,7 +65,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
 
 
     "should return authorisation errors when one is encountered" in {
-      when(mockTaxEnrolmentsConnector.createEnrolment(any(), any(), any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(401, responseJson = Some(Json.obj()))))
 
       forAll(arbitrary[EnrolmentInfo]){
@@ -82,7 +80,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
     }
 
     "should return bad request when one is encountered" in {
-      when(mockTaxEnrolmentsConnector.createEnrolment(any(), any(), any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(400, responseJson = Some(Json.obj()))))
 
       forAll(arbitrary[EnrolmentInfo]){
@@ -97,7 +95,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
     }
 
     "should return gateway timeout when one is encountered" in {
-      when(mockTaxEnrolmentsConnector.createEnrolment(any(), any(), any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(504, responseJson = Some(Json.obj()))))
 
       forAll(arbitrary[EnrolmentInfo]){

@@ -21,7 +21,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, put, urlEqual
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.EnrolmentRequest
+import models.EnrolmentRequest.EnrolmentInfo
+import models.{EnrolmentRequest, Identifier, Verifier}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.http.Status._
@@ -42,54 +43,98 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
   lazy val connector: TaxEnrolmentsConnector = app.injector.instanceOf[TaxEnrolmentsConnector]
 
+  val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
+    businessName = None,
+    primaryContactName = "name",
+    primaryEmailAddress = "primaryEmail",
+    primaryTelephoneNumber = None,
+    secondaryContactName = None,
+    secondaryEmailAddress = None,
+    secondaryTelephoneNumber = None)
+
   "TaxEnrolmentsConnector" - {
 
-    "must return status as 204 for successful Tax Enrolment call" in {
+    "createEnrolment" - {
 
-      val enrolmentRequest = EnrolmentRequest(Seq(), Seq())
+      "must return status as 204 for successful Tax Enrolment call" in {
 
-         stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", NO_CONTENT)
+        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", NO_CONTENT)
 
-          val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
-            utr = "", isNiSource = true)
-          result.futureValue.status mustBe NO_CONTENT
+        val result = connector.createEnrolment(enrolmentInfo)
+        result.futureValue.status mustBe NO_CONTENT
+      }
+
+      "must return status as 401 for unauthorized request" in {
+
+        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", UNAUTHORIZED)
+
+        val result = connector.createEnrolment(enrolmentInfo)
+        result.futureValue.status mustBe UNAUTHORIZED
+      }
+
+      "must return status as 400 for a bad request" in {
+
+        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", BAD_REQUEST)
+
+        val result = connector.createEnrolment(enrolmentInfo)
+        result.futureValue.status mustBe BAD_REQUEST
+      }
+
+      "must return status as 503 for unsuccessful Tax Enrolment call" in {
+
+        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", SERVICE_UNAVAILABLE)
+
+        val result = connector.createEnrolment(enrolmentInfo)
+        result.futureValue.status mustBe SERVICE_UNAVAILABLE
+      }
     }
+    "createEnrolmentRequest" - {
 
-    "must return status as 401 for unauthorized request" in {
+      "must return correct EnrolmentRequest when all values populated in EnrolmentInfo" in {
 
-      val enrolmentRequest = EnrolmentRequest(Seq(), Seq())
+      val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
+          primaryContactName = "priConName",
+          primaryEmailAddress = "primaryEmail",
+          primaryTelephoneNumber = Some("priConNumber"),
+          secondaryContactName = Some("secConName"),
+          secondaryEmailAddress = Some("secConEmail"),
+          secondaryTelephoneNumber = Some("secConNumber"),
+          businessName = Some("businessName"))
 
-         stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", UNAUTHORIZED)
 
-          val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
-            utr = "", isNiSource = true)
-          result.futureValue.status mustBe UNAUTHORIZED
+        val expectedVerifiers = Seq(Verifier("CONTACTNAME", "priConName"),
+                                    Verifier("EMAIL", "primaryEmail"),
+                                    Verifier("TELEPHONE", "priConNumber"),
+                                    Verifier("SECCONTACTNAME", "secConName"),
+                                    Verifier("SECEMAIL", "secConEmail"),
+                                    Verifier("SECNUMBER", "secConNumber"),
+                                    Verifier("BUSINESSNAME", "businessName"))
+
+        val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
+                                                        verifiers = expectedVerifiers)
+
+       connector.createEnrolmentRequest(enrolmentInfo) mustBe expectedEnrolmentRequest
+
+      }
+
+     "must return correct EnrolmentRequest when all only mandatory values populated in EnrolmentInfo" in {
+
+      val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
+                                        primaryContactName = "priConName",
+                                        primaryEmailAddress = "primaryEmail")
+
+        val expectedVerifiers = Seq(Verifier("CONTACTNAME", "priConName"),
+                                    Verifier("EMAIL", "primaryEmail"))
+
+        val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
+                                                        verifiers = expectedVerifiers)
+
+       connector.createEnrolmentRequest(enrolmentInfo) mustBe expectedEnrolmentRequest
+
+      }
+
     }
-
-    "must return status as 400 for a bad request" in {
-
-      val enrolmentRequest = EnrolmentRequest(Seq(), Seq())
-
-         stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", BAD_REQUEST)
-
-          val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
-            utr = "", isNiSource = true)
-          result.futureValue.status mustBe BAD_REQUEST
-    }
-
-    "must return status as 503 for unsuccessful Tax Enrolment call" in {
-
-      val enrolmentRequest = EnrolmentRequest(Seq(), Seq())
-
-         stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", SERVICE_UNAVAILABLE)
-
-          val result = connector.createEnrolment(isInd = true, postCode = "", etmpSubscriptionId = "",
-            utr = "", isNiSource = true)
-          result.futureValue.status mustBe SERVICE_UNAVAILABLE
-    }
-
-   }
-
+  }
   private def stubResponseForPutRequest(expectedUrl: String, expectedStatus: Int): StubMapping =
     server.stubFor(
       put(urlEqualTo(expectedUrl))

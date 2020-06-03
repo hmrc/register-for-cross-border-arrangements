@@ -65,8 +65,12 @@ object EnrolmentRequest {
       )
   }
 
-  case class EnrolmentInfo(phoneNumber: String)
-
+  case class EnrolmentInfo (dac6UserID: String, primaryContactName: String,
+                            primaryEmailAddress: String, primaryTelephoneNumber: Option[String] = None,
+                            secondaryContactName: Option[String] = None, secondaryEmailAddress: Option[String] = None,
+                            secondaryTelephoneNumber: Option[String] = None,
+                            businessName: Option[String] = None,
+                           )
   object EnrolmentInfo {
     implicit val format = Json.format[EnrolmentInfo]
 

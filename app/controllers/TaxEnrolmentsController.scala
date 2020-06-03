@@ -18,32 +18,29 @@ package controllers
 
 import connectors.TaxEnrolmentsConnector
 import javax.inject.Inject
-import models.EnrolmentRequest
 import models.EnrolmentRequest.EnrolmentInfo
 import play.api.libs.json.{JsResult, JsValue}
 import play.api.mvc.{Action, ControllerComponents, Result}
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsController @Inject()(
-                                         taxEnrolmentsConnector: TaxEnrolmentsConnector,
-                                         override val controllerComponents: ControllerComponents)
+class TaxEnrolmentsController @Inject()(taxEnrolmentsConnector: TaxEnrolmentsConnector,
+                                        override val controllerComponents: ControllerComponents)
                                        (implicit executionContext: ExecutionContext) extends
   BackendController(controllerComponents) {
 
   def createEnrolment: Action[JsValue] = Action(parse.json).async {
     implicit request =>
-      val enrolmentRequest: JsResult[EnrolmentInfo] =
+      val enrolmentInfoJs: JsResult[EnrolmentInfo] =
         request.body.validate[EnrolmentInfo]
 
-      enrolmentRequest.fold(
-        invalid = _ => Future.successful(BadRequest("")),
-        valid = ims =>
+      enrolmentInfoJs.fold(
+        invalid = _ => Future.successful(BadRequest("malformed EnrolmentInfo")),
+        valid = enrolmentInfo =>
           for {
-            response <- taxEnrolmentsConnector.createEnrolment(true, "", "", "", true)
+            response <- taxEnrolmentsConnector.createEnrolment(enrolmentInfo)
             result = convertToResult(response)
           } yield result
       )
@@ -62,6 +59,4 @@ class TaxEnrolmentsController @Inject()(
       case _ => InternalServerError(httpResponse.body)
     }
   }
-
-
 }

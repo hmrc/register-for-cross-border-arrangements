@@ -62,6 +62,13 @@ trait ModelGenerators {
   }
 
   implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {
-    EnrolmentInfo("nivrn")
+    EnrolmentInfo(dac6UserID = arbitrary[String].toString,
+      businessName = None,
+      primaryContactName = arbitrary[String].toString,
+      primaryEmailAddress = arbitrary[String].toString,
+      primaryTelephoneNumber = None,
+      secondaryContactName = None,
+      secondaryEmailAddress = None,
+      secondaryTelephoneNumber = None)
   }
 }

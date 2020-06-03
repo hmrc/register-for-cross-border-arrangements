@@ -18,9 +18,8 @@ package connectors
 
 import com.google.inject.Inject
 import config.AppConfig
+import models.EnrolmentRequest.EnrolmentInfo
 import models.{EnrolmentRequest, Identifier, Verifier}
-import play.api.Logger
-import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -29,19 +28,47 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentsConnector @Inject()(val config: AppConfig, val http: HttpClient) {
 
-  def createEnrolment(isInd: Boolean, postCode: String, utr: String, etmpSubscriptionId: String, isNiSource: Boolean)
+  def createEnrolment(enrolmentInfo: EnrolmentInfo)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val url = s"${config.taxEnrolmentsUrl}"
-   // def utrType = if (isInd) SaUtrTypeKey else CtUtrTypeKey
 
-    lazy val DAC6SubIdKey = "DAC6SUBID"
-    lazy val PostCodeKey =  "POSTCODE"
-
-    val json = Json.toJson(EnrolmentRequest(
-      identifiers = Seq(Identifier(DAC6SubIdKey, etmpSubscriptionId)),
-      verifiers = Seq(/*Verifier(utrType, utr), */Verifier(PostCodeKey, postCode))
-    ))
+    val json = Json.toJson(createEnrolmentRequest(enrolmentInfo))
     http.PUT[JsValue, HttpResponse](url, json)
   }
-}
+
+  def createEnrolmentRequest(enrolmentInfo: EnrolmentInfo):EnrolmentRequest = {
+
+    EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", enrolmentInfo.dac6UserID)),
+                                       verifiers = buildVerifiers(enrolmentInfo))
+  }
+
+
+  private def buildVerifiers(enrolmentInfo: EnrolmentInfo): Seq[Verifier] = {
+
+   val mandatoryVerifiers = Seq(Verifier("CONTACTNAME", enrolmentInfo.primaryContactName),
+                                Verifier("EMAIL", enrolmentInfo.primaryEmailAddress))
+
+      mandatoryVerifiers ++
+      buildOptionalVerifier(enrolmentInfo.primaryTelephoneNumber, "TELEPHONE") ++
+      buildOptionalVerifier(enrolmentInfo.secondaryContactName, "SECCONTACTNAME") ++
+      buildOptionalVerifier(enrolmentInfo.secondaryEmailAddress, "SECEMAIL") ++
+      buildOptionalVerifier(enrolmentInfo.secondaryTelephoneNumber, "SECNUMBER") ++
+      buildOptionalVerifier(enrolmentInfo.businessName, "BUSINESSNAME")
+
+    }
+
+  private def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] ={
+    if(optionalInfo.isDefined) {
+      Seq(Verifier(key, optionalInfo.get))
+    }else Seq()
+
+ }
+
+
+
+  }
+
+
+
+

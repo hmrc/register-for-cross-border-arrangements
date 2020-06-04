@@ -19,7 +19,6 @@ package connectors
 import com.google.inject.Inject
 import config.AppConfig
 import models.EnrolmentRequest.EnrolmentInfo
-import models.{EnrolmentRequest, Identifier, Verifier}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -33,38 +32,10 @@ class TaxEnrolmentsConnector @Inject()(val config: AppConfig, val http: HttpClie
 
     val url = s"${config.taxEnrolmentsUrl}"
 
-    val json = Json.toJson(createEnrolmentRequest(enrolmentInfo))
+    val json = Json.toJson(enrolmentInfo.convertToEnrolmentRequest)
     http.PUT[JsValue, HttpResponse](url, json)
   }
-
-  def createEnrolmentRequest(enrolmentInfo: EnrolmentInfo): EnrolmentRequest = {
-
-    EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", enrolmentInfo.dac6UserID)),
-      verifiers = buildVerifiers(enrolmentInfo))
-  }
-
-
-  private def buildVerifiers(enrolmentInfo: EnrolmentInfo): Seq[Verifier] = {
-
-    val mandatoryVerifiers = Seq(Verifier("CONTACTNAME", enrolmentInfo.primaryContactName),
-      Verifier("EMAIL", enrolmentInfo.primaryEmailAddress))
-
-    mandatoryVerifiers ++
-      buildOptionalVerifier(enrolmentInfo.primaryTelephoneNumber, "TELEPHONE") ++
-      buildOptionalVerifier(enrolmentInfo.secondaryContactName, "SECCONTACTNAME") ++
-      buildOptionalVerifier(enrolmentInfo.secondaryEmailAddress, "SECEMAIL") ++
-      buildOptionalVerifier(enrolmentInfo.secondaryTelephoneNumber, "SECNUMBER") ++
-      buildOptionalVerifier(enrolmentInfo.businessName, "BUSINESSNAME")
-
-  }
-
-  private def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] = {
-    if (optionalInfo.isDefined) {
-      Seq(Verifier(key, optionalInfo.get))
-    } else Seq()
-
-  }
-}
+ }
 
 
 

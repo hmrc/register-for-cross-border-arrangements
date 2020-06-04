@@ -59,12 +59,42 @@ object EnrolmentRequest {
       )
   }
 
-  case class EnrolmentInfo (dac6UserID: String, primaryContactName: String,
-                            primaryEmailAddress: String, primaryTelephoneNumber: Option[String] = None,
-                            secondaryContactName: Option[String] = None, secondaryEmailAddress: Option[String] = None,
+  case class EnrolmentInfo (dac6UserID: String,
+                            primaryContactName: String,
+                            primaryEmailAddress: String,
+                            primaryTelephoneNumber: Option[String] = None,
+                            secondaryContactName: Option[String] = None,
+                            secondaryEmailAddress: Option[String] = None,
                             secondaryTelephoneNumber: Option[String] = None,
                             businessName: Option[String] = None,
-                           )
+                           ) {
+
+    def convertToEnrolmentRequest: EnrolmentRequest = {
+
+      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", dac6UserID)),
+                        verifiers = buildVerifiers)
+    }
+
+     def buildVerifiers: Seq[Verifier] = {
+
+      val mandatoryVerifiers = Seq(Verifier("CONTACTNAME", primaryContactName),
+        Verifier("EMAIL", primaryEmailAddress))
+
+      mandatoryVerifiers ++
+        buildOptionalVerifier(primaryTelephoneNumber, "TELEPHONE") ++
+        buildOptionalVerifier(secondaryContactName, "SECCONTACTNAME") ++
+        buildOptionalVerifier(secondaryEmailAddress, "SECEMAIL") ++
+        buildOptionalVerifier(secondaryTelephoneNumber, "SECNUMBER") ++
+        buildOptionalVerifier(businessName, "BUSINESSNAME")
+
+    }
+
+     def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] = {
+      optionalInfo.map(info => Verifier(key, info)).toSeq
+
+    }
+
+  }
   object EnrolmentInfo {
     implicit val format = Json.format[EnrolmentInfo]
 

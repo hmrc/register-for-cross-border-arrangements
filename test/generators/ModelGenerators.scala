@@ -77,18 +77,50 @@ trait ModelGenerators {
 
 
 
-  implicit val arbitraryEnrolmentRequest: Arbitrary[EnrolmentRequest] = Arbitrary {
-           EnrolmentRequest(Seq(), Seq())
+  implicit val arbitraryEnrolmentRequest: Arbitrary[EnrolmentRequest] = {
+    implicit val arbitraryIdentifier: Arbitrary[Identifier] = Arbitrary {
+      for {
+        key <- arbitrary[String]
+        value <- arbitrary[String]
+      } yield Identifier(key, value)
+    }
+
+    implicit val arbitraryVerifier: Arbitrary[Verifier] = Arbitrary {
+      for {
+        key <- arbitrary[String]
+        value <- arbitrary[String]
+      } yield Verifier(key, value)
+    }
+
+    Arbitrary {
+      for {
+        identifiers <- Gen.listOf(arbitrary[Identifier])
+        verifiers <- Gen.listOf(arbitrary[Verifier])
+      } yield
+        EnrolmentRequest(identifiers, verifiers)
+    }
   }
 
-  implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {
-    EnrolmentInfo(dac6UserID = arbitrary[String].toString,
-      businessName = None,
-      primaryContactName = arbitrary[String].toString,
-      primaryEmailAddress = arbitrary[String].toString,
-      primaryTelephoneNumber = None,
-      secondaryContactName = None,
-      secondaryEmailAddress = None,
-      secondaryTelephoneNumber = None)
+  implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {for {
+    userid <- arbitrary[String]
+    primaryContactName <- arbitrary[String]
+    primaryEmailAddress <- arbitrary[String]
+    businessName <- Gen.option(arbitrary[String])
+    primaryTelephoneNumber <- Gen.option(arbitrary[String])
+    secondaryContactName <- Gen.option(arbitrary[String])
+    secondaryEmailAddress <- Gen.option(arbitrary[String])
+    secondaryTelephoneNumber <- Gen.option(arbitrary[String])
+  } yield
+    EnrolmentInfo(
+      dac6UserID = userid,
+      businessName = businessName,
+      primaryContactName = primaryContactName,
+      primaryEmailAddress = primaryEmailAddress,
+      primaryTelephoneNumber = primaryTelephoneNumber,
+      secondaryContactName = secondaryContactName,
+      secondaryEmailAddress = secondaryEmailAddress,
+      secondaryTelephoneNumber = secondaryTelephoneNumber
+    )
   }
+
 }

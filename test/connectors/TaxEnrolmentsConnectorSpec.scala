@@ -113,7 +113,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
         val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
                                                         verifiers = expectedVerifiers)
 
-       connector.createEnrolmentRequest(enrolmentInfo) mustBe expectedEnrolmentRequest
+      enrolmentInfo.convertToEnrolmentRequest mustBe expectedEnrolmentRequest
 
       }
 
@@ -129,8 +129,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
         val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
                                                         verifiers = expectedVerifiers)
 
-       connector.createEnrolmentRequest(enrolmentInfo) mustBe expectedEnrolmentRequest
-
+       enrolmentInfo.convertToEnrolmentRequest mustBe expectedEnrolmentRequest
       }
 
     }

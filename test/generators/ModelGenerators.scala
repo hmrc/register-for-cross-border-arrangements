@@ -18,6 +18,7 @@ package generators
 
 import java.time.LocalDate
 
+import models.EnrolmentRequest.EnrolmentInfo
 import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -74,5 +75,52 @@ trait ModelGenerators {
         Organisation(organisationName, organisationType))
   }
 
+
+
+  implicit val arbitraryEnrolmentRequest: Arbitrary[EnrolmentRequest] = {
+    implicit val arbitraryIdentifier: Arbitrary[Identifier] = Arbitrary {
+      for {
+        key <- arbitrary[String]
+        value <- arbitrary[String]
+      } yield Identifier(key, value)
+    }
+
+    implicit val arbitraryVerifier: Arbitrary[Verifier] = Arbitrary {
+      for {
+        key <- arbitrary[String]
+        value <- arbitrary[String]
+      } yield Verifier(key, value)
+    }
+
+    Arbitrary {
+      for {
+        identifiers <- Gen.listOf(arbitrary[Identifier])
+        verifiers <- Gen.listOf(arbitrary[Verifier])
+      } yield
+        EnrolmentRequest(identifiers, verifiers)
+    }
+  }
+
+  implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {for {
+    userid <- arbitrary[String]
+    primaryContactName <- arbitrary[String]
+    primaryEmailAddress <- arbitrary[String]
+    businessName <- Gen.option(arbitrary[String])
+    primaryTelephoneNumber <- Gen.option(arbitrary[String])
+    secondaryContactName <- Gen.option(arbitrary[String])
+    secondaryEmailAddress <- Gen.option(arbitrary[String])
+    secondaryTelephoneNumber <- Gen.option(arbitrary[String])
+  } yield
+    EnrolmentInfo(
+      dac6UserID = userid,
+      businessName = businessName,
+      primaryContactName = primaryContactName,
+      primaryEmailAddress = primaryEmailAddress,
+      primaryTelephoneNumber = primaryTelephoneNumber,
+      secondaryContactName = secondaryContactName,
+      secondaryEmailAddress = secondaryEmailAddress,
+      secondaryTelephoneNumber = secondaryTelephoneNumber
+    )
+  }
 
 }

@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{Json, OWrites, Reads, __}
+import play.api.libs.json.{Json, OWrites}
 
 case class Identifier(key: String, value: String)
 

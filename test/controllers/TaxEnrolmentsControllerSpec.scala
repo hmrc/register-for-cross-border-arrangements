@@ -50,7 +50,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
   "Business Matching Controller" - {
     "should return a found business partner match when one is found" in {
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(200, responseJson = Some(Json.obj()))))
+        .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
       forAll(arbitrary[EnrolmentInfo]){
         (enrolmentInfo) =>
@@ -66,7 +66,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
 
     "should return authorisation errors when one is encountered" in {
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(401, responseJson = Some(Json.obj()))))
+        .thenReturn(Future.successful(HttpResponse(401, Json.obj(), Map.empty[String, Seq[String]])))
 
       forAll(arbitrary[EnrolmentInfo]){
         (enrolmentInfo) =>
@@ -81,7 +81,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
 
     "should return bad request when one is encountered" in {
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(400, responseJson = Some(Json.obj()))))
+        .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
       forAll(arbitrary[EnrolmentInfo]){
         (enrolmentInfo) =>
@@ -96,7 +96,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
 
     "should return gateway timeout when one is encountered" in {
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(504, responseJson = Some(Json.obj()))))
+        .thenReturn(Future.successful(HttpResponse(504, Json.obj(), Map.empty[String, Seq[String]])))
 
       forAll(arbitrary[EnrolmentInfo]){
         (enrolmentInfo) =>

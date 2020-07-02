@@ -52,7 +52,7 @@ class BusinessMatchingControllerSpec extends SpecBase
     "for an individual match" - {
       "should return a found business partner match when one is found" in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(200, responseJson = Some(Json.obj()))))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, individualMatchingSubmission) =>
@@ -67,7 +67,7 @@ class BusinessMatchingControllerSpec extends SpecBase
 
       "should return not found when one is not found" in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(404, responseJson = Some(Json.obj()))))
+          .thenReturn(Future.successful(HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, individualMatchingSubmission) =>
@@ -82,7 +82,7 @@ class BusinessMatchingControllerSpec extends SpecBase
 
       "should return authorisation errors when one is encountered" in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(401, responseJson = Some(Json.obj()))))
+          .thenReturn(Future.successful(HttpResponse(401, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, individualMatchingSubmission) =>
@@ -97,7 +97,7 @@ class BusinessMatchingControllerSpec extends SpecBase
 
       "should return bad request when one is encountered" in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(400, responseJson = Some(Json.obj()))))
+          .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, individualMatchingSubmission) =>
@@ -112,7 +112,7 @@ class BusinessMatchingControllerSpec extends SpecBase
 
       "should return gateway timeout when one is encountered" in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(504, responseJson = Some(Json.obj()))))
+          .thenReturn(Future.successful(HttpResponse(504, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, individualMatchingSubmission) =>
@@ -129,7 +129,7 @@ class BusinessMatchingControllerSpec extends SpecBase
     "for a business match" - {
       "should return a found business partner match when one is found" in {
         when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(200, responseJson = Some(Json.obj()))))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
           (utr, businessMatchingSubmission) =>

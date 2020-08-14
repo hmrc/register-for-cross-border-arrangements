@@ -1,5 +1,6 @@
 # microservice specific routes
 
 POST    /matching/individual/:nino          controllers.BusinessMatchingController.individualMatchingSubmission(nino: Nino)
+POST    /matching/individual/utr/:utr       controllers.BusinessMatchingController.soleProprietorMatchingSubmission(utr: String)
 POST    /matching/organisation/:utr         controllers.BusinessMatchingController.businessMatchingSubmission(utr: String)
-PUT    /enrolment/create-enrolment  controllers.TaxEnrolmentsController.createEnrolment
+PUT     /enrolment/create-enrolment         controllers.TaxEnrolmentsController.createEnrolment

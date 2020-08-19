@@ -84,6 +84,41 @@ class BusinessMatchingConnectorSpec extends SpecBase
       }
     }
 
+    "for a sole proprietor matching submission" - {
+      "must return status as OK for submission of valid Sole Proprietor Matching Submission" in {
+
+        forAll(RegexpGen.from(Utr.regex), arbitrary[BusinessMatchingSubmission]) {
+          (utr, bms) =>
+            stubResponse(s"/register-for-cross-border-arrangement-stubs/registration/individual/utr/$utr", OK)
+
+            val result = connector.sendSoleProprietorMatchingInformation(utr, bms)
+            result.futureValue.status mustBe OK
+        }
+      }
+
+      "must return status as BAD_REQUEST for submission of invalid arrival notification" in {
+
+        forAll(RegexpGen.from(Utr.regex), arbitrary[BusinessMatchingSubmission]) {
+          (utr, bms) =>
+            stubResponse(s"/register-for-cross-border-arrangement-stubs/registration/individual/utr/$utr", BAD_REQUEST)
+
+            val result = connector.sendSoleProprietorMatchingInformation(utr, bms)
+            result.futureValue.status mustBe BAD_REQUEST
+        }
+      }
+
+      "must return status as INTERNAL_SERVER_ERROR for technical error incurred" in {
+
+        forAll(RegexpGen.from(Utr.regex), arbitrary[BusinessMatchingSubmission]) {
+          (utr, bms) =>
+            stubResponse(s"/register-for-cross-border-arrangement-stubs/registration/individual/utr/$utr", INTERNAL_SERVER_ERROR)
+
+            val result = connector.sendSoleProprietorMatchingInformation(utr, bms)
+            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+    }
+
     "for an business matching submission" - {
       "must return status as OK for submission of valid Business Matching Submission" in {
 

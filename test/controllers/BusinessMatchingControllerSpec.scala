@@ -126,6 +126,38 @@ class BusinessMatchingControllerSpec extends SpecBase
       }
     }
 
+    "for a sole proprietor match" - {
+      "should return a found business partner match when one is found" in {
+        when(mockBusinessMatchingConnector.sendSoleProprietorMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(OK, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.soleProprietorMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual OK
+        }
+      }
+
+      "should return not found when one is not found" in {
+        when(mockBusinessMatchingConnector.sendSoleProprietorMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.soleProprietorMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual NOT_FOUND
+        }
+      }
+    }
+
     "for a business match" - {
       "should return a found business partner match when one is found" in {
         when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))

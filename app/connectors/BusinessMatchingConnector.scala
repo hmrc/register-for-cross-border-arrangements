@@ -16,6 +16,8 @@
 
 package connectors
 
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 import config.AppConfig
@@ -62,9 +64,14 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
     http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission)(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
   }
 
-  private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
+  private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
+
+    //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
+    val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
+
     Seq(
       "x-forwarded-host" -> "mdtp",
+      "date" -> ZonedDateTime.now().format(formatter),
       "x-correlation-id" -> {
         headerCarrier.sessionId
           .map(_.value)
@@ -75,9 +82,9 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
       },
-      "environment"     -> config.desEnvironment,
       "content-type"    -> "application/json",
       "accept"          -> "application/json"
     )
+  }
 
 }

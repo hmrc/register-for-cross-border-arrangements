@@ -82,12 +82,8 @@ class BusinessMatchingController @Inject()(
   private def convertToResult(httpResponse: HttpResponse): Result = {
     httpResponse.status match {
       case OK => Ok(httpResponse.body)
-      case NOT_FOUND => NotFound(httpResponse.body)
       case BAD_REQUEST => BadRequest(httpResponse.body)
-      case UNAUTHORIZED => Unauthorized(httpResponse.body)
-      case SERVICE_UNAVAILABLE => ServiceUnavailable(httpResponse.body)
-      case BAD_GATEWAY => BadGateway(httpResponse.body)
-      case GATEWAY_TIMEOUT => GatewayTimeout(httpResponse.body)
+      case FORBIDDEN => Forbidden(httpResponse.body)
       case _ => InternalServerError(httpResponse.body)
     }
   }

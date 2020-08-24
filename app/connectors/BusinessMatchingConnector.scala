@@ -16,6 +16,8 @@
 
 package connectors
 
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 import config.AppConfig
@@ -23,8 +25,7 @@ import javax.inject.Inject
 import models.{BusinessMatchingSubmission, IndividualMatchingSubmission}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -63,17 +64,27 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
     http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission)(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
   }
 
-  private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
+  private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
+
+    //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
+    val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
+
     Seq(
-      "X-Forwarded-Host" -> "mdtp",
-      "X-Correlation-ID" -> {
+      "x-forwarded-host" -> "mdtp",
+      "date" -> ZonedDateTime.now().format(formatter),
+      "x-correlation-id" -> {
         headerCarrier.sessionId
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
       },
-      "Environment" -> config.desEnvironment,
-      "Content-Type"     -> "application/json",
-      "Accept"           -> "application/json"
+      "x-conversation-id" -> {
+        headerCarrier.requestId
+          .map(_.value)
+          .getOrElse(UUID.randomUUID().toString)
+      },
+      "content-type"    -> "application/json",
+      "accept"          -> "application/json"
     )
+  }
 
 }

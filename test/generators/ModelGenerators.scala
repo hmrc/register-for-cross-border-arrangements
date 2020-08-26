@@ -103,24 +103,18 @@ trait ModelGenerators {
 
   implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {for {
     userid <- arbitrary[String]
-    primaryContactName <- arbitrary[String]
-    primaryEmailAddress <- arbitrary[String]
-    businessName <- Gen.option(arbitrary[String])
-    primaryTelephoneNumber <- Gen.option(arbitrary[String])
-    secondaryContactName <- Gen.option(arbitrary[String])
-    secondaryEmailAddress <- Gen.option(arbitrary[String])
-    secondaryTelephoneNumber <- Gen.option(arbitrary[String])
+    safeId <- arbitrary[String]
+    utr <- Gen.option(arbitrary[String])
+    nino <- Gen.option(arbitrary[String])
+    nonUkPostcode <- Gen.option(arbitrary[String])
+
   } yield
     EnrolmentInfo(
       dac6UserID = userid,
-      businessName = businessName,
-      primaryContactName = primaryContactName,
-      primaryEmailAddress = primaryEmailAddress,
-      primaryTelephoneNumber = primaryTelephoneNumber,
-      secondaryContactName = secondaryContactName,
-      secondaryEmailAddress = secondaryEmailAddress,
-      secondaryTelephoneNumber = secondaryTelephoneNumber
-    )
+      safeID = safeId,
+      utr = utr,
+      nino = nino,
+      nonUkPostcode = nonUkPostcode)
   }
 
 }

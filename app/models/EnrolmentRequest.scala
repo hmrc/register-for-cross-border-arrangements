@@ -60,14 +60,10 @@ object EnrolmentRequest {
   }
 
   case class EnrolmentInfo (dac6UserID: String,
-                            primaryContactName: String,
-                            primaryEmailAddress: String,
-                            primaryTelephoneNumber: Option[String] = None,
-                            secondaryContactName: Option[String] = None,
-                            secondaryEmailAddress: Option[String] = None,
-                            secondaryTelephoneNumber: Option[String] = None,
-                            businessName: Option[String] = None,
-                           ) {
+                            safeID: String,
+                            utr: Option[String] = None,
+                            nino: Option[String] = None,
+                            nonUkPostcode: Option[String] = None) {
 
     def convertToEnrolmentRequest: EnrolmentRequest = {
 
@@ -77,15 +73,12 @@ object EnrolmentRequest {
 
      def buildVerifiers: Seq[Verifier] = {
 
-      val mandatoryVerifiers = Seq(Verifier("CONTACTNAME", primaryContactName),
-        Verifier("EMAIL", primaryEmailAddress))
+      val mandatoryVerifiers = Seq(Verifier("SAFEID", safeID))
 
       mandatoryVerifiers ++
-        buildOptionalVerifier(primaryTelephoneNumber, "TELEPHONE") ++
-        buildOptionalVerifier(secondaryContactName, "SECCONTACTNAME") ++
-        buildOptionalVerifier(secondaryEmailAddress, "SECEMAIL") ++
-        buildOptionalVerifier(secondaryTelephoneNumber, "SECNUMBER") ++
-        buildOptionalVerifier(businessName, "BUSINESSNAME")
+        buildOptionalVerifier(utr, "UTR") ++
+        buildOptionalVerifier(nino, "NINO") ++
+        buildOptionalVerifier(nonUkPostcode, "NonUKPostalCode")
 
     }
 

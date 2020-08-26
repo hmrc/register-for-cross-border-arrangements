@@ -62,7 +62,8 @@ object EnrolmentRequest {
   }
 
   case class EnrolmentInfo (safeID: String,
-                            utr: Option[String] = None,
+                            saUtr: Option[String] = None,
+                            ctUtr: Option[String] = None,
                             nino: Option[String] = None,
                             nonUkPostcode: Option[String] = None) {
 
@@ -77,7 +78,8 @@ object EnrolmentRequest {
       val mandatoryVerifiers = Seq(Verifier("SAFEID", safeID))
 
       mandatoryVerifiers ++
-        buildOptionalVerifier(utr, "UTR") ++
+        buildOptionalVerifier(saUtr, "SAUTR") ++
+        buildOptionalVerifier(ctUtr, "CTUTR") ++
         buildOptionalVerifier(nino, "NINO") ++
         buildOptionalVerifier(nonUkPostcode, "NonUKPostalCode")
 

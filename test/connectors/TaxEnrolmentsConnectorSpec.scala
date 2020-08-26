@@ -43,9 +43,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
   lazy val connector: TaxEnrolmentsConnector = app.injector.instanceOf[TaxEnrolmentsConnector]
 
-  val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
-    safeID = "safeId",
-    utr = Some("utr"))
+  val enrolmentInfo = EnrolmentInfo(safeID = "safeId", utr = Some("utr"))
 
   "TaxEnrolmentsConnector" - {
 
@@ -87,34 +85,29 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
       "must return correct EnrolmentRequest nino provided" in {
 
-      val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
-          safeID = "safeId",
-          nino = Some("nino"))
+      val enrolmentInfo = EnrolmentInfo(safeID = "safeId",
+                                        nino = Some("nino"))
 
 
         val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
                                     Verifier("NINO", enrolmentInfo.nino.get))
 
-        val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
-                                                        verifiers = expectedVerifiers)
 
-      enrolmentInfo.convertToEnrolmentRequest mustBe expectedEnrolmentRequest
+      enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
 
       }
 
      "must return correct EnrolmentRequest when utr provided as verifier" in {
 
-      val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
-                                        safeID = "safeId",
+      val enrolmentInfo = EnrolmentInfo(safeID = "safeId",
                                         utr = Some("utr"))
 
         val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
                                     Verifier("UTR", enrolmentInfo.utr.get))
 
-        val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
-                                                        verifiers = expectedVerifiers)
 
-       enrolmentInfo.convertToEnrolmentRequest mustBe expectedEnrolmentRequest
+
+       enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
       }
 
     }

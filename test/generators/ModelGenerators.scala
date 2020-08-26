@@ -102,7 +102,6 @@ trait ModelGenerators {
   }
 
   implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {for {
-    userid <- arbitrary[String]
     safeId <- arbitrary[String]
     utr <- Gen.option(arbitrary[String])
     nino <- Gen.option(arbitrary[String])
@@ -110,7 +109,6 @@ trait ModelGenerators {
 
   } yield
     EnrolmentInfo(
-      dac6UserID = userid,
       safeID = safeId,
       utr = utr,
       nino = nino,

@@ -18,6 +18,8 @@ package models
 
 import play.api.libs.json.{Json, OWrites}
 
+import scala.util.Random
+
 case class Identifier(key: String, value: String)
 
 object Identifier {
@@ -59,15 +61,14 @@ object EnrolmentRequest {
       )
   }
 
-  case class EnrolmentInfo (dac6UserID: String,
-                            safeID: String,
+  case class EnrolmentInfo (safeID: String,
                             utr: Option[String] = None,
                             nino: Option[String] = None,
                             nonUkPostcode: Option[String] = None) {
 
     def convertToEnrolmentRequest: EnrolmentRequest = {
 
-      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", dac6UserID)),
+      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", Random.alphanumeric.take(10).mkString("").toUpperCase)),
                         verifiers = buildVerifiers)
     }
 

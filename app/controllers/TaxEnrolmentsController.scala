@@ -18,7 +18,7 @@ package controllers
 
 import connectors.TaxEnrolmentsConnector
 import javax.inject.Inject
-import models.EnrolmentRequest.EnrolmentInfo
+import models.EnrolmentRequest.SubscriptionInfo
 import play.api.libs.json.{JsResult, JsValue}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.http.HttpResponse
@@ -33,8 +33,8 @@ class TaxEnrolmentsController @Inject()(taxEnrolmentsConnector: TaxEnrolmentsCon
 
   def createEnrolment: Action[JsValue] = Action(parse.json).async {
     implicit request =>
-      val enrolmentInfoJs: JsResult[EnrolmentInfo] =
-        request.body.validate[EnrolmentInfo]
+      val enrolmentInfoJs: JsResult[SubscriptionInfo] =
+        request.body.validate[SubscriptionInfo]
 
       enrolmentInfoJs.fold(
         invalid = _ => Future.successful(BadRequest("malformed EnrolmentInfo")),

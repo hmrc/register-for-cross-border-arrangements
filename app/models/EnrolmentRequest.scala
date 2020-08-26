@@ -61,11 +61,11 @@ object EnrolmentRequest {
       )
   }
 
-  case class EnrolmentInfo (safeID: String,
-                            saUtr: Option[String] = None,
-                            ctUtr: Option[String] = None,
-                            nino: Option[String] = None,
-                            nonUkPostcode: Option[String] = None) {
+  case class SubscriptionInfo(safeID: String,
+                              saUtr: Option[String] = None,
+                              ctUtr: Option[String] = None,
+                              nino: Option[String] = None,
+                              nonUkPostcode: Option[String] = None) {
 
     def convertToEnrolmentRequest: EnrolmentRequest = {
 
@@ -91,8 +91,8 @@ object EnrolmentRequest {
     }
 
   }
-  object EnrolmentInfo {
-    implicit val format = Json.format[EnrolmentInfo]
+  object SubscriptionInfo {
+    implicit val format = Json.format[SubscriptionInfo]
 
   }
 

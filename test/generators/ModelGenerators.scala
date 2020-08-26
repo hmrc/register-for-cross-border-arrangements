@@ -18,7 +18,7 @@ package generators
 
 import java.time.LocalDate
 
-import models.EnrolmentRequest.EnrolmentInfo
+import models.EnrolmentRequest.SubscriptionInfo
 import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -101,7 +101,7 @@ trait ModelGenerators {
     }
   }
 
-  implicit val arbitraryEnrolmentInfo: Arbitrary[EnrolmentInfo] = Arbitrary {for {
+  implicit val arbitraryEnrolmentInfo: Arbitrary[SubscriptionInfo] = Arbitrary {for {
     safeId <- arbitrary[String]
     saUtr <- Gen.option(arbitrary[String])
     ctUtr <- Gen.option(arbitrary[String])
@@ -109,7 +109,7 @@ trait ModelGenerators {
     nonUkPostcode <- Gen.option(arbitrary[String])
 
   } yield
-    EnrolmentInfo(
+    SubscriptionInfo(
       safeID = safeId,
       saUtr = saUtr,
       ctUtr = ctUtr,

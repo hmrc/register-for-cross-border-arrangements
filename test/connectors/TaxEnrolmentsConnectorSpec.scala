@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, put, urlEqual
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.EnrolmentRequest.EnrolmentInfo
+import models.EnrolmentRequest.SubscriptionInfo
 import models.{EnrolmentRequest, Identifier, Verifier}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -43,7 +43,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
   lazy val connector: TaxEnrolmentsConnector = app.injector.instanceOf[TaxEnrolmentsConnector]
 
-  val enrolmentInfo = EnrolmentInfo(safeID = "safeId", saUtr = Some("utr"))
+  val enrolmentInfo = SubscriptionInfo(safeID = "safeId", saUtr = Some("utr"))
 
   "TaxEnrolmentsConnector" - {
 
@@ -85,7 +85,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
       "must return correct EnrolmentRequest nino provided" in {
 
-      val enrolmentInfo = EnrolmentInfo(safeID = "safeId",
+      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
                                         nino = Some("nino"))
 
 
@@ -99,7 +99,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
      "must return correct EnrolmentRequest when saUtr provided as verifier" in {
 
-      val enrolmentInfo = EnrolmentInfo(safeID = "safeId",
+      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
                                         saUtr = Some("utr"))
 
         val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
@@ -112,7 +112,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
       "must return correct EnrolmentRequest when ctUtr provided as verifier" in {
 
-      val enrolmentInfo = EnrolmentInfo(safeID = "safeId",
+      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
                                         ctUtr = Some("utr"))
 
         val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),

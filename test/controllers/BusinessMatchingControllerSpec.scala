@@ -65,36 +65,6 @@ class BusinessMatchingControllerSpec extends SpecBase
         }
       }
 
-      "should return not found when one is not found" in {
-        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])))
-
-        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
-          (nino, individualMatchingSubmission) =>
-            val request =
-              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
-                .withJsonBody(Json.toJson(individualMatchingSubmission))
-
-            val result = route(application, request).value
-            status(result) mustEqual NOT_FOUND
-        }
-      }
-
-      "should return authorisation errors when one is encountered" in {
-        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(401, Json.obj(), Map.empty[String, Seq[String]])))
-
-        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
-          (nino, individualMatchingSubmission) =>
-            val request =
-              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
-                .withJsonBody(Json.toJson(individualMatchingSubmission))
-
-            val result = route(application, request).value
-            status(result) mustEqual UNAUTHORIZED
-        }
-      }
-
       "should return bad request when one is encountered" in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
@@ -110,9 +80,9 @@ class BusinessMatchingControllerSpec extends SpecBase
         }
       }
 
-      "should return gateway timeout when one is encountered" in {
+      "should return forbidden error from security layer when authorisation is invalid, missing parameters etc." in {
         when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(504, Json.obj(), Map.empty[String, Seq[String]])))
+          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, individualMatchingSubmission) =>
@@ -121,7 +91,69 @@ class BusinessMatchingControllerSpec extends SpecBase
                 .withJsonBody(Json.toJson(individualMatchingSubmission))
 
             val result = route(application, request).value
-            status(result) mustEqual GATEWAY_TIMEOUT
+            status(result) mustEqual FORBIDDEN
+        }
+      }
+
+      "should return internal server error when one is encountered" in {
+        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(500, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, individualMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+                .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual INTERNAL_SERVER_ERROR
+        }
+      }
+    }
+
+    "for a sole proprietor match" - {
+      "should return a found business partner match when one is found" in {
+        when(mockBusinessMatchingConnector.sendSoleProprietorMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(OK, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.soleProprietorMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual OK
+        }
+      }
+
+      "should return bad request when there's an application error like incorrect data" in {
+        when(mockBusinessMatchingConnector.sendSoleProprietorMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.soleProprietorMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
+        }
+      }
+
+      "should return forbidden error from security layer when authorisation is invalid, missing parameters etc." in {
+        when(mockBusinessMatchingConnector.sendSoleProprietorMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.soleProprietorMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual FORBIDDEN
         }
       }
     }
@@ -139,6 +171,21 @@ class BusinessMatchingControllerSpec extends SpecBase
 
             val result = route(application, request).value
             status(result) mustEqual OK
+        }
+      }
+
+      "should return forbidden error from security layer when authorisation is invalid, missing parameters etc." in {
+        when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.businessMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual FORBIDDEN
         }
       }
     }

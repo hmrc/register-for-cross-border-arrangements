@@ -48,6 +48,22 @@ class BusinessMatchingController @Inject()(
       )
   }
 
+  def soleProprietorMatchingSubmission(utr: String): Action[JsValue] = Action(parse.json).async {
+    implicit request =>
+      //Note: ETMP data suggests sole trader business partner accounts are individual records
+      val soleProprietorMatchingSubmission: JsResult[BusinessMatchingSubmission] =
+        request.body.validate[BusinessMatchingSubmission]
+
+      soleProprietorMatchingSubmission.fold(
+        invalid = _ => Future.successful(BadRequest("")),
+        valid = bms =>
+          for {
+            response <- businessMatchingConnector.sendSoleProprietorMatchingInformation(utr, bms)
+            result = convertToResult(response)
+          } yield result
+      )
+  }
+
   def businessMatchingSubmission(utr: String): Action[JsValue] = Action(parse.json).async {
     implicit request =>
       val businessMatchingSubmissionResult: JsResult[BusinessMatchingSubmission] =
@@ -66,12 +82,8 @@ class BusinessMatchingController @Inject()(
   private def convertToResult(httpResponse: HttpResponse): Result = {
     httpResponse.status match {
       case OK => Ok(httpResponse.body)
-      case NOT_FOUND => NotFound(httpResponse.body)
       case BAD_REQUEST => BadRequest(httpResponse.body)
-      case UNAUTHORIZED => Unauthorized(httpResponse.body)
-      case SERVICE_UNAVAILABLE => ServiceUnavailable(httpResponse.body)
-      case BAD_GATEWAY => BadGateway(httpResponse.body)
-      case GATEWAY_TIMEOUT => GatewayTimeout(httpResponse.body)
+      case FORBIDDEN => Forbidden(httpResponse.body)
       case _ => InternalServerError(httpResponse.body)
     }
   }

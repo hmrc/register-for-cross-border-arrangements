@@ -237,3 +237,17 @@ trait ModelGenerators {
       } yield WithIDOrganisation(organisationName, organisationType)
   }
 }
+
+  implicit val arbitraryIdentification: Arbitrary[Identification] = Arbitrary {for {
+    idNumber <- arbitrary[String]
+    issuingInstitution <- arbitrary[String]
+    issuingCountryCode <- arbitrary[String]
+  } yield
+    Identification(
+      idNumber = idNumber,
+      issuingInstitution = issuingInstitution,
+      issuingCountryCode = issuingCountryCode
+    )
+  }
+
+}

@@ -28,7 +28,7 @@ class BusinessMatchingSubmissionSpec extends SpecBase
   with ScalaCheckPropertyChecks {
 
   "BusinessMatchingSubmission" - {
-    "should marshall correctly from json" in {
+    "should marshall correctly from json for individual" in {
       val jsonPayload =
         """{
           |   "regime":"DACSIX",

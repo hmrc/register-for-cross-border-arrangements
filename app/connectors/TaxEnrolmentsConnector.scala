@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.Inject
 import config.AppConfig
-import models.EnrolmentRequest.EnrolmentInfo
+import models.EnrolmentRequest.SubscriptionInfo
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentsConnector @Inject()(val config: AppConfig, val http: HttpClient) {
 
-  def createEnrolment(enrolmentInfo: EnrolmentInfo)
+  def createEnrolment(enrolmentInfo: SubscriptionInfo)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val url = s"${config.taxEnrolmentsUrl}"

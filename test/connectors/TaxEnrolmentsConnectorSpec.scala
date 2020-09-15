@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, put, urlEqual
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.EnrolmentRequest.EnrolmentInfo
+import models.EnrolmentRequest.SubscriptionInfo
 import models.{EnrolmentRequest, Identifier, Verifier}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -43,14 +43,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
   lazy val connector: TaxEnrolmentsConnector = app.injector.instanceOf[TaxEnrolmentsConnector]
 
-  val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
-    businessName = None,
-    primaryContactName = "name",
-    primaryEmailAddress = "primaryEmail",
-    primaryTelephoneNumber = None,
-    secondaryContactName = None,
-    secondaryEmailAddress = None,
-    secondaryTelephoneNumber = None)
+  val enrolmentInfo = SubscriptionInfo(safeID = "safeId", saUtr = Some("utr"))
 
   "TaxEnrolmentsConnector" - {
 
@@ -90,46 +83,43 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
     }
     "createEnrolmentRequest" - {
 
-      "must return correct EnrolmentRequest when all values populated in EnrolmentInfo" in {
+      "must return correct EnrolmentRequest nino provided" in {
 
-      val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
-          primaryContactName = "priConName",
-          primaryEmailAddress = "primaryEmail",
-          primaryTelephoneNumber = Some("priConNumber"),
-          secondaryContactName = Some("secConName"),
-          secondaryEmailAddress = Some("secConEmail"),
-          secondaryTelephoneNumber = Some("secConNumber"),
-          businessName = Some("businessName"))
+      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
+                                        nino = Some("nino"))
 
 
-        val expectedVerifiers = Seq(Verifier("CONTACTNAME", "priConName"),
-                                    Verifier("EMAIL", "primaryEmail"),
-                                    Verifier("TELEPHONE", "priConNumber"),
-                                    Verifier("SECCONTACTNAME", "secConName"),
-                                    Verifier("SECEMAIL", "secConEmail"),
-                                    Verifier("SECNUMBER", "secConNumber"),
-                                    Verifier("BUSINESSNAME", "businessName"))
+        val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
+                                    Verifier("NINO", enrolmentInfo.nino.get))
 
-        val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
-                                                        verifiers = expectedVerifiers)
 
-      enrolmentInfo.convertToEnrolmentRequest mustBe expectedEnrolmentRequest
+      enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
 
       }
 
-     "must return correct EnrolmentRequest when all only mandatory values populated in EnrolmentInfo" in {
+     "must return correct EnrolmentRequest when saUtr provided as verifier" in {
 
-      val enrolmentInfo = EnrolmentInfo(dac6UserID = "id",
-                                        primaryContactName = "priConName",
-                                        primaryEmailAddress = "primaryEmail")
+      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
+                                        saUtr = Some("utr"))
 
-        val expectedVerifiers = Seq(Verifier("CONTACTNAME", "priConName"),
-                                    Verifier("EMAIL", "primaryEmail"))
+        val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
+                                    Verifier("SAUTR", enrolmentInfo.saUtr.get))
 
-        val expectedEnrolmentRequest = EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", "id")),
-                                                        verifiers = expectedVerifiers)
 
-       enrolmentInfo.convertToEnrolmentRequest mustBe expectedEnrolmentRequest
+
+       enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
+      }
+
+      "must return correct EnrolmentRequest when ctUtr provided as verifier" in {
+
+      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
+                                        ctUtr = Some("utr"))
+
+        val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
+                                    Verifier("CTUTR", enrolmentInfo.ctUtr.get))
+
+
+       enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
       }
 
     }

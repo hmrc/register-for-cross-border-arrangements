@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.TaxEnrolmentsConnector
 import generators.Generators
-import models.EnrolmentRequest.EnrolmentInfo
+import models.EnrolmentRequest.SubscriptionInfo
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -52,7 +52,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
-      forAll(arbitrary[EnrolmentInfo]){
+      forAll(arbitrary[SubscriptionInfo]){
         (enrolmentInfo) =>
           val request =
             FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
@@ -68,7 +68,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(401, Json.obj(), Map.empty[String, Seq[String]])))
 
-      forAll(arbitrary[EnrolmentInfo]){
+      forAll(arbitrary[SubscriptionInfo]){
         (enrolmentInfo) =>
           val request =
             FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
@@ -83,7 +83,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
-      forAll(arbitrary[EnrolmentInfo]){
+      forAll(arbitrary[SubscriptionInfo]){
         (enrolmentInfo) =>
           val request =
             FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
@@ -98,7 +98,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(504, Json.obj(), Map.empty[String, Seq[String]])))
 
-      forAll(arbitrary[EnrolmentInfo]){
+      forAll(arbitrary[SubscriptionInfo]){
         (enrolmentInfo) =>
           val request =
             FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)

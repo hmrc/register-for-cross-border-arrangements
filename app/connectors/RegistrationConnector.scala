@@ -30,14 +30,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClient) {
 
-  def sendWithoutIDInformation(registration: Registration, submissionUrl: String)
+  def sendWithoutIDInformation(registration: Registration)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val newHeaders = hc
       .copy(authorization = Some(Authorization(s"Bearer ${config.desBearerToken}")))
       .withExtraHeaders(addHeaders(): _*)
 
-    http.POST[Registration, HttpResponse](submissionUrl, registration)(wts = Registration.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[Registration, HttpResponse](config.registerUrl, registration)(wts = Registration.format, rds = httpReads, hc = newHeaders, ec = ec)
   }
 
 

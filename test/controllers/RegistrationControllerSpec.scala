@@ -50,7 +50,7 @@ class RegistrationControllerSpec extends SpecBase
   "Registration Controller" - {
     "for an individual no id" - {
       "should send data and return ok" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any(),any())(any(), any()))
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Registration]) {
@@ -65,7 +65,7 @@ class RegistrationControllerSpec extends SpecBase
       }
 
       "should return bad request when one is encountered" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any(), any())(any(), any()))
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Registration]) {
@@ -80,7 +80,7 @@ class RegistrationControllerSpec extends SpecBase
       }
 
       "should return forbidden error when authorisation is invalid" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any(), any())(any(), any()))
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Registration]) {
@@ -97,7 +97,7 @@ class RegistrationControllerSpec extends SpecBase
 
     "for an organisation no id" - {
       "should send data and return ok" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any(), any())(any(), any()))
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Registration]) {
@@ -112,7 +112,7 @@ class RegistrationControllerSpec extends SpecBase
       }
 
       "should return bad request when one is encountered" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any(), any())(any(), any()))
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Registration]) {
@@ -127,7 +127,7 @@ class RegistrationControllerSpec extends SpecBase
       }
 
       "should return forbidden error when authorisation is invalid" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any(), any())(any(), any()))
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Registration]) {

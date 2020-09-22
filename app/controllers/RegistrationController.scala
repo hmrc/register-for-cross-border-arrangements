@@ -40,7 +40,7 @@ class RegistrationController @Inject()(val config: AppConfig, registrationConnec
         invalid = _ => Future.successful(BadRequest("")),
         valid = sub =>
           for {
-            response <- registrationConnector.sendWithoutIDInformation(sub,  config.organisationRegistrationUrl)
+            response <- registrationConnector.sendWithoutIDInformation(sub)
             result = convertToResult(response)
           } yield result
       )
@@ -55,7 +55,7 @@ class RegistrationController @Inject()(val config: AppConfig, registrationConnec
         invalid = _ => Future.successful(BadRequest("")),
         valid = sub =>
           for {
-            response <- registrationConnector.sendWithoutIDInformation(sub, config.individualRegistrationUrl)
+            response <- registrationConnector.sendWithoutIDInformation(sub)
             result = convertToResult(response)
           } yield result
       )

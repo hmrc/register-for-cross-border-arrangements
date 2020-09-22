@@ -25,8 +25,7 @@ class AppConfig @Inject()(config: Configuration) {
   lazy val registrationUrl: String = s"${config.get[Service]("microservice.services.registration").baseUrl}${config.get[String]("microservice.services.registration.startUrl")}"
   lazy val taxEnrolmentsUrl: String = s"${config.get[Service]("microservice.services.tax-enrolments").baseUrl}${config.get[String]("microservice.services.tax-enrolments.url")}"
 
-  lazy val organisationRegistrationUrl: String = s"${registrationUrl}/registration/02.00.00/organisation"
-  lazy val individualRegistrationUrl: String = s"${registrationUrl}/registration/02.00.00/individual"
+  lazy val registerUrl: String = s"${registrationUrl}/dac6/dct01/v1"
 
   lazy val desBearerToken: String = config.get[String]("microservice.services.business-matching.bearer-token")
   lazy val desEnvironment: String = config.get[String]("microservice.services.business-matching.environment")

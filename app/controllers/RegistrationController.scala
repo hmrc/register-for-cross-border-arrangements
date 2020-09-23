@@ -31,7 +31,7 @@ class RegistrationController @Inject()(val config: AppConfig, registrationConnec
                                        override val controllerComponents: ControllerComponents)
                                          (implicit executionContext: ExecutionContext) extends BackendController(controllerComponents) {
 
-  def noIdOrganisationRegistration: Action[JsValue] = Action(parse.json).async {
+  def noIdRegistration: Action[JsValue] = Action(parse.json).async {
     implicit request =>
       val noIdOrganisationRegistration: JsResult[Registration] =
         request.body.validate[Registration]
@@ -41,27 +41,9 @@ class RegistrationController @Inject()(val config: AppConfig, registrationConnec
         valid = sub =>
           for {
             response <- registrationConnector.sendWithoutIDInformation(sub)
-            result = convertToResult(response)
-          } yield result
+          } yield convertToResult(response)
       )
   }
-
-  def noIdIndividualRegistration: Action[JsValue] = Action(parse.json).async {
-    implicit request =>
-      val noIdOrganisationRegistration: JsResult[Registration] =
-        request.body.validate[Registration]
-
-      noIdOrganisationRegistration.fold(
-        invalid = _ => Future.successful(BadRequest("")),
-        valid = sub =>
-          for {
-            response <- registrationConnector.sendWithoutIDInformation(sub)
-            result = convertToResult(response)
-          } yield result
-      )
-  }
-
-
 
   private def convertToResult(httpResponse: HttpResponse): Result = {
     httpResponse.status match {

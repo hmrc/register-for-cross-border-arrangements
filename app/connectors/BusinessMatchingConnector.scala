@@ -36,7 +36,7 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
     val submissionUrl = s"${config.businessMatchingUrl}/registration/individual/nino/$nino"
 
     val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.desBearerToken}")))
+      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
       .withExtraHeaders(addHeaders(): _*)
 
     http.POST[IndividualMatchingSubmission, HttpResponse](submissionUrl, individualSubmission)(wts = IndividualMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
@@ -47,7 +47,7 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
     val submissionUrl = s"${config.businessMatchingUrl}/registration/individual/utr/$utr"
 
     val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.desBearerToken}")))
+      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
       .withExtraHeaders(addHeaders(): _*)
 
     http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, soleProprietorSubmission)(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
@@ -58,7 +58,7 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
     val submissionUrl = s"${config.businessMatchingUrl}/registration/organisation/utr/$utr"
 
     val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.desBearerToken}")))
+      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
       .withExtraHeaders(addHeaders(): _*)
 
     http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission)(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)

@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import play.api.libs.json.{JsValue, Json, OFormat, OWrites, Reads, __}
 
+
 case class NoIdIndividual(name: Name, dateOfBirth: LocalDate)
 
 object NoIdIndividual {
@@ -31,6 +32,7 @@ object NoIdIndividual {
         "dateOfBirth" -> individual.dateOfBirth.toString
       )
   }
+  implicit val format: OFormat[NoIdOrganisation] = Json.format[NoIdOrganisation]
 
   implicit lazy val reads: Reads[NoIdIndividual] = {
     import play.api.libs.functional.syntax._
@@ -42,20 +44,12 @@ object NoIdIndividual {
   }
 }
 
-
 case class NoIdOrganisation(organisationName: String)
 
 object NoIdOrganisation {
-  implicit lazy val writes: OWrites[NoIdOrganisation] = OWrites[NoIdOrganisation] {
-    organisation =>
-      Json.obj("organisationName" -> organisation.organisationName)
-  }
+
   implicit val format: OFormat[NoIdOrganisation] = Json.format[NoIdOrganisation]
 
-  implicit lazy val reads: JsValue => NoIdOrganisation = {
-    (__ \ "organisationName").read[String]
-    organisationName => NoIdOrganisation(organisationName.toString)
-  }
 }
 
 case class Address(addressLine1: String, addressLine2: Option[String], addressLine3: String, addressLine4: Option[String], postalCode: Option[String], countryCode: String)

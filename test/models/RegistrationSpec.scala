@@ -28,8 +28,6 @@ class RegistrationSpec extends SpecBase
   with Generators
   with ScalaCheckPropertyChecks {
 
-
-
   "Subscription" - {
     "marshal from Json individual" in {
       Json.parse(jsonPayload).validate[Registration].get mustBe sub

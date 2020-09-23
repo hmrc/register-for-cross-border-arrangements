@@ -48,7 +48,7 @@ class RegistrationControllerSpec extends SpecBase
     ).build()
 
   "Registration Controller" - {
-    "for an individual no id" - {
+    "for a user without id" - {
       "should send data and return ok" in {
         when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
@@ -56,7 +56,7 @@ class RegistrationControllerSpec extends SpecBase
         forAll(arbitrary[Registration]) {
           individualNoIdRegistration =>
             val request =
-              FakeRequest(POST, routes.RegistrationController.noIdIndividualRegistration().url)
+              FakeRequest(POST, routes.RegistrationController.noIdRegistration().url)
                 .withJsonBody(Json.toJson(individualNoIdRegistration))
 
             val result = route(application, request).value
@@ -71,7 +71,7 @@ class RegistrationControllerSpec extends SpecBase
         forAll(arbitrary[Registration]) {
           individualNoIdSubscription =>
             val request =
-              FakeRequest(POST, routes.RegistrationController.noIdIndividualRegistration.url)
+              FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
                 .withJsonBody(Json.toJson(individualNoIdSubscription))
 
             val result = route(application, request).value
@@ -86,54 +86,7 @@ class RegistrationControllerSpec extends SpecBase
         forAll(arbitrary[Registration]) {
           individualNoIdRegistration =>
             val request =
-              FakeRequest(POST, routes.RegistrationController.noIdIndividualRegistration.url)
-                .withJsonBody(Json.toJson(individualNoIdRegistration))
-
-            val result = route(application, request).value
-            status(result) mustEqual FORBIDDEN
-        }
-      }
-    }
-
-    "for an organisation no id" - {
-      "should send data and return ok" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
-
-        forAll(arbitrary[Registration]) {
-          organisationNoIdSubscription =>
-            val request =
-              FakeRequest(POST, routes.RegistrationController.noIdOrganisationRegistration.url)
-                .withJsonBody(Json.toJson(organisationNoIdSubscription))
-
-            val result = route(application, request).value
-            status(result) mustEqual OK
-        }
-      }
-
-      "should return bad request when one is encountered" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
-
-        forAll(arbitrary[Registration]) {
-          individualNoIdRegistration =>
-            val request =
-              FakeRequest(POST, routes.RegistrationController.noIdOrganisationRegistration.url)
-                .withJsonBody(Json.toJson(individualNoIdRegistration))
-
-            val result = route(application, request).value
-            status(result) mustEqual BAD_REQUEST
-        }
-      }
-
-      "should return forbidden error when authorisation is invalid" in {
-        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
-
-        forAll(arbitrary[Registration]) {
-          individualNoIdRegistration =>
-            val request =
-              FakeRequest(POST, routes.RegistrationController.noIdOrganisationRegistration.url)
+              FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
                 .withJsonBody(Json.toJson(individualNoIdRegistration))
 
             val result = route(application, request).value

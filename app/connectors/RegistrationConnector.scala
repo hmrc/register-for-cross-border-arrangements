@@ -34,7 +34,7 @@ class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClien
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.desBearerToken}")))
+      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
       .withExtraHeaders(addHeaders(): _*)
 
     http.POST[Registration, HttpResponse](config.registerUrl, registration)(wts = Registration.format, rds = httpReads, hc = newHeaders, ec = ec)

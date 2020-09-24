@@ -32,7 +32,6 @@ object NoIdIndividual {
         "dateOfBirth" -> individual.dateOfBirth.toString
       )
   }
-  implicit val format: OFormat[NoIdOrganisation] = Json.format[NoIdOrganisation]
 
   implicit lazy val reads: Reads[NoIdIndividual] = {
     import play.api.libs.functional.syntax._

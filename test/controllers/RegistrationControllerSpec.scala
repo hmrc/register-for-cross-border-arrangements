@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.RegistrationConnector
 import generators.Generators
-import models.Registration
+import models.{PayloadRegisterWithID, Registration}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -88,6 +88,53 @@ class RegistrationControllerSpec extends SpecBase
             val request =
               FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
                 .withJsonBody(Json.toJson(individualNoIdRegistration))
+
+            val result = route(application, request).value
+            status(result) mustEqual FORBIDDEN
+        }
+      }
+    }
+
+    "for a user with id" - {
+      "should send data and return ok" in {
+        when(mockRegistrationConnector.sendWithID(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          withIDRegistration =>
+            val request =
+              FakeRequest(POST, routes.RegistrationController.withIdRegistration.url)
+                .withJsonBody(Json.toJson(withIDRegistration))
+
+            val result = route(application, request).value
+            status(result) mustEqual OK
+        }
+      }
+
+      "should return bad request when one is encountered" in {
+        when(mockRegistrationConnector.sendWithID(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(POST, routes.RegistrationController.withIdRegistration.url)
+                .withJsonBody(Json.toJson(withIdSubscription))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
+        }
+      }
+
+      "should return forbidden error when authorisation is invalid" in {
+        when(mockRegistrationConnector.sendWithID(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(POST, routes.RegistrationController.withIdRegistration.url)
+                .withJsonBody(Json.toJson(withIdSubscription))
 
             val result = route(application, request).value
             status(result) mustEqual FORBIDDEN

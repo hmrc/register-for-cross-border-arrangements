@@ -17,9 +17,9 @@
 package controllers
 
 import config.AppConfig
-import connectors.{RegistrationConnector}
+import connectors.RegistrationConnector
 import javax.inject.Inject
-import models.Registration
+import models.{PayloadRegisterWithID, Registration}
 import play.api.libs.json.{JsResult, JsValue}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.http.HttpResponse
@@ -41,6 +41,20 @@ class RegistrationController @Inject()(val config: AppConfig, registrationConnec
         valid = sub =>
           for {
             response <- registrationConnector.sendWithoutIDInformation(sub)
+          } yield convertToResult(response)
+      )
+  }
+
+  def withIdRegistration: Action[JsValue] = Action(parse.json).async {
+    implicit request =>
+      val withIDRegistration: JsResult[PayloadRegisterWithID] =
+        request.body.validate[PayloadRegisterWithID]
+
+      withIDRegistration.fold(
+        invalid = _ => Future.successful(BadRequest("")),
+        valid = sub =>
+          for {
+            response <- registrationConnector.sendWithID(sub)
           } yield convertToResult(response)
       )
   }

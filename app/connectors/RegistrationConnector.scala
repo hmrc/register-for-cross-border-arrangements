@@ -22,7 +22,7 @@ import java.util.UUID
 
 import config.AppConfig
 import javax.inject.Inject
-import models.Registration
+import models.{PayloadRegisterWithID, Registration}
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
@@ -38,6 +38,16 @@ class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClien
       .withExtraHeaders(addHeaders(): _*)
 
     http.POST[Registration, HttpResponse](config.registerUrl, registration)(wts = Registration.format, rds = httpReads, hc = newHeaders, ec = ec)
+  }
+
+  def sendWithID(registration: PayloadRegisterWithID)
+                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+
+    val newHeaders = hc
+      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
+      .withExtraHeaders(addHeaders(): _*)
+
+    http.POST[PayloadRegisterWithID, HttpResponse](config.registerWithIDUrl, registration)(wts = PayloadRegisterWithID.format, rds = httpReads, hc = newHeaders, ec = ec)
   }
 
 

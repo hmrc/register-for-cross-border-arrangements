@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqua
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.Registration
+import models.{PayloadRegisterWithID, Registration}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -44,7 +44,7 @@ class RegistrationConnectorSpec extends SpecBase
   lazy val connector: RegistrationConnector = app.injector.instanceOf[RegistrationConnector]
 
   "SubscriptionConnector" - {
-    "for a subscription submission" - {
+    "for a registration without id submission" - {
       "must return status as OK for submission of Subscription" in {
 
 
@@ -81,7 +81,46 @@ class RegistrationConnectorSpec extends SpecBase
         }
       }
     }
+
+    "for a registration with id submission" - {
+      "must return status as OK for submission of Subscription" in {
+
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          sub =>
+            stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct02/v1", OK)
+
+            val result = connector.sendWithID(sub)
+            result.futureValue.status mustBe OK
+        }
+      }
+
+      "must return status as BAD_REQUEST for submission of invalid subscription" in {
+
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          sub =>
+            stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct02/v1", BAD_REQUEST)
+
+            val result = connector.sendWithID(sub)
+            result.futureValue.status mustBe BAD_REQUEST
+        }
+      }
+
+      "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
+
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          sub =>
+            stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct02/v1", INTERNAL_SERVER_ERROR)
+
+            val result = connector.sendWithID(sub)
+            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+    }
   }
+
       private def stubResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
         server.stubFor(
           post(urlEqualTo(expectedUrl))

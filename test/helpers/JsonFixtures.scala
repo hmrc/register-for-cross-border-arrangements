@@ -18,8 +18,8 @@ package helpers
 
 import java.time.LocalDate
 
-import models.{Address, ContactDetails, Name, NoIdIndividual, NoIdOrganisation, RegisterWithoutIDRequest, RequestCommon, RequestDetails, Registration}
-import play.api.libs.json.{JsNull, Json}
+import models._
+import play.api.libs.json.Json
 
 object JsonFixtures {
   val jsonPayload =
@@ -268,7 +268,72 @@ object JsonFixtures {
       )
     )
   )
+  val registerWithIDPayload =
+    """
+      |{
+      |"registerWithIDRequest": {
+      |"requestCommon": {
+      |"regime": "DAC",
+      |"receiptDate": "2016-08-16T15:55:30Z",
+      |"acknowledgementReference": "ec031b045855445e96f98a569ds56cd2",
+      |"requestParameters": [
+      |{
+      |"paramName": "REGIME",
+      |"paramValue": "DAC"
+      |}
+      |]
+      |},
+      |"requestDetail": {
+      |"IDType": "NINO",
+      |"IDNumber": "0123456789",
+      |"requiresNameMatch": true,
+      |"isAnAgent": false,
+      |"individual": {
+      |"firstName": "Fred",
+      |"middleName": "Flintstone",
+      |"lastName": "Flint",
+      |"dateOfBirth": "1999-12-20"
+      |}
+      |}
+      |}
+      |}""".stripMargin
 
 
+val registerWithIDJson = Json.obj(
+  "registerWithIDRequest" -> Json.obj(
+    "requestCommon" -> Json.obj(
+        "regime" -> "DAC",
+              "receiptDate" -> "2016-08-16T15:55:30Z",
+              "acknowledgementReference" -> "ec031b045855445e96f98a569ds56cd2",
+              "requestParameters" -> Json.arr( Json.obj(
+                "paramName" -> "REGIME",
+                "paramValue" -> "DAC"
+              ))
+        ),
+      "requestDetail" -> Json.obj(
+        "IDType" -> "NINO",
+        "IDNumber" -> "0123456789",
+        "requiresNameMatch" -> true,
+        "isAnAgent" -> false,
+        "individual" -> Json.obj(
+          "firstName" -> "Fred",
+          "middleName" -> "Flintstone",
+          "lastName" -> "Flint",
+          "dateOfBirth" -> "1999-12-20"
+        )
+      )
+    )
+  )
+
+  val registrationWithRequest = PayloadRegisterWithID(RegisterWithIDRequest(
+    RequestCommon("2016-08-16T15:55:30Z", "DAC", "ec031b045855445e96f98a569ds56cd2",
+  Some(Seq(RequestParameter("REGIME", "DAC")))),
+    RequestWithIDDetails(
+      "NINO",
+      "0123456789",
+      requiresNameMatch = true,
+      isAnAgent = false,
+      WithIDIndividual("Fred", Some("Flintstone"), "Flint", "1999-12-20")))
+  )
 
 }

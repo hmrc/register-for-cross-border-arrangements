@@ -184,6 +184,74 @@ trait ModelGenerators {
       emailAddress = emailAddress
     )
   }
+  //TODO - change below implicits depending on model Changes
+
+  implicit val arbitraryRequestCommon: Arbitrary[RequestCommon] = Arbitrary {
+    for {
+      receiptDate <- arbitrary[String]
+      acknowledgementRef <- stringsWithMaxLength(32)
+      originatingSystem <- RegexpGen.from("^[A-Za-z0-9\\-\\._]") //TODO - check Regex
+
+  } yield RequestCommon(
+      receiptDate = receiptDate,
+      regime = "DAC",
+      acknowledgementReference = acknowledgementRef,
+      originatingSystem = originatingSystem,
+      requestParameters = None
+    )
+  }
+
+  implicit val arbitraryIndividualDetails: Arbitrary[IndividualDetails] = Arbitrary {
+    for {
+      firstName <- arbitrary[String]
+      middleName <- Gen.option(arbitrary[String])
+      lastName <- arbitrary[String]
+    } yield
+      IndividualDetails(
+        firstName = firstName,
+        middleName = middleName,
+        lastName = lastName
+      )
+  }
+
+  implicit val arbitraryContactInformation: Arbitrary[ContactInformation] = Arbitrary {
+    for {
+      emailAddress <- arbitrary[String]
+      phoneNumber <- Gen.option(RegexpGen.from("^[A-Z0-9 )/(\\-*#+]")) //TODO - check Regex
+      mobileNumber <- Gen.option(RegexpGen.from("^[A-Z0-9 )/(\\-*#+]")) //TODO - check Regex
+      individual <- Gen.option(arbitrary[IndividualDetails])
+  } yield
+    ContactInformation(
+      email = emailAddress,
+      phone = phoneNumber,
+      mobile = mobileNumber,
+      individual,
+      None
+    )
+  }
+
+  implicit val arbitrarySubscription: Arbitrary[SubscriptionForDACRequest] = Arbitrary {
+    for {
+      requestCommon <- arbitrary[RequestCommon]
+      idType <- arbitrary[String]
+      idNumber <- arbitrary[String]
+      tradingName <- arbitrary[String]
+      isGBUser <- arbitrary[Boolean]
+      contactInformation <- arbitrary[ContactInformation]
+
+  } yield
+      SubscriptionForDACRequest(
+        requestCommon,
+        RequestDetail(
+          idType = idType,
+          idNumber = idNumber,
+          tradingName = tradingName,
+          isGBUser = isGBUser,
+          primaryContact = PrimaryContact(contactInformation),
+          secondaryContact = None)
+    )
+  }
+
 
   implicit val arbitraryIdentification: Arbitrary[Identification] = Arbitrary {
     for {

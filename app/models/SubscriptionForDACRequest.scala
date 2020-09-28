@@ -16,46 +16,53 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads, __}
 
-case class SubscriptionForDACRequest(requestDetail: RequestDetail, requestCommon: RequestCommon)
+case class OrganisationDetails(name: String)
 
-object SubscriptionForDACRequest {
-  implicit val format = Json.format[SubscriptionForDACRequest]
+object OrganisationDetails {
+  implicit val format = Json.format[OrganisationDetails]
 }
 
-case class Organisation(name: String)
+case class IndividualDetails(firstName: String, middleName: Option[String], lastName: String)
 
-object Organisation {
-  implicit val format = Json.format[Organisation]
-}
-
-case class Individual(firstName: String, middleName: Option[String], lastName: String)
-
-object Individual {
-  implicit val format = Json.format[Individual]
+object IndividualDetails {
+  implicit val format = Json.format[IndividualDetails]
 }
 
 case class ContactInformation(email: String,
                               phone: Option[String],
                               mobile: Option[String],
-                              individual: Option[Individual],
-                              organisation: Option[Organisation])
+                              individual: Option[IndividualDetails],
+                              organisation: Option[OrganisationDetails])
 
 object ContactInformation {
-  implicit  val format = Json.format[ContactInformation]
+
+  implicit lazy val residentWrites = Json.writes[ContactInformation]
+
+  implicit lazy val reads: Reads[ContactInformation] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "email").read[String] and
+        (__ \ "phone").readNullable[String]  and
+        (__ \ "mobile").readNullable[String]  and
+        (__ \ "individual").readNullable[IndividualDetails]  and
+        (__ \ "organisation").readNullable[OrganisationDetails]
+      )((email, phone, mobile, individual, organisation ) => ContactInformation(
+      email, phone, mobile, individual, organisation ))
+  }
 }
 
 case class PrimaryContact(contactInformation: ContactInformation)
 
 object PrimaryContact{
-  implicit val format = Json.format[ContactInformation]
+  implicit val format = Json.format[PrimaryContact]
 }
 
 case class SecondaryContact(contactInformation: ContactInformation)
 
 object SecondaryContact{
-  implicit val format = Json.format[ContactInformation]
+  implicit val format = Json.format[SecondaryContact]
 }
 
 case class RequestDetail(idType: String,
@@ -65,10 +72,29 @@ case class RequestDetail(idType: String,
                          primaryContact: PrimaryContact,
                          secondaryContact: Option[SecondaryContact])
 object RequestDetail {
-  implicit val format = Json.format[RequestDetail]
+
+implicit lazy val residentWrites = Json.writes[RequestDetail]
+
+  implicit lazy val reads: Reads[RequestDetail] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "idType").read[String] and
+        (__ \ "idNumber").read[String] and
+        (__ \ "tradingName").read[String] and
+        (__ \ "isGBUser").read[Boolean] and
+        (__ \ "primaryContact").read[PrimaryContact] and
+        (__ \ "secondaryContact").readNullable[SecondaryContact]
+
+      )((idType, idNumber,tradingName, isGBUser, primaryContact, secondaryContact) => RequestDetail(
+      idType, idNumber, tradingName, isGBUser,primaryContact, secondaryContact))
+  }
 }
 
-case class RequestCommon(regime: String, receiptDate: String, acknowledgementReference: String, originatingSystem: String, requestParameters: Option[Seq[String]])
+case class RequestCommon(regime: String,
+                         receiptDate: String,
+                         acknowledgementReference: String,
+                         originatingSystem: String,
+                         requestParameters: Option[Seq[String]])
 
 object RequestCommon {
 
@@ -79,7 +105,12 @@ object RequestCommon {
   object RequestParameters {
     implicit  val format = Json.format[RequestParameters]
   }
+}
 
+case class SubscriptionForDACRequest(requestCommon: RequestCommon, requestDetail: RequestDetail)
+
+object SubscriptionForDACRequest {
+  implicit val format = Json.format[SubscriptionForDACRequest]
 }
 
 

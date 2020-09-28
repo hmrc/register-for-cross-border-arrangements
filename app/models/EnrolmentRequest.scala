@@ -18,6 +18,8 @@ package models
 
 import play.api.libs.json.{Json, OWrites}
 
+import scala.util.Random
+
 case class Identifier(key: String, value: String)
 
 object Identifier {
@@ -59,33 +61,27 @@ object EnrolmentRequest {
       )
   }
 
-  case class EnrolmentInfo (dac6UserID: String,
-                            primaryContactName: String,
-                            primaryEmailAddress: String,
-                            primaryTelephoneNumber: Option[String] = None,
-                            secondaryContactName: Option[String] = None,
-                            secondaryEmailAddress: Option[String] = None,
-                            secondaryTelephoneNumber: Option[String] = None,
-                            businessName: Option[String] = None,
-                           ) {
+  case class SubscriptionInfo(safeID: String,
+                              saUtr: Option[String] = None,
+                              ctUtr: Option[String] = None,
+                              nino: Option[String] = None,
+                              nonUkPostcode: Option[String] = None) {
 
     def convertToEnrolmentRequest: EnrolmentRequest = {
 
-      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", dac6UserID)),
+      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", Random.alphanumeric.take(10).mkString("").toUpperCase)),
                         verifiers = buildVerifiers)
     }
 
      def buildVerifiers: Seq[Verifier] = {
 
-      val mandatoryVerifiers = Seq(Verifier("CONTACTNAME", primaryContactName),
-        Verifier("EMAIL", primaryEmailAddress))
+      val mandatoryVerifiers = Seq(Verifier("SAFEID", safeID))
 
       mandatoryVerifiers ++
-        buildOptionalVerifier(primaryTelephoneNumber, "TELEPHONE") ++
-        buildOptionalVerifier(secondaryContactName, "SECCONTACTNAME") ++
-        buildOptionalVerifier(secondaryEmailAddress, "SECEMAIL") ++
-        buildOptionalVerifier(secondaryTelephoneNumber, "SECNUMBER") ++
-        buildOptionalVerifier(businessName, "BUSINESSNAME")
+        buildOptionalVerifier(saUtr, "SAUTR") ++
+        buildOptionalVerifier(ctUtr, "CTUTR") ++
+        buildOptionalVerifier(nino, "NINO") ++
+        buildOptionalVerifier(nonUkPostcode, "NonUKPostalCode")
 
     }
 
@@ -95,8 +91,8 @@ object EnrolmentRequest {
     }
 
   }
-  object EnrolmentInfo {
-    implicit val format = Json.format[EnrolmentInfo]
+  object SubscriptionInfo {
+    implicit val format = Json.format[SubscriptionInfo]
 
   }
 

@@ -31,6 +31,10 @@ class AppConfig @Inject()(config: Configuration) {
   lazy val bearerToken: String = config.get[String]("microservice.services.business-matching.bearer-token")
   lazy val desEnvironment: String = config.get[String]("microservice.services.business-matching.environment")
 
-  lazy val subscriptionURL: String = s"???/dac6/dct03/v1" //TODO - change ??? to microservice to be used
+  lazy val registrationUrl: String = s"${config.get[Service](
+    "microservice.services.registration").baseUrl}${config.get[String](
+    "microservice.services.registration.startUrl")}"
+
+  lazy val subscriptionURL: String = s"$registrationUrl/dac6/dct03/v1" //TODO - change ??? to microservice to be used
 
 }

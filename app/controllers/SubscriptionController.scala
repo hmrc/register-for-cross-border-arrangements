@@ -33,7 +33,7 @@ class SubscriptionController @Inject()(
   override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext) extends  BackendController(controllerComponents) {
 
-  def subscriptionSubmission: Action[JsValue] = Action(parse.json).async {
+  def createSubscription: Action[JsValue] = Action(parse.json).async {
     implicit request =>
       val subscriptionSubmissionResult: JsResult[SubscriptionForDACRequest] =
         request.body.validate[SubscriptionForDACRequest]
@@ -45,8 +45,7 @@ class SubscriptionController @Inject()(
         valid = sub =>
           for {
           response <- subscriptionConnector.sendSubscriptionInformation(sub)
-          result = convertToResult(response)
-          } yield result
+          } yield convertToResult(response)
       )
   }
 

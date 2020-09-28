@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.Json
 
-case class SubscriptionForDACRequest(requestDetail: RequestDetail)
+case class SubscriptionForDACRequest(requestDetail: RequestDetail, requestCommon: RequestCommon)
 
 object SubscriptionForDACRequest {
   implicit val format = Json.format[SubscriptionForDACRequest]
@@ -67,4 +67,20 @@ case class RequestDetail(idType: String,
 object RequestDetail {
   implicit val format = Json.format[RequestDetail]
 }
+
+case class RequestCommon(regime: String, receiptDate: String, acknowledgementReference: String, originatingSystem: String, requestParameters: Option[Seq[String]])
+
+object RequestCommon {
+
+  implicit val requestCommonFormats = Json.format[RequestCommon]
+
+  case class RequestParameters(paramName: String, paramValue: String)
+
+  object RequestParameters {
+    implicit  val format = Json.format[RequestParameters]
+  }
+
+}
+
+
 

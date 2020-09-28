@@ -8,3 +8,5 @@ POST    /registration/02.00.00/noId             controllers.RegistrationControll
 POST    /registration/02.00.00/withId           controllers.RegistrationController.withIdRegistration
 
 PUT     /enrolment/create-enrolment             controllers.TaxEnrolmentsController.createEnrolment
+
+POST    /subscription/create-dac-subscription   controllers.SubscriptionController.createSubscription

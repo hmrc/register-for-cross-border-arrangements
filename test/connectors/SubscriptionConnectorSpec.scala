@@ -1,0 +1,65 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package connectors
+
+import base.SpecBase
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import generators.Generators
+import helpers.WireMockServerHandler
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
+
+
+class SubscriptionConnectorSpec extends SpecBase
+  with WireMockServerHandler
+  with Generators
+  with ScalaCheckPropertyChecks {
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure(
+      conf = "microservice.services.registration.port" -> server.port()
+    )
+    .build()
+
+  lazy val connector: SubscriptionConnector = app.injector.instanceOf[SubscriptionConnector]
+
+  "SubscriptionConnector" - {
+    "for a create Subscription submission" - {
+     "return status as OK for valid subscription details" in {
+
+
+//       forAll(arbitrary[SubscriptionForDACRequest]) {
+//         sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", OK)
+//
+//           val result = connector.sendSubscriptionInformation(sub)
+//           result.futureValue.status mustBe OK
+//       }
+     }
+    }
+  }
+
+  private def stubResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
+    server.stubFor(
+      post(urlEqualTo(expectedUrl))
+        .willReturn(
+          aResponse()
+            .withStatus(expectedStatus)
+        )
+    )
+}

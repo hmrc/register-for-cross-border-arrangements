@@ -48,8 +48,11 @@ object ContactInformation {
         (__ \ "mobile").readNullable[String]  and
         (__ \ "individual").readNullable[IndividualDetails]  and
         (__ \ "organisation").readNullable[OrganisationDetails]
-      )((email, phone, mobile, individual, organisation ) => ContactInformation(
-      email, phone, mobile, individual, organisation ))
+      )((email, phone, mobile, individual, organisation ) => (organisation, individual) match {
+      case (None, None) => throw new Exception("Contact information must have either org or individual elem")
+      case (Some(_), Some(_)) => throw new Exception("Contact Information cannot contain both org & Individual elem")
+      case (organisation, individual) => ContactInformation(email, phone, mobile, individual, organisation)
+    })
   }
 }
 
@@ -57,17 +60,49 @@ case class PrimaryContact(contactInformation: ContactInformation)
 
 object PrimaryContact{
   implicit val format = Json.format[PrimaryContact]
+
+  implicit lazy val reads: Reads[PrimaryContact] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "individual").readNullable[IndividualDetails]  and
+        (__ \ "organisation").readNullable[OrganisationDetails] and
+        (__ \ "email").read[String] and
+        (__ \ "phone").readNullable[String]  and
+        (__ \ "mobile").readNullable[String]
+      )((individual, organisation, email, phone, mobile) =>
+      if (organisation.isDefined){
+        PrimaryContact(ContactInformation(email, phone, mobile, None, organisation))
+      } else {
+        PrimaryContact(ContactInformation(email, phone, mobile, individual, None))
+      })
+  }
 }
 
 case class SecondaryContact(contactInformation: ContactInformation)
 
 object SecondaryContact{
   implicit val format = Json.format[SecondaryContact]
+
+  implicit lazy val reads: Reads[SecondaryContact] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "individual").readNullable[IndividualDetails] and
+        (__ \ "organisation").readNullable[OrganisationDetails] and
+        (__ \ "email").read[String] and
+        (__ \ "phone").readNullable[String] and
+        (__ \ "mobile").readNullable[String]
+      ) ((individual, organisation, email, phone, mobile) =>
+      if (organisation.isDefined) {
+        SecondaryContact(ContactInformation(email, phone, mobile, None, organisation))
+      } else {
+        SecondaryContact(ContactInformation(email, phone, mobile, individual, None))
+      })
+  }
 }
 
 case class RequestDetail(idType: String,
                          idNumber: String,
-                         tradingName: String,
+                         tradingName: Option[String],
                          isGBUser: Boolean,
                          primaryContact: PrimaryContact,
                          secondaryContact: Option[SecondaryContact])
@@ -80,32 +115,32 @@ implicit lazy val residentWrites = Json.writes[RequestDetail]
     (
       (__ \ "idType").read[String] and
         (__ \ "idNumber").read[String] and
-        (__ \ "tradingName").read[String] and
+        (__ \ "tradingName").readNullable[String] and
         (__ \ "isGBUser").read[Boolean] and
         (__ \ "primaryContact").read[PrimaryContact] and
         (__ \ "secondaryContact").readNullable[SecondaryContact]
-
-      )((idType, idNumber,tradingName, isGBUser, primaryContact, secondaryContact) => RequestDetail(
+      )(
+      (idType, idNumber,tradingName, isGBUser, primaryContact, secondaryContact) => RequestDetail(
       idType, idNumber, tradingName, isGBUser,primaryContact, secondaryContact))
   }
+}
+
+case class RequestParameters(paramName: String, paramValue: String)
+
+object RequestParameters {
+  implicit val indentifierFormats = Json.format[RequestParameters]
 }
 
 case class RequestCommon(regime: String,
                          receiptDate: String,
                          acknowledgementReference: String,
                          originatingSystem: String,
-                         requestParameters: Option[Seq[String]])
+                         requestParameters: Option[Seq[RequestParameters]])
 
 object RequestCommon {
-
   implicit val requestCommonFormats = Json.format[RequestCommon]
-
-  case class RequestParameters(paramName: String, paramValue: String)
-
-  object RequestParameters {
-    implicit  val format = Json.format[RequestParameters]
-  }
 }
+
 
 case class SubscriptionForDACRequest(requestCommon: RequestCommon, requestDetail: RequestDetail)
 

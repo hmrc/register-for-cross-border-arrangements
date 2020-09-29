@@ -188,9 +188,10 @@ trait ModelGenerators {
 
   implicit val arbitraryRequestCommon: Arbitrary[RequestCommon] = Arbitrary {
     for {
-      receiptDate <- arbitrary[String]
+      receiptDate <- stringsWithMaxLength(30)
       acknowledgementRef <- stringsWithMaxLength(32)
-      originatingSystem <- RegexpGen.from("^[A-Za-z0-9\\-\\._]") //TODO - check Regex
+      originatingSystem <- stringsWithMaxLength(30)
+//        RegexpGen.from("^[A-Za-z0-9\\-\\._]{1,30}$") //TODO - check Regex
 
   } yield RequestCommon(
       receiptDate = receiptDate,
@@ -214,41 +215,62 @@ trait ModelGenerators {
       )
   }
 
+  implicit val arbitraryOrganisationDetails: Arbitrary[OrganisationDetails] = Arbitrary {
+    for {
+      name <- arbitrary[String]
+    } yield
+      OrganisationDetails(
+        name = name
+      )
+  }
+
   implicit val arbitraryContactInformation: Arbitrary[ContactInformation] = Arbitrary {
     for {
       emailAddress <- arbitrary[String]
-      phoneNumber <- Gen.option(RegexpGen.from("^[A-Z0-9 )/(\\-*#+]")) //TODO - check Regex
-      mobileNumber <- Gen.option(RegexpGen.from("^[A-Z0-9 )/(\\-*#+]")) //TODO - check Regex
+      phoneNumber <- Gen.option(arbitrary[String]) //TODO - check Regex??
+      mobileNumber <- Gen.option(arbitrary[String]) //TODO - check Regex??
       individual <- Gen.option(arbitrary[IndividualDetails])
+      organisation <- Gen.option(arbitrary[OrganisationDetails]) //TODO - is this correct???
   } yield
     ContactInformation(
       email = emailAddress,
       phone = phoneNumber,
       mobile = mobileNumber,
-      individual,
-      None
+      individual = individual,
+      organisation = organisation
     )
   }
+
+  implicit val arbitraryRequestDetails: Arbitrary[RequestDetail] = Arbitrary {
+    for {
+      emailAddress <- arbitrary[String]
+      idType <- arbitrary[String]
+      idNumber <- arbitrary[String]
+      tradingName <- Gen.option(arbitrary[String]) //TODO - check Regex
+      isGBUser <- arbitrary[Boolean]
+      individualDetails <- arbitrary[IndividualDetails]
+  } yield
+    RequestDetail(
+      idType = idType,
+      idNumber = idNumber,
+      tradingName = tradingName,
+      isGBUser = isGBUser,
+      primaryContact = PrimaryContact(ContactInformation(
+        email = emailAddress, None, None, Some(individualDetails), None)
+      ),
+      secondaryContact = None
+    )
+  }
+
 
   implicit val arbitrarySubscription: Arbitrary[SubscriptionForDACRequest] = Arbitrary {
     for {
       requestCommon <- arbitrary[RequestCommon]
-      idType <- arbitrary[String]
-      idNumber <- arbitrary[String]
-      tradingName <- arbitrary[String]
-      isGBUser <- arbitrary[Boolean]
-      contactInformation <- arbitrary[ContactInformation]
-
+      requestDetail <- arbitrary[RequestDetail]
   } yield
       SubscriptionForDACRequest(
-        requestCommon,
-        RequestDetail(
-          idType = idType,
-          idNumber = idNumber,
-          tradingName = tradingName,
-          isGBUser = isGBUser,
-          primaryContact = PrimaryContact(contactInformation),
-          secondaryContact = None)
+        requestCommon = requestCommon,
+        requestDetail = requestDetail
     )
   }
 

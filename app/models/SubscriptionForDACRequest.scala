@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{Json, Reads, __}
+import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
 
 case class OrganisationDetails(name: String)
 
@@ -30,36 +30,27 @@ object IndividualDetails {
   implicit val format = Json.format[IndividualDetails]
 }
 
-case class ContactInformation(email: String,
-                              phone: Option[String],
-                              mobile: Option[String],
-                              individual: Option[IndividualDetails],
-                              organisation: Option[OrganisationDetails])
+sealed trait ContactInformation
 
-object ContactInformation {
+case class ContactInformationForIndividual(individual: IndividualDetails,
+                                           email: String,
+                                           phone: Option[String],
+                                           mobile: Option[String]) extends ContactInformation
+object ContactInformationForIndividual {
+  implicit val format: OFormat[ContactInformationForIndividual] = Json.format[ContactInformationForIndividual]
+}
 
-  implicit lazy val residentWrites = Json.writes[ContactInformation]
-
-  implicit lazy val reads: Reads[ContactInformation] = {
-    import play.api.libs.functional.syntax._
-    (
-      (__ \ "email").read[String] and
-        (__ \ "phone").readNullable[String]  and
-        (__ \ "mobile").readNullable[String]  and
-        (__ \ "individual").readNullable[IndividualDetails]  and
-        (__ \ "organisation").readNullable[OrganisationDetails]
-      )((email, phone, mobile, individual, organisation ) => (organisation, individual) match {
-      case (None, None) => throw new Exception("Contact information must have either org or individual elem")
-      case (Some(_), Some(_)) => throw new Exception("Contact Information cannot contain both org & Individual elem")
-      case (organisation, individual) => ContactInformation(email, phone, mobile, individual, organisation)
-    })
-  }
+case class ContactInformationForOrganisation(organisation: OrganisationDetails,
+                                             email: String,
+                                             phone: Option[String],
+                                             mobile: Option[String]) extends ContactInformation
+object ContactInformationForOrganisation {
+  implicit val format: OFormat[ContactInformationForOrganisation] = Json.format[ContactInformationForOrganisation]
 }
 
 case class PrimaryContact(contactInformation: ContactInformation)
 
 object PrimaryContact{
-  implicit val format = Json.format[PrimaryContact]
 
   implicit lazy val reads: Reads[PrimaryContact] = {
     import play.api.libs.functional.syntax._
@@ -71,17 +62,23 @@ object PrimaryContact{
         (__ \ "mobile").readNullable[String]
       )((individual, organisation, email, phone, mobile) =>
       if (organisation.isDefined){
-        PrimaryContact(ContactInformation(email, phone, mobile, None, organisation))
+        PrimaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
       } else {
-        PrimaryContact(ContactInformation(email, phone, mobile, individual, None))
+        PrimaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
       })
+  }
+
+  implicit lazy val writes: OWrites[PrimaryContact] = {
+    case PrimaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case PrimaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
   }
 }
 
 case class SecondaryContact(contactInformation: ContactInformation)
 
 object SecondaryContact{
-  implicit val format = Json.format[SecondaryContact]
 
   implicit lazy val reads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
@@ -93,10 +90,17 @@ object SecondaryContact{
         (__ \ "mobile").readNullable[String]
       ) ((individual, organisation, email, phone, mobile) =>
       if (organisation.isDefined) {
-        SecondaryContact(ContactInformation(email, phone, mobile, None, organisation))
+        SecondaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
       } else {
-        SecondaryContact(ContactInformation(email, phone, mobile, individual, None))
+        SecondaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
       })
+  }
+
+  implicit lazy val writes: OWrites[SecondaryContact] = {
+    case SecondaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case SecondaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
   }
 }
 

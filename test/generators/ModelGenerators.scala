@@ -220,45 +220,55 @@ trait ModelGenerators {
       name <- arbitrary[String]
     } yield
       OrganisationDetails(
-        name = name
+        name = name)
+  }
+
+  implicit val arbitraryContactInformationForIndividual: Arbitrary[ContactInformationForIndividual] = Arbitrary {
+    for {
+    individualDetails <- arbitrary[IndividualDetails]
+      email <- arbitrary[String]
+      phone <- Gen.option(arbitrary[String])
+      mobile <- Gen.option(arbitrary[String])
+    } yield
+      ContactInformationForIndividual(
+        individualDetails,
+        email,
+        phone,
+        mobile
       )
   }
 
-  implicit val arbitraryContactInformation: Arbitrary[ContactInformation] = Arbitrary {
+  implicit val arbitraryContactInformationForOrganisation: Arbitrary[ContactInformationForOrganisation] = Arbitrary {
     for {
-      emailAddress <- arbitrary[String]
-      phoneNumber <- Gen.option(arbitrary[String]) //TODO - check Regex??
-      mobileNumber <- Gen.option(arbitrary[String]) //TODO - check Regex??
-      individual <- Gen.option(arbitrary[IndividualDetails])
-      organisation <- Gen.option(arbitrary[OrganisationDetails]) //TODO - is this correct???
-  } yield
-    ContactInformation(
-      email = emailAddress,
-      phone = phoneNumber,
-      mobile = mobileNumber,
-      individual = individual,
-      organisation = organisation
-    )
+      organisationDetails <- arbitrary[OrganisationDetails]
+      email <- arbitrary[String]
+      phone <- Gen.option(arbitrary[String])
+      mobile <- Gen.option(arbitrary[String])
+    } yield
+      ContactInformationForOrganisation(
+        organisationDetails,
+        email,
+        phone,
+        mobile
+      )
   }
 
   implicit val arbitraryRequestDetails: Arbitrary[RequestDetail] = Arbitrary {
     for {
-      emailAddress <- arbitrary[String]
       idType <- arbitrary[String]
       idNumber <- arbitrary[String]
       tradingName <- Gen.option(arbitrary[String]) //TODO - check Regex
       isGBUser <- arbitrary[Boolean]
-      individualDetails <- arbitrary[IndividualDetails]
+      contactInformationForIndividual <- arbitrary[ContactInformationForIndividual]
+      contactInformationForOrg <- arbitrary[ContactInformationForOrganisation]
   } yield
     RequestDetail(
       idType = idType,
       idNumber = idNumber,
       tradingName = tradingName,
       isGBUser = isGBUser,
-      primaryContact = PrimaryContact(ContactInformation(
-        email = emailAddress, None, None, Some(individualDetails), None)
-      ),
-      secondaryContact = None
+      primaryContact = PrimaryContact(contactInformationForIndividual),
+      secondaryContact = Some(SecondaryContact(contactInformationForOrg))
     )
   }
 

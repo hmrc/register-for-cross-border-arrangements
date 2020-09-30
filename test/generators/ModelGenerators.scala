@@ -25,6 +25,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
 import wolfendale.scalacheck.regexp.RegexpGen
 
+
 trait ModelGenerators {
  self: Generators =>
 

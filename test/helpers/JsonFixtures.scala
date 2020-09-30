@@ -149,66 +149,10 @@ object JsonFixtures {
       |"mobileNumber": "7698908090",
       |"faxNumber": "837587345",
       |"emailAddress": "ABC@YAHOO.COM"
-import models._
-
-object JsonFixtures {
-
-  val jsonPayload =
-    """{
-      |"createSubscriptionForDACRequest": {
-      |"requestCommon": {
-      |"regime": "DAC",
-      |"receiptDate": "2020-09-12T18:03:45Z",
-      |"acknowledgementReference": "abcdefghijklmnopqrstuvwxyz123456",
-      |"originatingSystem": "MDTP",
-      |"parameters": null
-      |},
-      |"requestDetail": {
-      |"IDType": "SAFE",
-      |"IDNumber": "AB123456Z",
-      |"tradingName": "Tools for Traders Limited",
-      |"isGBUser": true,
-      |"primaryContact": {
-      |"individual": {
-      |"firstName": "FIRST NAME",
-      |"lastName": "LAST NAME",
-      |},
-      |"email": "john@toolsfortraders.com",
-      |"phone": "0188899999",
-      |"mobile": "07321012345"
-      |},
-      |"secondaryContact": {
-      |"organisation": {
-      |"organisationName": "Tools for Traders"
-      |},
-      |"email": "contact@toolsfortraders.com",
-      |"phone": "+44 020 39898980"
       |}
       |}
       |}
       |}""".stripMargin
-
-
-  val subscription = SubscriptionForDACRequest(
-    RequestCommon("DAC", "2020-09-12T18:03:45Z", "abcdefghijklmnopqrstuvwxyz123456", "MDTP", None),
-    RequestDetail(
-      "SAFE",
-      "AB123456Z",
-      Some("Tools for Traders Limited"),
-      true,
-      PrimaryContact(ContactInformationForIndividual(
-        IndividualDetails("FIRST NAME", None, "LAST NAME"),
-        "john@toolsfortraders.com",
-       Some("0188899999"),
-        Some("07321012345"))),
-        Some(SecondaryContact(ContactInformationForOrganisation(
-          OrganisationDetails("Tools for Traders"),
-          "contact@toolsfortraders.com",
-          Some("+44 020 39898980"),
-          None
-        )))
-    )
-  )
 
   val sub = Registration(
     RegisterWithoutIDRequest(
@@ -353,6 +297,67 @@ object JsonFixtures {
       |}
       |}
       |}""".stripMargin
+
+  //Subscription Fixtures
+
+  val createSubscriptionJsonPayload =
+    """{
+      |"createSubscriptionForDACRequest": {
+      |"requestCommon": {
+      |"regime": "DAC",
+      |"receiptDate": "2020-09-12T18:03:45Z",
+      |"acknowledgementReference": "abcdefghijklmnopqrstuvwxyz123456",
+      |"originatingSystem": "MDTP",
+      |"parameters": null
+      |},
+      |"requestDetail": {
+      |"IDType": "SAFE",
+      |"IDNumber": "AB123456Z",
+      |"tradingName": "Tools for Traders Limited",
+      |"isGBUser": true,
+      |"primaryContact": {
+      |"individual": {
+      |"firstName": "FIRST NAME",
+      |"lastName": "LAST NAME",
+      |},
+      |"email": "john@toolsfortraders.com",
+      |"phone": "0188899999",
+      |"mobile": "07321012345"
+      |},
+      |"secondaryContact": {
+      |"organisation": {
+      |"organisationName": "Tools for Traders"
+      |},
+      |"email": "contact@toolsfortraders.com",
+      |"phone": "+44 020 39898980"
+      |}
+      |}
+      |}
+      |}""".stripMargin
+
+
+  val subscription =
+
+    SubscriptionForDACRequest(
+    RequestCommon("DAC", "2020-09-12T18:03:45Z", "abcdefghijklmnopqrstuvwxyz123456", "MDTP", None),
+    RequestDetail(
+      "SAFE",
+      "AB123456Z",
+      Some("Tools for Traders Limited"),
+      true,
+      PrimaryContact(ContactInformationForIndividual(
+        IndividualDetails("FIRST NAME", None, "LAST NAME"),
+        "john@toolsfortraders.com",
+        Some("0188899999"),
+        Some("07321012345"))),
+      Some(SecondaryContact(ContactInformationForOrganisation(
+        OrganisationDetails("Tools for Traders"),
+        "contact@toolsfortraders.com",
+        Some("+44 020 39898980"),
+        None
+      )))
+    )
+  )
 
 
 val registerWithIDJson = Json.obj(

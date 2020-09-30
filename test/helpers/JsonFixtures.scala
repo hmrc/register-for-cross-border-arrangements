@@ -339,7 +339,7 @@ object JsonFixtures {
   val subscription =
 
     SubscriptionForDACRequest(
-    RequestCommon("DAC", "2020-09-12T18:03:45Z", "abcdefghijklmnopqrstuvwxyz123456", "MDTP", None),
+    RequestCommonForSubscription("DAC", "2020-09-12T18:03:45Z", "abcdefghijklmnopqrstuvwxyz123456", "MDTP", None),
     RequestDetail(
       "SAFE",
       "AB123456Z",

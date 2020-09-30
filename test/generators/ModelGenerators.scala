@@ -187,14 +187,14 @@ trait ModelGenerators {
   }
   //TODO - change below implicits depending on model Changes
 
-  implicit val arbitraryRequestCommon: Arbitrary[RequestCommon] = Arbitrary {
+  implicit val arbitraryRequestCommonForSubscription: Arbitrary[RequestCommonForSubscription] = Arbitrary {
     for {
       receiptDate <- stringsWithMaxLength(30)
       acknowledgementRef <- stringsWithMaxLength(32)
       originatingSystem <- stringsWithMaxLength(30)
 //        RegexpGen.from("^[A-Za-z0-9\\-\\._]{1,30}$") //TODO - check Regex
 
-  } yield RequestCommon(
+  } yield RequestCommonForSubscription(
       receiptDate = receiptDate,
       regime = "DAC",
       acknowledgementReference = acknowledgementRef,
@@ -276,7 +276,7 @@ trait ModelGenerators {
 
   implicit val arbitrarySubscription: Arbitrary[SubscriptionForDACRequest] = Arbitrary {
     for {
-      requestCommon <- arbitrary[RequestCommon]
+      requestCommon <- arbitrary[RequestCommonForSubscription]
       requestDetail <- arbitrary[RequestDetail]
   } yield
       SubscriptionForDACRequest(

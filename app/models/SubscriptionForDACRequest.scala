@@ -135,18 +135,18 @@ object RequestParameters {
   implicit val indentifierFormats = Json.format[RequestParameters]
 }
 
-case class RequestCommon(regime: String,
+case class RequestCommonForSubscription(regime: String,
                          receiptDate: String,
                          acknowledgementReference: String,
                          originatingSystem: String,
                          requestParameters: Option[Seq[RequestParameters]])
 
-object RequestCommon {
-  implicit val requestCommonFormats = Json.format[RequestCommon]
+object RequestCommonForSubscription {
+  implicit val requestCommonFormats = Json.format[RequestCommonForSubscription]
 }
 
 
-case class SubscriptionForDACRequest(requestCommon: RequestCommon, requestDetail: RequestDetail)
+case class SubscriptionForDACRequest(requestCommon: RequestCommonForSubscription, requestDetail: RequestDetail)
 
 object SubscriptionForDACRequest {
   implicit val format = Json.format[SubscriptionForDACRequest]

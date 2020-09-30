@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.SubscriptionConnector
 import generators.Generators
-import models.SubscriptionForDACRequest
+import models.CreateSubscriptionForDACRequest
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -54,7 +54,7 @@ class SubscriptionControllerSpec extends SpecBase
         when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[SubscriptionForDACRequest]) {
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
           (subscriptionForDACRequest) =>
             val request =
               FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
@@ -69,7 +69,7 @@ class SubscriptionControllerSpec extends SpecBase
         when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
           .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[SubscriptionForDACRequest]) {
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
           (subscriptionForDacRequest) =>
             val request =
               FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
@@ -84,7 +84,7 @@ class SubscriptionControllerSpec extends SpecBase
         when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
           .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[SubscriptionForDACRequest]) {
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
           (subscriptionForDacRequest) =>
             val request =
               FakeRequest(POST, routes.SubscriptionController.createSubscription().url)

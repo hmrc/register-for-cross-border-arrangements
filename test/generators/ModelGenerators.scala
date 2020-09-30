@@ -221,7 +221,7 @@ trait ModelGenerators {
       name <- arbitrary[String]
     } yield
       OrganisationDetails(
-        name = name)
+        organisationName = name)
   }
 
   implicit val arbitraryContactInformationForIndividual: Arbitrary[ContactInformationForIndividual] = Arbitrary {
@@ -258,7 +258,7 @@ trait ModelGenerators {
     for {
       idType <- arbitrary[String]
       idNumber <- arbitrary[String]
-      tradingName <- Gen.option(arbitrary[String]) //TODO - check Regex
+      tradingName <- Gen.option(arbitrary[String])
       isGBUser <- arbitrary[Boolean]
       contactInformationForIndividual <- arbitrary[ContactInformationForIndividual]
       contactInformationForOrg <- arbitrary[ContactInformationForOrganisation]
@@ -274,15 +274,16 @@ trait ModelGenerators {
   }
 
 
-  implicit val arbitrarySubscription: Arbitrary[SubscriptionForDACRequest] = Arbitrary {
+  implicit val arbitrarySubscription: Arbitrary[CreateSubscriptionForDACRequest] = Arbitrary {
     for {
       requestCommon <- arbitrary[RequestCommonForSubscription]
       requestDetail <- arbitrary[RequestDetail]
   } yield
+      CreateSubscriptionForDACRequest(
       SubscriptionForDACRequest(
-        requestCommon = requestCommon,
-        requestDetail = requestDetail
-    )
+        requestCommon,
+        requestDetail
+    ))
   }
 
 

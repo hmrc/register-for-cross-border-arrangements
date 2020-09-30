@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqua
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
-import models.SubscriptionForDACRequest
+import models.CreateSubscriptionForDACRequest
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -48,7 +48,7 @@ class SubscriptionConnectorSpec extends SpecBase
     "for a create DAC6 subscription submission" - {
      "must return status OK for valid subscription details" in {
 
-       forAll(arbitrary[SubscriptionForDACRequest]) {
+       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
          sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", OK)
 
            val result = connector.sendSubscriptionInformation(sub)
@@ -58,7 +58,7 @@ class SubscriptionConnectorSpec extends SpecBase
 
       "must return status BAD_REQUEST for invalid subscription details" in {
 
-        forAll(arbitrary[SubscriptionForDACRequest]) {
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
           sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", BAD_REQUEST)
 
             val result = connector.sendSubscriptionInformation(sub)
@@ -68,7 +68,7 @@ class SubscriptionConnectorSpec extends SpecBase
 
       "must return status INTERNAL_SERVER_ERROR for technical error" in {
 
-        forAll(arbitrary[SubscriptionForDACRequest]) {
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
           sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", INTERNAL_SERVER_ERROR)
 
             val result = connector.sendSubscriptionInformation(sub)

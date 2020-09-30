@@ -19,7 +19,7 @@ package controllers
 import config.AppConfig
 import connectors.SubscriptionConnector
 import javax.inject.Inject
-import models.SubscriptionForDACRequest
+import models.CreateSubscriptionForDACRequest
 import play.api.libs.json.{JsResult, JsValue}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.http.HttpResponse
@@ -35,8 +35,8 @@ class SubscriptionController @Inject()(
 
   def createSubscription: Action[JsValue] = Action(parse.json).async {
     implicit request =>
-      val subscriptionSubmissionResult: JsResult[SubscriptionForDACRequest] =
-        request.body.validate[SubscriptionForDACRequest]
+      val subscriptionSubmissionResult: JsResult[CreateSubscriptionForDACRequest] =
+        request.body.validate[CreateSubscriptionForDACRequest]
 
       //TODO - add businessResponseError NOT_OK
 

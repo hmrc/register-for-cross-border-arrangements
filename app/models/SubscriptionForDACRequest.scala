@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
 
-case class OrganisationDetails(name: String)
+case class OrganisationDetails(organisationName: String)
 
 object OrganisationDetails {
   implicit val format = Json.format[OrganisationDetails]
@@ -52,6 +52,13 @@ case class PrimaryContact(contactInformation: ContactInformation)
 
 object PrimaryContact{
 
+  implicit lazy val writes: OWrites[PrimaryContact] = {
+    case PrimaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case PrimaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
+  }
+
   implicit lazy val reads: Reads[PrimaryContact] = {
     import play.api.libs.functional.syntax._
     (
@@ -67,18 +74,18 @@ object PrimaryContact{
         PrimaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
       })
   }
-
-  implicit lazy val writes: OWrites[PrimaryContact] = {
-    case PrimaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
-      Json.toJsObject(contactInformationForInd)
-    case PrimaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
-      Json.toJsObject(contactInformationForOrg)
-  }
 }
 
 case class SecondaryContact(contactInformation: ContactInformation)
 
 object SecondaryContact{
+
+  implicit lazy val writes: OWrites[SecondaryContact] = {
+    case SecondaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case SecondaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
+  }
 
   implicit lazy val reads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
@@ -94,13 +101,6 @@ object SecondaryContact{
       } else {
         SecondaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
       })
-  }
-
-  implicit lazy val writes: OWrites[SecondaryContact] = {
-    case SecondaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
-      Json.toJsObject(contactInformationForInd)
-    case SecondaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
-      Json.toJsObject(contactInformationForOrg)
   }
 }
 
@@ -143,14 +143,44 @@ case class RequestCommonForSubscription(regime: String,
 
 object RequestCommonForSubscription {
   implicit val requestCommonFormats = Json.format[RequestCommonForSubscription]
-}
 
+}
 
 case class SubscriptionForDACRequest(requestCommon: RequestCommonForSubscription, requestDetail: RequestDetail)
 
 object SubscriptionForDACRequest {
   implicit val format = Json.format[SubscriptionForDACRequest]
+
 }
+
+case class CreateSubscriptionForDACRequest(createSubscriptionForDACRequest: SubscriptionForDACRequest)
+
+object CreateSubscriptionForDACRequest {
+  implicit val format = Json.format[CreateSubscriptionForDACRequest]
+}
+
+
+//case class SubscriptionForDACRequest(requestCommon: RequestCommonForSubscription, requestDetail: RequestDetail)
+//
+//object SubscriptionForDACRequest {
+//  implicit val writes: OWrites[SubscriptionForDACRequest] = OWrites[SubscriptionForDACRequest] {
+//    dacRequest =>
+//      Json.obj(
+//        "createSubscriptionForDACRequest" -> Json.obj(
+//          "requestCommon" -> dacRequest.requestCommon,
+//          "requestDetail" -> dacRequest.requestDetail
+//        )
+//      )
+//  }
+//
+//  implicit val reads: Reads[SubscriptionForDACRequest] = {
+//    import play.api.libs.functional.syntax._
+//    (
+//      (__ \ "createSubscriptionForDACResponse" \ "responseCommon").read[RequestCommonForSubscription] and
+//        (__ \ "createSubscriptionForDACResponse" \ "responseDetail").read[RequestDetail]
+//      )((responseCommon, responseDetail) => SubscriptionForDACRequest(responseCommon, responseDetail))
+//  }
+//}
 
 
 

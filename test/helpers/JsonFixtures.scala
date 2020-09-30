@@ -300,7 +300,7 @@ object JsonFixtures {
 
   //Subscription Fixtures
 
-  val createSubscriptionJsonPayload =
+  val subscriptionIndividualJsonPayload =
     """{
       |"createSubscriptionForDACRequest": {
       |"requestCommon": {
@@ -317,45 +317,55 @@ object JsonFixtures {
       |"isGBUser": true,
       |"primaryContact": {
       |"individual": {
-      |"firstName": "FIRST NAME",
-      |"lastName": "LAST NAME",
+      |"firstName": "TIMMY",
+      |"lastName": "MALLET"
       |},
-      |"email": "john@toolsfortraders.com",
-      |"phone": "0188899999",
-      |"mobile": "07321012345"
+      |"email": "timmy@toolsfortraders.com",
+      |"phone": "0191000000",
+      |"mobile": "07123456789"
       |},
       |"secondaryContact": {
-      |"organisation": {
-      |"organisationName": "Tools for Traders"
+      |"individual": {
+      |"firstName": "JIMMY",
+      |"lastName": "NAIL"
       |},
-      |"email": "contact@toolsfortraders.com",
-      |"phone": "+44 020 39898980"
+      |"email": "Jimmy@toolsfortraders.com",
+      |"phone": "0191000000",
+      |"mobile": "07123456789"
       |}
       |}
       |}
       |}""".stripMargin
 
 
-  val subscription =
-
+  val subscriptionIndividual =
+    CreateSubscriptionForDACRequest(
     SubscriptionForDACRequest(
-    RequestCommonForSubscription("DAC", "2020-09-12T18:03:45Z", "abcdefghijklmnopqrstuvwxyz123456", "MDTP", None),
+    RequestCommonForSubscription(
+      "DAC",
+      "2020-09-12T18:03:45Z",
+      "abcdefghijklmnopqrstuvwxyz123456",
+      "MDTP",
+      None),
     RequestDetail(
       "SAFE",
       "AB123456Z",
       Some("Tools for Traders Limited"),
       true,
       PrimaryContact(ContactInformationForIndividual(
-        IndividualDetails("FIRST NAME", None, "LAST NAME"),
-        "john@toolsfortraders.com",
-        Some("0188899999"),
-        Some("07321012345"))),
-      Some(SecondaryContact(ContactInformationForOrganisation(
-        OrganisationDetails("Tools for Traders"),
-        "contact@toolsfortraders.com",
-        Some("+44 020 39898980"),
-        None
-      )))
+        IndividualDetails("TIMMY", None, "MALLET"),
+        "timmy@toolsfortraders.com",
+        Some("01910000000"),
+        Some("07123456789"))),
+      Some(SecondaryContact(ContactInformationForIndividual(
+        IndividualDetails("JIMMY", None, "NAIL"),
+        "jimmy@toolsfortraders.com",
+        Some("01910000000"),
+        Some("07123456789")
+          )
+        )
+      )
+    )
     )
   )
 

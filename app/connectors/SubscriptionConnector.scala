@@ -22,7 +22,7 @@ import java.util.UUID
 
 import config.AppConfig
 import javax.inject.Inject
-import models.SubscriptionForDACRequest
+import models.CreateSubscriptionForDACRequest
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
@@ -31,15 +31,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubscriptionConnector @Inject()(val config: AppConfig, val http: HttpClient) {
 
   def sendSubscriptionInformation(
-    subscription: SubscriptionForDACRequest
+    subscription: CreateSubscriptionForDACRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val newHeaders = hc
       .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}"))) //TODO - change Bearer Token
       .withExtraHeaders(addHeaders(): _*)
 
-    http.POST[SubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription)(wts =
-    SubscriptionForDACRequest.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription)(wts =
+      CreateSubscriptionForDACRequest.format, rds = httpReads, hc = newHeaders, ec = ec)
   }
 
   private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String,String)] = {

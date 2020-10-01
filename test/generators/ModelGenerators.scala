@@ -224,30 +224,30 @@ trait ModelGenerators {
         organisationName = name)
   }
 
-  implicit val arbitraryContactInformationForIndividual: Arbitrary[ContactInformationForIndividual] = Arbitrary {
+  implicit val arbitraryPrimaryContact: Arbitrary[PrimaryContact] = Arbitrary {
     for {
-    individualDetails <- arbitrary[IndividualDetails]
+      indOrOrg <- Gen.oneOf(arbitrary[OrganisationDetails], arbitrary[IndividualDetails])
       email <- arbitrary[String]
       phone <- Gen.option(arbitrary[String])
       mobile <- Gen.option(arbitrary[String])
     } yield
-      ContactInformationForIndividual(
-        individualDetails,
+      PrimaryContact(
+        indOrOrg,
         email,
         phone,
         mobile
       )
   }
 
-  implicit val arbitraryContactInformationForOrganisation: Arbitrary[ContactInformationForOrganisation] = Arbitrary {
+  implicit val arbitrarySecondaryContact: Arbitrary[SecondaryContact] = Arbitrary {
     for {
-      organisationDetails <- arbitrary[OrganisationDetails]
+      indOrOrg <- Gen.oneOf(arbitrary[OrganisationDetails], arbitrary[IndividualDetails])
       email <- arbitrary[String]
       phone <- Gen.option(arbitrary[String])
       mobile <- Gen.option(arbitrary[String])
     } yield
-      ContactInformationForOrganisation(
-        organisationDetails,
+      SecondaryContact(
+        indOrOrg,
         email,
         phone,
         mobile
@@ -260,16 +260,16 @@ trait ModelGenerators {
       idNumber <- arbitrary[String]
       tradingName <- Gen.option(arbitrary[String])
       isGBUser <- arbitrary[Boolean]
-      contactInformationForIndividual <- arbitrary[ContactInformationForIndividual]
-      contactInformationForOrg <- arbitrary[ContactInformationForOrganisation]
+      primaryContact <- arbitrary[PrimaryContact]
+      secondaryContact <- Gen.option(arbitrary[SecondaryContact])
   } yield
     RequestDetail(
       idType = idType,
       idNumber = idNumber,
       tradingName = tradingName,
       isGBUser = isGBUser,
-      primaryContact = PrimaryContact(contactInformationForIndividual),
-      secondaryContact = Some(SecondaryContact(contactInformationForOrg))
+      primaryContact = primaryContact,
+      secondaryContact = secondaryContact
     )
   }
 

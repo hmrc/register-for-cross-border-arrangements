@@ -352,12 +352,12 @@ object JsonFixtures {
       "AB123456Z",
       Some("Tools for Traders Limited"),
       true,
-      PrimaryContact(ContactInformationForIndividual(
+      PrimaryContact(
         IndividualDetails("TIMMY", None, "MALLET"),
         "timmy@toolsfortraders.com",
         Some("01910000000"),
-        Some("07123456789"))),
-      Some(SecondaryContact(ContactInformationForIndividual(
+        Some("07123456789")),
+      Some(SecondaryContact(
         IndividualDetails("JIMMY", None, "NAIL"),
         "jimmy@toolsfortraders.com",
         Some("01910000000"),
@@ -366,6 +366,41 @@ object JsonFixtures {
         )
       )
     )
+  )
+
+  val subscriptionIndividualJson =
+    Json.obj(
+      "createSubscriptionForDACRequest" -> Json.obj(
+        "requestCommon" -> Json.obj(
+          "regime" -> "DAC",
+          "receiptDate" -> "2020-09-12T18:03:45Z",
+          "acknowledgementReference" -> "abcdefghijklmnopqrstuvwxyz123456",
+          "originatingSystem" -> "MDTP"
+        ),
+      "requestDetail" -> Json.obj(
+        "idType" -> "SAFE",
+        "idNumber" -> "AB123456Z",
+        "tradingName" -> "Tools for Traders Limited",
+        "isGBUser" -> true,
+        "primaryContact" -> Json.obj(
+          "individual" -> Json.obj(
+            "firstName" -> "TIMMY",
+            "lastName" -> "MALLET"
+          ),
+          "email" -> "timmy@toolsfortraders.com",
+          "phone" -> "01910000000",
+          "mobile" -> "07123456789"
+        ),
+        "secondaryContact" -> Json.obj(
+          "individual" -> Json.obj(
+            "firstName" -> "JIMMY",
+            "lastName" -> "NAIL"
+          ),
+          "email"-> "jimmy@toolsfortraders.com",
+          "phone" -> "01910000000",
+          "mobile" -> "07123456789"
+        )
+      )
     )
   )
 

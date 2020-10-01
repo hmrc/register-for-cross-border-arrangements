@@ -28,9 +28,14 @@ class SubscriptionSpec extends SpecBase
   with Generators
   with ScalaCheckPropertyChecks {
 
-  "Subscription" - {
-    "marshal from Json individual" in {
-      Json.parse(subscriptionIndividualJsonPayload).validate[CreateSubscriptionForDACRequest] mustBe subscriptionIndividual
+  "create Subscription for DAC Request" - {
+
+    "marshal from Json subscription for individual" in {
+      Json.parse(subscriptionIndividualJsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe subscriptionIndividual
+    }
+
+    "marshall into json subscription for individual" in {
+      Json.toJson(subscriptionIndividual) mustBe subscriptionIndividualJson
     }
   }
 }

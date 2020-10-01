@@ -81,6 +81,9 @@ case class SecondaryContact(indOrOrg: ContactInformation,
                            )
 
 object SecondaryContact{
+
+  // TODO - fix issue in regards to Optional Nullable Phone / Mobile
+
   implicit lazy val SecondaryContactReads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
     (

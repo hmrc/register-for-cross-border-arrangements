@@ -30,17 +30,29 @@ class SubscriptionSpec extends SpecBase
 
   "create Subscription for DAC Request" - {
 
+    "should marshall correctly from json for individual " in  {
+      Json.parse(jsonPayloadForIndividual).validate[CreateSubscriptionForDACRequest].get mustBe individualSubcription
+    }
+
     "marshall into json subscription for individual" in {
-      Json.toJson(subscriptionIndividual) mustBe subscriptionIndividualJson
+      Json.toJson(individualSubcription) mustBe IndividualSubscriptionJson
+    }
+
+    "should marshall correctly from json for organisation" in  {
+      Json.parse(jsonPayloadForOrganisation).validate[CreateSubscriptionForDACRequest].get mustBe organisationSubscription
     }
 
     "marshall into json subscription for organisation" in {
-      Json.toJson(subscriptionOrganisation) mustBe subscriptionOrganisationJson
+      Json.toJson(organisationSubscription) mustBe organisationSubscriptionJson
     }
 
-    "marshall into json subscription for individual with secondaryContact" in {
-      Json.toJson(subscriptionSecondaryContact) mustBe subscriptionSecondaryContactJson
+    "should marshall correctly from json for individual with Secondary Contact as org" in  {
+      Json.parse(jsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest].get mustBe secondaryContactSubscription
     }
 
+    //TODO - fix nullable values for phone & mobile for below test
+    "marshall into json subscription for individual with secondaryContact as org" in {
+      Json.toJson(secondaryContactSubscription) mustBe secondaryContactSubscriptionJson
+    }
   }
 }

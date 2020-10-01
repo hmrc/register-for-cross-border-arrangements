@@ -300,204 +300,279 @@ object JsonFixtures {
 
   //Subscription Fixtures
 
-  val subscriptionIndividualJsonPayload =
-    """{
-      |"createSubscriptionForDACRequest": {
-      |"requestCommon": {
-      |"regime": "DAC",
-      |"receiptDate": "2020-09-12T18:03:45Z",
-      |"acknowledgementReference": "abcdefghijklmnopqrstuvwxyz123456",
-      |"originatingSystem": "MDTP"
-      |},
-      |"requestDetail": {
-      |"IDType": "SAFE",
-      |"IDNumber": "AB123456Z",
-      |"tradingName": "Tools for Traders Limited",
-      |"isGBUser": true,
-      |"primaryContact": {
-      |"individual": {
-      |"firstName": "TIMMY",
-      |"lastName": "MALLET"
-      |},
-      |"email": "timmy@toolsfortraders.com",
-      |"phone": "0191000000",
-      |"mobile": "07123456789"
-      |},
-      |"secondaryContact": {
-      |"individual": {
-      |"firstName": "JIMMY",
-      |"lastName": "NAIL"
-      |},
-      |"email": "Jimmy@toolsfortraders.com",
-      |"phone": "0191000000",
-      |"mobile": "07123456789"
+  // Individual Fixtures
+  val jsonPayloadForIndividual: String =
+    """
+      |{
+      |  "createSubscriptionForDACRequest": {
+      |    "requestCommon": {
+      |      "regime": "DAC",
+      |      "receiptDate": "2020-09-23T16:12:11Z",
+      |      "acknowledgementReference": "AB123c",
+      |      "originatingSystem": "MDTP",
+      |      "requestParameters": [{
+      |        "paramName":"Name",
+      |        "paramValue":"Value"
+      |      }]
+      |    },
+      |    "requestDetail": {
+      |      "idType": "idType",
+      |      "idNumber": "idNumber",
+      |      "isGBUser": true,
+      |      "primaryContact": {
+      |        "individual": {
+      |          "firstName": "Fairy",
+      |          "lastName": "Liquid"
+      |        },
+      |        "email": "email2@email.com",
+      |        "phone": "01910002222",
+      |        "mobile": "07500000000"
+      |      }
+      |    }
+      |  }
       |}
-      |}
-      |}
-      |}""".stripMargin
+      |""".stripMargin
 
-  val subscriptionOrganisationJsonPayload =
-    """{
-      |"createSubscriptionForDACRequest": {
-      |"requestCommon": {
-      |"regime": "DAC",
-      |"receiptDate": "2020-09-12T18:03:45Z",
-      |"acknowledgementReference": "abcdefghijklmnopqrstuvwxyz123456",
-      |"originatingSystem": "MDTP"
-      |},
-      |"requestDetail": {
-      |"IDType": "SAFE",
-      |"IDNumber": "AB123456Z",
-      |"tradingName": "Tools for Traders Limited",
-      |"isGBUser": true,
-      |"primaryContact": {
-      |"organisation": {
-      |"organisationName": "Tools for Traders Limited",
-      |},
-      |"email": "timmy@toolsfortraders.com",
-      |"phone": "0191000000",
-      |"mobile": "07123456789"
-      |},
-      |"secondaryContact": {
-      |"organisation": {
-      |"organisationName": "Tools for Traders Limited",
-      |},
-      |"email": "Jimmy@toolsfortraders.com",
-      |"phone": "0191000000",
-      |"mobile": "07123456789"
-      |}
-      |}
-      |}
-      |}""".stripMargin
-
-
-  val subscriptionIndividual =
+  val individualSubcription =
     CreateSubscriptionForDACRequest(
     SubscriptionForDACRequest(
     RequestCommonForSubscription(
       "DAC",
-      "2020-09-12T18:03:45Z",
-      "abcdefghijklmnopqrstuvwxyz123456",
+      "2020-09-23T16:12:11Z",
+      "AB123c",
       "MDTP",
-      None),
+      Some(Seq(RequestParameters(
+        "Name",
+        "Value"
+      )))
+    ),
     RequestDetail(
-      "SAFE",
-      "AB123456Z",
-      Some("Tools for Traders Limited"),
+      "idType",
+      "idNumber",
+      None,
       true,
       PrimaryContact(
-        IndividualDetails("TIMMY", None, "MALLET"),
-        "timmy@toolsfortraders.com",
-        Some("01910000000"),
-        Some("07123456789")),
+        IndividualDetails("Fairy", None, "Liquid"),
+        "email2@email.com",
+        Some("01910002222"),
+        Some("07500000000")),
       None
       )
     )
   )
 
-  val subscriptionSecondaryContact =
-    CreateSubscriptionForDACRequest(
-    SubscriptionForDACRequest(
-    RequestCommonForSubscription(
-      "DAC",
-      "2020-09-12T18:03:45Z",
-      "abcdefghijklmnopqrstuvwxyz123456",
-      "MDTP",
-      None),
-    RequestDetail(
-      "SAFE",
-      "AB123456Z",
-      Some("Tools for Traders Limited"),
-      true,
-      PrimaryContact(
-        IndividualDetails("TIMMY", None, "MALLET"),
-        "timmy@toolsfortraders.com",
-        Some("01910000000"),
-        Some("07123456789")),
-      Some(SecondaryContact(
-        IndividualDetails("JIMMY", None, "NAIL"),
-        "jimmy@toolsfortraders.com",
-        Some("01910000000"),
-        Some("07123456789")
-          )
-        )
-      )
-    )
-  )
-
-  val subscriptionOrganisation: CreateSubscriptionForDACRequest =
-    CreateSubscriptionForDACRequest(
-    SubscriptionForDACRequest(
-    RequestCommonForSubscription(
-      "DAC",
-      "2020-09-12T18:03:45Z",
-      "abcdefghijklmnopqrstuvwxyz123456",
-      "MDTP",
-      None),
-    RequestDetail(
-      "SAFE",
-      "AB123456Z",
-      Some("Tools for Traders Limited"),
-      true,
-      PrimaryContact(
-        OrganisationDetails("Tools for Traders Limited"),
-        "timmy@toolsfortraders.com",
-        Some("01910000000"),
-        Some("07123456789")),
-      None
-      )
-    )
-  )
-
-  val subscriptionIndividualJson =
+  val IndividualSubscriptionJson =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
           "regime" -> "DAC",
-          "receiptDate" -> "2020-09-12T18:03:45Z",
-          "acknowledgementReference" -> "abcdefghijklmnopqrstuvwxyz123456",
-          "originatingSystem" -> "MDTP"
-        ),
+          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "acknowledgementReference" -> "AB123c",
+          "originatingSystem" -> "MDTP",
+          "requestParameters" -> Seq(Json.obj(
+            "paramName" -> "Name",
+            "paramValue" -> "Value"
+          )
+        )),
         "requestDetail" -> Json.obj(
-          "idType" -> "SAFE",
-          "idNumber" -> "AB123456Z",
-          "tradingName" -> "Tools for Traders Limited",
+          "idType" -> "idType",
+          "idNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
-              "firstName" -> "TIMMY",
-              "lastName" -> "MALLET"
+              "firstName" -> "Fairy",
+              "lastName" -> "Liquid"
             ),
-            "email" -> "timmy@toolsfortraders.com",
-            "phone" -> "01910000000",
-            "mobile" -> "07123456789"
+            "email" -> "email2@email.com",
+            "phone" -> "01910002222", //TODO - fix nullable values
+            "mobile" -> "07500000000" //TODO - fix nullable values
           )
         )
       )
     )
 
-  val subscriptionSecondaryContactJson =
+//Organisation Fixtures
+
+  val jsonPayloadForOrganisation: String =
+    """
+      |{
+      |  "createSubscriptionForDACRequest": {
+      |    "requestCommon": {
+      |      "regime": "DAC",
+      |      "receiptDate": "2020-09-23T16:12:11Z",
+      |      "acknowledgementReference": "AB123c",
+      |      "originatingSystem": "MDTP",
+      |      "requestParameters": [{
+      |        "paramName":"Name",
+      |        "paramValue":"Value"
+      |      }]
+      |    },
+      |    "requestDetail": {
+      |      "idType": "idType",
+      |      "idNumber": "idNumber",
+      |      "isGBUser": true,
+      |      "primaryContact": {
+      |        "organisation": {
+      |          "organisationName": "Pizza for you"
+      |        },
+      |        "email": "email@email.com",
+      |        "phone": "0191 111 2222",
+      |        "mobile": "07111111111"
+      |      }
+      |    }
+      |  }
+      |}
+      |""".stripMargin
+
+  val organisationSubscription: CreateSubscriptionForDACRequest =
+    CreateSubscriptionForDACRequest(
+      SubscriptionForDACRequest(
+        RequestCommonForSubscription(
+          "DAC",
+          "2020-09-23T16:12:11Z",
+          "AB123c",
+          "MDTP",
+          Some(Seq(RequestParameters(
+            "Name",
+            "Value"
+          )))
+        ),
+        RequestDetail(
+          "idType",
+          "idNumber",
+          None,
+          true,
+          PrimaryContact(
+            OrganisationDetails("Pizza for you"),
+            "email@email.com",
+            Some("0191 111 2222"),
+            Some("07111111111")),
+          None
+        )
+      )
+    )
+
+  val organisationSubscriptionJson =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
           "regime" -> "DAC",
-          "receiptDate" -> "2020-09-12T18:03:45Z",
-          "acknowledgementReference" -> "abcdefghijklmnopqrstuvwxyz123456",
+          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "acknowledgementReference" -> "AB123c",
+          "originatingSystem" -> "MDTP",
+          "requestParameters" -> Seq(Json.obj(
+            "paramName" -> "Name",
+            "paramValue" -> "Value"
+          ))
+        ),
+        "requestDetail" -> Json.obj(
+          "idType" -> "idType",
+          "idNumber" -> "idNumber",
+          "isGBUser" -> true,
+          "primaryContact" -> Json.obj(
+            "organisation" -> Json.obj(
+              "organisationName" -> "Pizza for you"
+            ),
+            "email" -> "email@email.com",
+            "phone" -> "0191 111 2222",
+            "mobile" -> "07111111111"
+          )
+        )
+      )
+    )
+
+  // SecondaryContact Fixtures
+
+  //TODO - fix nullable values for phone & mobile fixture
+
+  val jsonPayloadForSecondaryContact: String =
+    """
+      |{
+      |  "createSubscriptionForDACRequest": {
+      |    "requestCommon": {
+      |      "regime": "DAC",
+      |      "receiptDate": "2020-09-23T16:12:11Z",
+      |      "acknowledgementReference": "AB123c",
+      |      "originatingSystem": "MDTP"
+      |    },
+      |    "requestDetail": {
+      |      "idType": "idType",
+      |      "idNumber": "idNumber",
+      |      "isGBUser": true,
+      |      "primaryContact": {
+      |        "individual": {
+      |          "firstName": "Fairy",
+      |          "lastName": "Liquid"
+      |        },
+      |        "email": "email2@email.com"
+      |      },
+      |      "secondaryContact": {
+      |        "organisation": {
+      |          "organisationName": "Pizza for you"
+      |        },
+      |        "email": "email@email.com",
+      |        "phone": "0191 111 2222",
+      |        "mobile": "07111111111"
+      |      }
+      |    }
+      |  }
+      |}
+      |""".stripMargin
+
+  //TODO - fix nullable values for phone & mobile fixture
+
+  val secondaryContactSubscription =
+    CreateSubscriptionForDACRequest(
+    SubscriptionForDACRequest(
+    RequestCommonForSubscription(
+      "DAC",
+      "2020-09-23T16:12:11Z",
+      "AB123c",
+      "MDTP",
+      None),
+    RequestDetail(
+      "idType",
+      "idNumber",
+      None,
+      true,
+      PrimaryContact(
+        IndividualDetails("Fairy", None, "Liquid"),
+        "email2@email.com",
+        None,
+        None),
+      Some(SecondaryContact(
+        OrganisationDetails(
+          "Pizza for you"),
+        "email@email.com",
+        Some("0191 111 2222"),
+        Some("07111111111")
+          )
+        )
+      )
+    )
+  )
+
+  //TODO - fix nullable values for phone & mobile fixture
+
+  val secondaryContactSubscriptionJson =
+    Json.obj(
+      "createSubscriptionForDACRequest" -> Json.obj(
+        "requestCommon" -> Json.obj(
+          "regime" -> "DAC",
+          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "acknowledgementReference" -> "AB123c",
           "originatingSystem" -> "MDTP"
         ),
       "requestDetail" -> Json.obj(
-        "idType" -> "SAFE",
-        "idNumber" -> "AB123456Z",
-        "tradingName" -> "Tools for Traders Limited",
+        "idType" -> "idType",
+        "idNumber" -> "idNumber",
         "isGBUser" -> true,
         "primaryContact" -> Json.obj(
           "individual" -> Json.obj(
-            "firstName" -> "TIMMY",
-            "lastName" -> "MALLET"
+            "firstName" -> "Fairy",
+            "lastName" -> "Liquid"
           ),
-          "email" -> "timmy@toolsfortraders.com",
-          "phone" -> "01910000000",
-          "mobile" -> "07123456789"
+          "email" -> "email2@email.com"
         ),
         "secondaryContact" -> Json.obj(
           "individual" -> Json.obj(

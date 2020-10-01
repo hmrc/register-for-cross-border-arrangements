@@ -30,12 +30,17 @@ class SubscriptionSpec extends SpecBase
 
   "create Subscription for DAC Request" - {
 
-    "marshal from Json subscription for individual" in {
-      Json.parse(subscriptionIndividualJsonPayload).validate[CreateSubscriptionForDACRequest].get mustBe subscriptionIndividual
-    }
-
     "marshall into json subscription for individual" in {
       Json.toJson(subscriptionIndividual) mustBe subscriptionIndividualJson
     }
+
+    "marshall into json subscription for organisation" in {
+      Json.toJson(subscriptionOrganisation) mustBe subscriptionOrganisationJson
+    }
+
+    "marshall into json subscription for individual with secondaryContact" in {
+      Json.toJson(subscriptionSecondaryContact) mustBe subscriptionSecondaryContactJson
+    }
+
   }
 }

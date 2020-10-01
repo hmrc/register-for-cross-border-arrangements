@@ -38,8 +38,6 @@ class SubscriptionController @Inject()(
       val subscriptionSubmissionResult: JsResult[CreateSubscriptionForDACRequest] =
         request.body.validate[CreateSubscriptionForDACRequest]
 
-      //TODO - add businessResponseError NOT_OK
-
       subscriptionSubmissionResult.fold(
         invalid = _ => Future.successful(BadRequest("")),
         valid = sub =>
@@ -54,8 +52,6 @@ class SubscriptionController @Inject()(
       case OK => Ok(httpResponse.body)
       case BAD_REQUEST => BadRequest(httpResponse.body)
       case FORBIDDEN => Forbidden(httpResponse.body)
-      case NOT_FOUND => NotFound(httpResponse.body)
-      case METHOD_NOT_ALLOWED => MethodNotAllowed(httpResponse.body)
       case _ => InternalServerError(httpResponse.body)
 
     }

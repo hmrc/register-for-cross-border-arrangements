@@ -35,7 +35,7 @@ class SubscriptionConnector @Inject()(val config: AppConfig, val http: HttpClien
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}"))) //TODO - change Bearer Token
+      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
       .withExtraHeaders(addHeaders(): _*)
 
     http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription)(wts =

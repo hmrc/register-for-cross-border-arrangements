@@ -142,7 +142,7 @@ case class RequestCommonForSubscription(regime: String,
                          requestParameters: Option[Seq[RequestParameters]])
 
 object RequestCommonForSubscription {
-  implicit val requestCommonFormats = Json.format[RequestCommonForSubscription]
+  implicit val requestCommonForSubscriptionFormats = Json.format[RequestCommonForSubscription]
 
 }
 

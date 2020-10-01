@@ -307,8 +307,7 @@ object JsonFixtures {
       |"regime": "DAC",
       |"receiptDate": "2020-09-12T18:03:45Z",
       |"acknowledgementReference": "abcdefghijklmnopqrstuvwxyz123456",
-      |"originatingSystem": "MDTP",
-      |"parameters": null
+      |"originatingSystem": "MDTP"
       |},
       |"requestDetail": {
       |"IDType": "SAFE",
@@ -328,6 +327,40 @@ object JsonFixtures {
       |"individual": {
       |"firstName": "JIMMY",
       |"lastName": "NAIL"
+      |},
+      |"email": "Jimmy@toolsfortraders.com",
+      |"phone": "0191000000",
+      |"mobile": "07123456789"
+      |}
+      |}
+      |}
+      |}""".stripMargin
+
+  val subscriptionOrganisationJsonPayload =
+    """{
+      |"createSubscriptionForDACRequest": {
+      |"requestCommon": {
+      |"regime": "DAC",
+      |"receiptDate": "2020-09-12T18:03:45Z",
+      |"acknowledgementReference": "abcdefghijklmnopqrstuvwxyz123456",
+      |"originatingSystem": "MDTP"
+      |},
+      |"requestDetail": {
+      |"IDType": "SAFE",
+      |"IDNumber": "AB123456Z",
+      |"tradingName": "Tools for Traders Limited",
+      |"isGBUser": true,
+      |"primaryContact": {
+      |"organisation": {
+      |"organisationName": "Tools for Traders Limited",
+      |},
+      |"email": "timmy@toolsfortraders.com",
+      |"phone": "0191000000",
+      |"mobile": "07123456789"
+      |},
+      |"secondaryContact": {
+      |"organisation": {
+      |"organisationName": "Tools for Traders Limited",
       |},
       |"email": "Jimmy@toolsfortraders.com",
       |"phone": "0191000000",
@@ -357,6 +390,30 @@ object JsonFixtures {
         "timmy@toolsfortraders.com",
         Some("01910000000"),
         Some("07123456789")),
+      None
+      )
+    )
+  )
+
+  val subscriptionSecondaryContact =
+    CreateSubscriptionForDACRequest(
+    SubscriptionForDACRequest(
+    RequestCommonForSubscription(
+      "DAC",
+      "2020-09-12T18:03:45Z",
+      "abcdefghijklmnopqrstuvwxyz123456",
+      "MDTP",
+      None),
+    RequestDetail(
+      "SAFE",
+      "AB123456Z",
+      Some("Tools for Traders Limited"),
+      true,
+      PrimaryContact(
+        IndividualDetails("TIMMY", None, "MALLET"),
+        "timmy@toolsfortraders.com",
+        Some("01910000000"),
+        Some("07123456789")),
       Some(SecondaryContact(
         IndividualDetails("JIMMY", None, "NAIL"),
         "jimmy@toolsfortraders.com",
@@ -368,7 +425,58 @@ object JsonFixtures {
     )
   )
 
+  val subscriptionOrganisation: CreateSubscriptionForDACRequest =
+    CreateSubscriptionForDACRequest(
+    SubscriptionForDACRequest(
+    RequestCommonForSubscription(
+      "DAC",
+      "2020-09-12T18:03:45Z",
+      "abcdefghijklmnopqrstuvwxyz123456",
+      "MDTP",
+      None),
+    RequestDetail(
+      "SAFE",
+      "AB123456Z",
+      Some("Tools for Traders Limited"),
+      true,
+      PrimaryContact(
+        OrganisationDetails("Tools for Traders Limited"),
+        "timmy@toolsfortraders.com",
+        Some("01910000000"),
+        Some("07123456789")),
+      None
+      )
+    )
+  )
+
   val subscriptionIndividualJson =
+    Json.obj(
+      "createSubscriptionForDACRequest" -> Json.obj(
+        "requestCommon" -> Json.obj(
+          "regime" -> "DAC",
+          "receiptDate" -> "2020-09-12T18:03:45Z",
+          "acknowledgementReference" -> "abcdefghijklmnopqrstuvwxyz123456",
+          "originatingSystem" -> "MDTP"
+        ),
+        "requestDetail" -> Json.obj(
+          "idType" -> "SAFE",
+          "idNumber" -> "AB123456Z",
+          "tradingName" -> "Tools for Traders Limited",
+          "isGBUser" -> true,
+          "primaryContact" -> Json.obj(
+            "individual" -> Json.obj(
+              "firstName" -> "TIMMY",
+              "lastName" -> "MALLET"
+            ),
+            "email" -> "timmy@toolsfortraders.com",
+            "phone" -> "01910000000",
+            "mobile" -> "07123456789"
+          )
+        )
+      )
+    )
+
+  val subscriptionSecondaryContactJson =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -442,4 +550,29 @@ val registerWithIDJson = Json.obj(
       WithIDIndividual("Fred", Some("Flintstone"), "Flint", "1999-12-20")))
   )
 
+  val subscriptionOrganisationJson =
+    Json.obj(
+      "createSubscriptionForDACRequest" -> Json.obj(
+        "requestCommon" -> Json.obj(
+          "regime" -> "DAC",
+          "receiptDate" -> "2020-09-12T18:03:45Z",
+          "acknowledgementReference" -> "abcdefghijklmnopqrstuvwxyz123456",
+          "originatingSystem" -> "MDTP"
+        ),
+        "requestDetail" -> Json.obj(
+          "idType" -> "SAFE",
+          "idNumber" -> "AB123456Z",
+          "tradingName" -> "Tools for Traders Limited",
+          "isGBUser" -> true,
+          "primaryContact" -> Json.obj(
+            "organisation" -> Json.obj(
+              "organisationName" -> "Tools for Traders Limited"
+            ),
+            "email" -> "timmy@toolsfortraders.com",
+            "phone" -> "01910000000",
+            "mobile" -> "07123456789"
+          )
+        )
+      )
+    )
 }

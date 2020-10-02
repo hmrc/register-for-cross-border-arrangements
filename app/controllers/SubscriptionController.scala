@@ -52,6 +52,7 @@ class SubscriptionController @Inject()(
       case OK => Ok(httpResponse.body)
       case BAD_REQUEST => BadRequest(httpResponse.body)
       case FORBIDDEN => Forbidden(httpResponse.body)
+      case SERVICE_UNAVAILABLE => ServiceUnavailable(httpResponse.body)
       case _ => InternalServerError(httpResponse.body)
 
     }

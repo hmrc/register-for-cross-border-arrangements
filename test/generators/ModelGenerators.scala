@@ -180,15 +180,12 @@ trait ModelGenerators {
       emailAddress = emailAddress
     )
   }
-  //TODO - change below implicits depending on model Changes
 
   implicit val arbitraryRequestCommonForSubscription: Arbitrary[RequestCommonForSubscription] = Arbitrary {
     for {
       receiptDate <- stringsWithMaxLength(30)
       acknowledgementRef <- stringsWithMaxLength(32)
       originatingSystem <- stringsWithMaxLength(30)
-//        RegexpGen.from("^[A-Za-z0-9\\-\\._]{1,30}$") //TODO - check Regex
-
   } yield RequestCommonForSubscription(
       receiptDate = receiptDate,
       regime = "DAC",

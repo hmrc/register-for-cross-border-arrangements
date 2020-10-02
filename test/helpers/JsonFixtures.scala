@@ -385,8 +385,8 @@ object JsonFixtures {
               "lastName" -> "Liquid"
             ),
             "email" -> "email2@email.com",
-            "phone" -> "01910002222", //TODO - fix nullable values
-            "mobile" -> "07500000000" //TODO - fix nullable values
+            "phone" -> "01910002222",
+            "mobile" -> "07500000000"
           )
         )
       )

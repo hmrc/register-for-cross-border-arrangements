@@ -94,6 +94,21 @@ class SubscriptionControllerSpec extends SpecBase
             status(result) mustEqual FORBIDDEN
         }
       }
+
+      "should return SERVICE_UNAVAILABLE when EIS becomes unavailable" in {
+        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
+          .thenReturn(Future.successful(HttpResponse(503, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+          (subscriptionForDacRequest) =>
+            val request =
+              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+              .withJsonBody(Json.toJson(subscriptionForDacRequest))
+
+            val result = route(application, request).value
+            status(result) mustEqual SERVICE_UNAVAILABLE
+        }
+      }
     }
   }
 

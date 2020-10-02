@@ -18,7 +18,7 @@ package models
 
 import java.time.LocalDate
 
-import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
+import play.api.libs.json._
 
 trait IndividualAndBusinessMatchingSubmission
 

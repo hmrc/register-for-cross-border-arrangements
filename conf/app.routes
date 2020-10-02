@@ -5,5 +5,6 @@ POST    /matching/individual/utr/:utr           controllers.BusinessMatchingCont
 POST    /matching/organisation/utr/:utr         controllers.BusinessMatchingController.businessMatchingSubmission(utr: String)
 
 POST    /registration/02.00.00/noId             controllers.RegistrationController.noIdRegistration
+POST    /registration/02.00.00/withId           controllers.RegistrationController.withIdRegistration
 
 PUT     /enrolment/create-enrolment             controllers.TaxEnrolmentsController.createEnrolment

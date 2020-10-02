@@ -18,7 +18,7 @@ package models
 
 import java.time.LocalDate
 
-import play.api.libs.json.{JsValue, Json, OFormat, OWrites, Reads, __}
+import play.api.libs.json._
 
 
 case class NoIdIndividual(name: Name, dateOfBirth: LocalDate)
@@ -69,32 +69,22 @@ object Identification {
   implicit val indentifierFormats = Json.format[Identification]
 }
 
-case class RequestCommon(receiptDate: String, regime: String, acknowledgementReference: String, parameters: Option[String])
+
+case class RequestParameter(paramName: String, paramValue: String)
+
+object RequestParameter {
+  implicit val indentifierFormats = Json.format[RequestParameter]
+}
+
+case class RequestCommon(
+                          receiptDate: String,
+                          regime: String,
+                          acknowledgementReference: String,
+                          requestParameters: Option[Seq[RequestParameter]]
+                        )
 
 object RequestCommon {
-
   implicit val requestCommonFormats = Json.format[RequestCommon]
-
-  case class RequestParameters(paramName: String, paramValue: String)
-
-  object RequestParameters {
-    implicit lazy val writes: OWrites[RequestParameters] = OWrites[RequestParameters] {
-      parameters =>
-        Json.obj(
-          "paramName" -> parameters.paramName,
-          "paramValue" -> parameters.paramValue
-        )
-    }
-
-    implicit lazy val reads: Reads[RequestParameters] = {
-      import play.api.libs.functional.syntax._
-      (
-        (__ \ "paramName").read[String] and
-          (__ \ "paramValue").read[String]
-        ) ((name, value) => RequestParameters(name, value))
-    }
-  }
-
 }
 
 case class RequestDetails(
@@ -118,10 +108,10 @@ object RequestDetails {
         (__ \ "contactDetails").read[ContactDetails] and
         (__ \ "identification").readNullable[Identification]
       ) (
-      (organisation, individual, address, contactDetails, identification) => (organisation, individual, address, identification, contactDetails) match {
-        case (None, None, _, _, _) => throw new Exception("Request Details must have either an organisation or individual element")
-        case (Some(org), Some(ind), _, _, _) => throw new Exception("Request details cannot have both and organisation or individual element")
-        case (organisation, individual, address, identification, contactDetails) => RequestDetails(organisation, individual, address, contactDetails, identification)
+      (organisation, individual, address, contactDetails, identification) => (organisation, individual) match {
+        case (None, None) => throw new Exception("Request Details must have either an organisation or individual element")
+        case (Some(_), Some(_)) => throw new Exception("Request details cannot have both and organisation or individual element")
+        case (organisation, individual) => RequestDetails(organisation, individual, address, contactDetails, identification)
       }
     )
   }

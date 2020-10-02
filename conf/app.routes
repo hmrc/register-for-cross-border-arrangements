@@ -3,4 +3,7 @@
 POST    /matching/individual/nino/:nino         controllers.BusinessMatchingController.individualMatchingSubmission(nino: Nino)
 POST    /matching/individual/utr/:utr           controllers.BusinessMatchingController.soleProprietorMatchingSubmission(utr: String)
 POST    /matching/organisation/utr/:utr         controllers.BusinessMatchingController.businessMatchingSubmission(utr: String)
+
+POST    /registration/02.00.00/noId             controllers.RegistrationController.noIdRegistration
+
 PUT     /enrolment/create-enrolment             controllers.TaxEnrolmentsController.createEnrolment

@@ -33,6 +33,7 @@ object IndividualMatchingSubmission {
 
 
 case class Individual(name: Name, dateOfBirth: LocalDate)
+
 object Individual {
   implicit lazy val writes: OWrites[Individual] = OWrites[Individual] {
     individual =>

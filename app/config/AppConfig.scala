@@ -22,8 +22,11 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject()(config: Configuration) {
   lazy val businessMatchingUrl: String = s"${config.get[Service]("microservice.services.business-matching").baseUrl}${config.get[String]("microservice.services.business-matching.startUrl")}"
+  lazy val registrationUrl: String = s"${config.get[Service]("microservice.services.registration").baseUrl}${config.get[String]("microservice.services.registration.startUrl")}"
   lazy val taxEnrolmentsUrl: String = s"${config.get[Service]("microservice.services.tax-enrolments").baseUrl}${config.get[String]("microservice.services.tax-enrolments.url")}"
 
-  lazy val desBearerToken: String = config.get[String]("microservice.services.business-matching.bearer-token")
+  lazy val registerUrl: String = s"$registrationUrl/dac6/dct01/v1"
+
+  lazy val bearerToken: String = config.get[String]("microservice.services.business-matching.bearer-token")
   lazy val desEnvironment: String = config.get[String]("microservice.services.business-matching.environment")
 }

@@ -1,0 +1,274 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package helpers
+
+import java.time.LocalDate
+
+import models.{Address, ContactDetails, Name, NoIdIndividual, NoIdOrganisation, RegisterWithoutIDRequest, RequestCommon, RequestDetails, Registration}
+import play.api.libs.json.{JsNull, Json}
+
+object JsonFixtures {
+  val jsonPayload =
+    """{
+      |"registerWithoutIDRequest": {
+      |"requestCommon": {
+      |"receiptDate": "2001-12-17",
+      |"regime": "DAC",
+      |"acknowledgementReference":
+      |"ec031b045855445e96f98569ds56cd22",
+      |"parameters": null
+      |},
+      |"requestDetail": {
+      |"individual": {
+      |"firstName": "FIRST NAME",
+      |"lastName": "LAST NAME",
+      |"dateOfBirth": "1999-01-23"
+      |},
+      |"address": {
+      |"addressLine1": "ADDRESS1",
+      |"addressLine2": "ADDRESS2",
+      |"addressLine3": "ADDRESS3",
+      |"addressLine4": "ADDRESS4",
+      |"postalCode": "bh1 3fg",
+      |"countryCode": "GB"
+      |},
+      |"contactDetails": {
+      |"phoneNumber": "878798798798",
+      |"mobileNumber": "7698908090",
+      |"faxNumber": "837587345",
+      |"emailAddress": "ABC@YAHOO.COM"
+      |}
+      |}
+      |}
+      |}""".stripMargin
+
+  val invalidJsonPayload =
+    """{
+      |"registerWithoutIDRequest": {
+      |"requestCommon": {
+      |"receiptDate": "2001-12-17",
+      |"regime": "DAC",
+      |"acknowledgementReference":
+      |"ec031b045855445e96f98569ds56cd22",
+      |"parameters": null
+      |},
+      |"requestDetail": {
+      |"organisation": {
+      |"organisationName": "org1"
+      |},
+      |"individual": {
+      |"firstName": "FIRST NAME",
+      |"lastName": "LAST NAME",
+      |"dateOfBirth": "1999-01-23"
+      |},
+      |"address": {
+      |"addressLine1": "ADDRESS1",
+      |"addressLine2": "ADDRESS2",
+      |"addressLine3": "ADDRESS3",
+      |"addressLine4": "ADDRESS4",
+      |"postalCode": "bh1 3fg",
+      |"countryCode": "GB"
+      |},
+      |"contactDetails": {
+      |"phoneNumber": "878798798798",
+      |"mobileNumber": "7698908090",
+      |"faxNumber": "837587345",
+      |"emailAddress": "ABC@YAHOO.COM"
+      |}
+      |}
+      |}
+      |}""".stripMargin
+
+  val invalidJsonPayloadDual =
+    """{
+      |"registerWithoutIDRequest": {
+      |"requestCommon": {
+      |"receiptDate": "2001-12-17",
+      |"regime": "DAC",
+      |"acknowledgementReference":
+      |"ec031b045855445e96f98569ds56cd22",
+      |"parameters": null
+      |},
+      |"requestDetail": {
+      |"address": {
+      |"addressLine1": "ADDRESS1",
+      |"addressLine2": "ADDRESS2",
+      |"addressLine3": "ADDRESS3",
+      |"addressLine4": "ADDRESS4",
+      |"postalCode": "bh1 3fg",
+      |"countryCode": "GB"
+      |},
+      |"contactDetails": {
+      |"phoneNumber": "878798798798",
+      |"mobileNumber": "7698908090",
+      |"faxNumber": "837587345",
+      |"emailAddress": "ABC@YAHOO.COM"
+      |}
+      |}
+      |}
+      |}""".stripMargin
+
+  val jsonSubWithOrg  =
+    """{
+      |"registerWithoutIDRequest": {
+      |"requestCommon": {
+      |"receiptDate": "2001-12-17",
+      |"regime": "DAC",
+      |"acknowledgementReference":
+      |"ec031b045855445e96f98569ds56cd22",
+      |"parameters": null
+      |},
+      |"requestDetail": {
+      |"organisation": {
+      |"organisationName": "org1"
+      |},
+      |"address": {
+      |"addressLine1": "ADDRESS1",
+      |"addressLine2": "ADDRESS2",
+      |"addressLine3": "ADDRESS3",
+      |"addressLine4": "ADDRESS4",
+      |"postalCode": "bh1 3fg",
+      |"countryCode": "GB"
+      |},
+      |"contactDetails": {
+      |"phoneNumber": "878798798798",
+      |"mobileNumber": "7698908090",
+      |"faxNumber": "837587345",
+      |"emailAddress": "ABC@YAHOO.COM"
+      |}
+      |}
+      |}
+      |}""".stripMargin
+
+  val sub = Registration(
+    RegisterWithoutIDRequest(
+      RequestCommon("2001-12-17", "DAC", "ec031b045855445e96f98569ds56cd22", None),
+      RequestDetails(
+        None,
+        Some(NoIdIndividual(
+          Name("FIRST NAME", "LAST NAME"),
+          LocalDate.parse("1999-01-23")
+        )),
+        Address(
+          "ADDRESS1",
+          Some("ADDRESS2"),
+          "ADDRESS3",
+          Some("ADDRESS4"),
+          Some("bh1 3fg"),
+          "GB"
+        ),
+        ContactDetails(
+          Some("878798798798"),
+          Some("7698908090"),
+          Some("837587345"),
+          Some("ABC@YAHOO.COM")
+        ),
+        None
+      )
+    )
+  )
+
+  val subWithOrg = Registration(
+    RegisterWithoutIDRequest(
+      RequestCommon("2001-12-17", "DAC", "ec031b045855445e96f98569ds56cd22", None),
+      RequestDetails(
+        Some(NoIdOrganisation("org1")),
+        None,
+        Address(
+          "ADDRESS1",
+          Some("ADDRESS2"),
+          "ADDRESS3",
+          Some("ADDRESS4"),
+          Some("bh1 3fg"),
+          "GB"
+        ),
+        ContactDetails(
+          Some("878798798798"),
+          Some("7698908090"),
+          Some("837587345"),
+          Some("ABC@YAHOO.COM")
+        ),
+        None
+      )
+    )
+  )
+
+  val subJson = Json.obj(
+    "registerWithoutIDRequest" -> Json.obj(
+      "requestCommon" ->
+        Json.obj(
+          "receiptDate" -> "2001-12-17",
+          "regime" -> "DAC",
+          "acknowledgementReference" -> "ec031b045855445e96f98569ds56cd22"
+        ),
+      "requestDetail" -> Json.obj(
+        "individual" -> Json.obj(
+          "firstName" -> "FIRST NAME",
+          "lastName" -> "LAST NAME",
+          "dateOfBirth" -> "1999-01-23"
+        ),
+        "address" -> Json.obj(
+          "addressLine1" -> "ADDRESS1",
+          "addressLine2" -> "ADDRESS2",
+          "addressLine3" -> "ADDRESS3",
+          "addressLine4" -> "ADDRESS4",
+          "postalCode" -> "bh1 3fg",
+          "countryCode" -> "GB"
+        ),
+        "contactDetails" -> Json.obj(
+          "phoneNumber" -> "878798798798",
+          "mobileNumber" -> "7698908090",
+          "faxNumber" -> "837587345",
+          "emailAddress" -> "ABC@YAHOO.COM"
+        )
+
+      )
+    )
+  )
+
+  val subJsonWithOrg = Json.obj(
+    "registerWithoutIDRequest" -> Json.obj(
+      "requestCommon" ->
+        Json.obj(
+          "receiptDate" -> "2001-12-17",
+          "regime" -> "DAC",
+          "acknowledgementReference" -> "ec031b045855445e96f98569ds56cd22"
+        ),
+      "requestDetail" -> Json.obj(
+        "organisation" -> Json.obj("organisationName" -> "org1"),
+        "address" -> Json.obj(
+          "addressLine1" -> "ADDRESS1",
+          "addressLine2" -> "ADDRESS2",
+          "addressLine3" -> "ADDRESS3",
+          "addressLine4" -> "ADDRESS4",
+          "postalCode" -> "bh1 3fg",
+          "countryCode" -> "GB"
+        ),
+        "contactDetails" -> Json.obj(
+          "phoneNumber" -> "878798798798",
+          "mobileNumber" -> "7698908090",
+          "faxNumber" -> "837587345",
+          "emailAddress" -> "ABC@YAHOO.COM"
+        )
+
+      )
+    )
+  )
+
+
+
+}

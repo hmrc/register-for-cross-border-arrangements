@@ -87,6 +87,4 @@ class BusinessMatchingController @Inject()(
       case _ => InternalServerError(httpResponse.body)
     }
   }
-
-
 }

@@ -117,4 +117,84 @@ trait ModelGenerators {
       nonUkPostcode = nonUkPostcode)
   }
 
+  implicit val arbitraryRequestCommon: Arbitrary[RequestCommon] = Arbitrary {for {
+    receiptDate <- arbitrary[String]
+    acknowledgementRef <- stringsWithMaxLength(32)
+
+  } yield RequestCommon(
+    receiptDate = receiptDate,
+    regime = "DAC",
+    acknowledgementReference = acknowledgementRef,
+    None
+  )
+  }
+
+
+  implicit val arbitraryRegistration: Arbitrary[Registration] = Arbitrary {for {
+    requestCommon <- arbitrary[RequestCommon]
+    name <- arbitrary[String]
+    address <- arbitrary[Address]
+    contactDetails <- arbitrary[ContactDetails]
+    identification <- Gen.option(arbitrary[Identification])
+  } yield
+    Registration(
+      RegisterWithoutIDRequest(
+        requestCommon,
+        RequestDetails(
+
+           Some(NoIdOrganisation(name)),
+          None,
+      address = address,
+      contactDetails = contactDetails,
+      identification = identification)
+      )
+    )
+  }
+
+
+
+  implicit val arbitraryAddress: Arbitrary[Address] = Arbitrary {for {
+    addressLine1 <- arbitrary[String]
+    addressLine2 <- Gen.option(arbitrary[String])
+    addressLine3 <- arbitrary[String]
+    addressLine4 <- Gen.option(arbitrary[String])
+    postalCode <- Gen.option(arbitrary[String])
+    countryCode <- arbitrary[String]
+  } yield
+    Address(
+      addressLine1 = addressLine1,
+      addressLine2 = addressLine2,
+      addressLine3 = addressLine3,
+      addressLine4 = addressLine4,
+      postalCode = postalCode,
+      countryCode = countryCode,
+    )
+  }
+
+  implicit val arbitraryContactDetails: Arbitrary[ContactDetails] = Arbitrary {for {
+    phoneNumber <- Gen.option(arbitrary[String])
+    mobileNumber <- Gen.option(arbitrary[String])
+    faxNumber <- Gen.option(arbitrary[String])
+    emailAddress <- Gen.option(arbitrary[String])
+  } yield
+    ContactDetails(
+      phoneNumber = phoneNumber,
+      mobileNumber = mobileNumber,
+      faxNumber = faxNumber,
+      emailAddress = emailAddress
+    )
+  }
+
+  implicit val arbitraryIdentification: Arbitrary[Identification] = Arbitrary {for {
+    idNumber <- arbitrary[String]
+    issuingInstitution <- arbitrary[String]
+    issuingCountryCode <- arbitrary[String]
+  } yield
+    Identification(
+      idNumber = idNumber,
+      issuingInstitution = issuingInstitution,
+      issuingCountryCode = issuingCountryCode
+    )
+  }
+
 }

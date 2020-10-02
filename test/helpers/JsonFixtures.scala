@@ -299,8 +299,8 @@ object JsonFixtures {
       |}""".stripMargin
 
   //Subscription Fixtures
-
   // Individual Fixtures
+
   val jsonPayloadForIndividual: String =
     """
       |{
@@ -351,11 +351,12 @@ object JsonFixtures {
       "idNumber",
       None,
       true,
-      PrimaryContact(
+      PrimaryContact(ContactInformationForIndividual(
         IndividualDetails("Fairy", None, "Liquid"),
         "email2@email.com",
         Some("01910002222"),
-        Some("07500000000")),
+        Some("07500000000"))
+      ),
       None
       )
     )
@@ -443,10 +444,12 @@ object JsonFixtures {
           None,
           true,
           PrimaryContact(
-            OrganisationDetails("Pizza for you"),
+            ContactInformationForOrganisation(
+              OrganisationDetails("Pizza for you"),
             "email@email.com",
             Some("0191 111 2222"),
-            Some("07111111111")),
+            Some("07111111111"))
+          ),
           None
         )
       )
@@ -483,8 +486,6 @@ object JsonFixtures {
 
   // SecondaryContact Fixtures
 
-  //TODO - fix nullable values for phone & mobile fixture
-
   val jsonPayloadForSecondaryContact: String =
     """
       |{
@@ -519,8 +520,6 @@ object JsonFixtures {
       |}
       |""".stripMargin
 
-  //TODO - fix nullable values for phone & mobile fixture
-
   val secondaryContactSubscription =
     CreateSubscriptionForDACRequest(
     SubscriptionForDACRequest(
@@ -536,13 +535,17 @@ object JsonFixtures {
       None,
       true,
       PrimaryContact(
-        IndividualDetails("Fairy", None, "Liquid"),
+        ContactInformationForIndividual(
+          IndividualDetails("Fairy", None, "Liquid"),
         "email2@email.com",
         None,
-        None),
+        None)
+      ),
       Some(SecondaryContact(
-        OrganisationDetails(
-          "Pizza for you"),
+        ContactInformationForOrganisation(
+          OrganisationDetails(
+            "Pizza for you"
+          ),
         "email@email.com",
         Some("0191 111 2222"),
         Some("07111111111")
@@ -550,9 +553,7 @@ object JsonFixtures {
         )
       )
     )
-  )
-
-  //TODO - fix nullable values for phone & mobile fixture
+  ))
 
   val secondaryContactSubscriptionJson =
     Json.obj(
@@ -649,5 +650,67 @@ val registerWithIDJson = Json.obj(
           )
         )
       )
+    ))
+
+  //Invalid Subscription Json
+
+  val invalidJsonPayloadForIndividual: String =
+    """
+      |{
+      |  "createSubscriptionForDACRequest": {
+      |    "requestCommon": {
+      |      "regime": "DAC",
+      |      "receiptDate": "2020-09-23T16:12:11Z",
+      |      "acknowledgementReference": "AB123c",
+      |      "originatingSystem": "MDTP",
+      |      "requestParameters": [{
+      |        "paramName":"Name",
+      |        "paramValue":"Value"
+      |      }]
+      |    },
+      |    "requestDetail": {
+      |      "idType": "idType",
+      |      "idNumber": "idNumber",
+      |      "isGBUser": true,
+      |      "primaryContact": {
+      |        "email": "email2@email.com",
+      |        "phone": "01910002222",
+      |        "mobile": "07500000000"
+      |      }
+      |    }
+      |  }
+      |}
+      |""".stripMargin
+
+  val invalidJsonPayloadForSecondaryContact: String =
+    """
+      |{
+      |  "createSubscriptionForDACRequest": {
+      |    "requestCommon": {
+      |      "regime": "DAC",
+      |      "receiptDate": "2020-09-23T16:12:11Z",
+      |      "acknowledgementReference": "AB123c",
+      |      "originatingSystem": "MDTP"
+      |    },
+      |    "requestDetail": {
+      |      "idType": "idType",
+      |      "idNumber": "idNumber",
+      |      "isGBUser": true,
+      |      "primaryContact": {
+      |        "individual": {
+      |          "firstName": "Fairy",
+      |          "lastName": "Liquid"
+      |        },
+      |        "email": "email2@email.com"
+      |      },
+      |      "secondaryContact": {
+      |        "email": "email@email.com",
+      |        "phone": "0191 111 2222",
+      |        "mobile": "07111111111"
+      |      }
+      |    }
+      |  }
+      |}
+      |""".stripMargin
     )
 }

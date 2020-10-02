@@ -76,8 +76,6 @@ trait ModelGenerators {
         Organisation(organisationName, organisationType))
   }
 
-
-
   implicit val arbitraryEnrolmentRequest: Arbitrary[EnrolmentRequest] = {
     implicit val arbitraryIdentifier: Arbitrary[Identifier] = Arbitrary {
       for {
@@ -130,7 +128,6 @@ trait ModelGenerators {
   )
   }
 
-
   implicit val arbitraryRegistration: Arbitrary[Registration] = Arbitrary {for {
     requestCommon <- arbitrary[RequestCommon]
     name <- arbitrary[String]
@@ -151,8 +148,6 @@ trait ModelGenerators {
       )
     )
   }
-
-
 
   implicit val arbitraryAddress: Arbitrary[Address] = Arbitrary {for {
     addressLine1 <- arbitrary[String]
@@ -224,33 +219,49 @@ trait ModelGenerators {
         organisationName = name)
   }
 
-  implicit val arbitraryPrimaryContact: Arbitrary[PrimaryContact] = Arbitrary {
+  implicit val arbitraryContactInformationForIndividual: Arbitrary[ContactInformationForIndividual] = Arbitrary {
     for {
-      indOrOrg <- Gen.oneOf(arbitrary[OrganisationDetails], arbitrary[IndividualDetails])
+      individual <- arbitrary[IndividualDetails]
       email <- arbitrary[String]
       phone <- Gen.option(arbitrary[String])
       mobile <- Gen.option(arbitrary[String])
     } yield
-      PrimaryContact(
-        indOrOrg,
+      ContactInformationForIndividual(
+        individual,
         email,
         phone,
         mobile
       )
   }
 
-  implicit val arbitrarySecondaryContact: Arbitrary[SecondaryContact] = Arbitrary {
+  implicit val arbitraryContactInformationForOrganisation: Arbitrary[ContactInformationForOrganisation] = Arbitrary {
     for {
-      indOrOrg <- Gen.oneOf(arbitrary[OrganisationDetails], arbitrary[IndividualDetails])
+      organisation <- arbitrary[OrganisationDetails]
       email <- arbitrary[String]
       phone <- Gen.option(arbitrary[String])
       mobile <- Gen.option(arbitrary[String])
     } yield
-      SecondaryContact(
-        indOrOrg,
+      ContactInformationForOrganisation(
+        organisation,
         email,
         phone,
         mobile
+      )
+  }
+
+  implicit val arbitraryPrimaryContact: Arbitrary[PrimaryContact] = Arbitrary {
+    for {
+      contactInformation <- Gen.oneOf(arbitrary[ContactInformationForIndividual], arbitrary[ContactInformationForIndividual])
+    } yield
+      PrimaryContact(contactInformation
+      )
+  }
+
+  implicit val arbitrarySecondaryContact: Arbitrary[SecondaryContact] = Arbitrary {
+    for {
+      contactInformation <- Gen.oneOf(arbitrary[ContactInformationForIndividual], arbitrary[ContactInformationForIndividual])
+    } yield
+      SecondaryContact(contactInformation
       )
   }
 
@@ -272,7 +283,6 @@ trait ModelGenerators {
       secondaryContact = secondaryContact
     )
   }
-
 
   implicit val arbitrarySubscription: Arbitrary[CreateSubscriptionForDACRequest] = Arbitrary {
     for {

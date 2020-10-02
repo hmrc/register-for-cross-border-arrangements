@@ -16,29 +16,42 @@
 
 package models
 
-import play.api.libs.json.{Json, OWrites, Reads, __}
+import play.api.libs.json._
 
 sealed trait ContactInformation
 
-case class OrganisationDetails(organisationName: String) extends ContactInformation
+case class OrganisationDetails(organisationName: String)
 
 object OrganisationDetails {
   implicit val format = Json.format[OrganisationDetails]
 }
 
-case class IndividualDetails(firstName: String, middleName: Option[String], lastName: String) extends ContactInformation
+case class IndividualDetails(firstName: String, middleName: Option[String], lastName: String)
 
 object IndividualDetails {
   implicit val format = Json.format[IndividualDetails]
 }
 
-case class PrimaryContact(indOrOrg: ContactInformation,
-                          email: String,
-                          phone: Option[String],
-                          mobile: Option[String]
-                         )
+
+case class ContactInformationForIndividual(individual: IndividualDetails,
+                                           email: String,
+                                           phone: Option[String],
+                                           mobile: Option[String]) extends ContactInformation
+object ContactInformationForIndividual {
+  implicit val format: OFormat[ContactInformationForIndividual] = Json.format[ContactInformationForIndividual]
+}
+
+case class ContactInformationForOrganisation(organisation: OrganisationDetails,
+                                             email: String,
+                                             phone: Option[String],
+                                             mobile: Option[String]) extends ContactInformation
+object ContactInformationForOrganisation {
+  implicit val format: OFormat[ContactInformationForOrganisation] = Json.format[ContactInformationForOrganisation]
+}
+
+case class PrimaryContact(contactInformation: ContactInformation)
 object PrimaryContact {
-  implicit lazy val primaryContactReads: Reads[PrimaryContact] = {
+  implicit lazy val reads: Reads[PrimaryContact] = {
     import play.api.libs.functional.syntax._
     (
       (__ \ "organisation").readNullable[OrganisationDetails] and
@@ -46,45 +59,26 @@ object PrimaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-      ) (
-      (organisation, individual, email, phone, mobile) => (organisation, individual) match {
-        case (Some(_), Some(_)) => throw new Exception("SecondaryContact cannot have both and organisation or individual element")
-        case (Some(org), _) => PrimaryContact(org, email, phone, mobile)
-        case (_, Some(ind)) => PrimaryContact(ind, email, phone, mobile)
-        case (None, None) => throw new Exception("SecondaryContact must have either an organisation or individual element")
+      )((organisation, individual, email, phone, mobile) =>
+      (organisation.isDefined, individual.isDefined)  match {
+        case (true, false) => PrimaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
+        case (false, true) => PrimaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+        case _ => throw new Exception("Primary Contact must have either an organisation or individual element")
       }
     )
   }
 
-  implicit lazy val primaryContactWrites: OWrites[PrimaryContact] = OWrites[PrimaryContact] {
-    case PrimaryContact(individual@IndividualDetails(_, _, _), email, phone, mobile) =>
-      Json.obj(
-        "individual" -> individual,
-        "email" -> email,
-        "phone" -> phone,
-        "mobile" -> mobile
-      )
-    case PrimaryContact(organisation@OrganisationDetails(_), email, phone, mobile) =>
-      Json.obj(
-        "organisation" -> organisation,
-        "email" -> email,
-        "phone" -> phone,
-        "mobile" -> mobile
-      )
+  implicit lazy val writes: OWrites[PrimaryContact] = {
+    case PrimaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case PrimaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
   }
 }
 
-case class SecondaryContact(indOrOrg: ContactInformation,
-                            email: String,
-                            phone: Option[String],
-                            mobile: Option[String]
-                           )
-
-object SecondaryContact{
-
-  // TODO - fix issue in regards to Optional Nullable Phone / Mobile
-
-  implicit lazy val SecondaryContactReads: Reads[SecondaryContact] = {
+case class SecondaryContact(contactInformation: ContactInformation)
+object SecondaryContact {
+  implicit lazy val reads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
     (
       (__ \ "organisation").readNullable[OrganisationDetails] and
@@ -92,31 +86,20 @@ object SecondaryContact{
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-      ) (
-      (organisation, individual, email, phone, mobile) => (organisation, individual) match {
-        case (Some(_), Some(_)) => throw new Exception("SecondaryContact cannot have both and organisation or individual element")
-        case (Some(org), _) => SecondaryContact(org, email, phone, mobile)
-        case (_, Some(ind)) => SecondaryContact(ind, email, phone, mobile)
-        case (None, None) => throw new Exception("SecondaryContact must have either an organisation or individual element")
+      )((organisation, individual, email, phone, mobile) =>
+      (organisation.isDefined, individual.isDefined)  match {
+        case (true, false) => SecondaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
+        case (false, true) => SecondaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+        case _ => throw new Exception("Secondary Contact must have either an organisation or individual element")
       }
     )
   }
 
-  implicit lazy val SecondaryContactWrites: OWrites[SecondaryContact] = OWrites[SecondaryContact] {
-    case SecondaryContact(individual@IndividualDetails(_, _, _), email, phone, mobile) =>
-      Json.obj(
-        "individual" -> individual,
-        "email" -> email,
-        "phone" -> phone,
-        "mobile" -> mobile
-      )
-    case SecondaryContact(organisation@OrganisationDetails(_), email, phone, mobile) =>
-      Json.obj(
-        "organisation" -> organisation,
-        "email" -> email,
-        "phone" -> phone,
-        "mobile" -> mobile
-      )
+  implicit lazy val writes: OWrites[SecondaryContact] = {
+    case SecondaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForInd)
+    case SecondaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+      Json.toJsObject(contactInformationForOrg)
   }
 }
 

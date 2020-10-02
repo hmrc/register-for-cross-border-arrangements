@@ -50,9 +50,22 @@ class SubscriptionSpec extends SpecBase
       Json.parse(jsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest].get mustBe secondaryContactSubscription
     }
 
-    //TODO - fix nullable values for phone & mobile for below test
-    "marshall into json subscription for individual with secondaryContact as org" in {
+    "marshall into json subscription for individual with Secondary Contact as org" in {
       Json.toJson(secondaryContactSubscription) mustBe secondaryContactSubscriptionJson
     }
+  }
+
+  "catch error if neither organisation or individual is present in PrimaryContact" in {
+    val error = intercept[Exception] {
+      Json.parse(invalidJsonPayloadForIndividual).validate[CreateSubscriptionForDACRequest] mustBe individualSubcription
+    }
+    error.getMessage mustBe "Primary Contact must have either an organisation or individual element"
+  }
+
+  "catch error if neither organisation or individual is present in SecondaryContact" in {
+    val error = intercept[Exception] {
+      Json.parse(invalidJsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest] mustBe secondaryContactSubscription
+    }
+    error.getMessage mustBe "Secondary Contact must have either an organisation or individual element"
   }
 }

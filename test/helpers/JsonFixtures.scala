@@ -576,14 +576,13 @@ object JsonFixtures {
           "email" -> "email2@email.com"
         ),
         "secondaryContact" -> Json.obj(
-          "individual" -> Json.obj(
-            "firstName" -> "JIMMY",
-            "lastName" -> "NAIL"
-          ),
-          "email"-> "jimmy@toolsfortraders.com",
-          "phone" -> "01910000000",
-          "mobile" -> "07123456789"
-        )
+        "organisation" -> Json.obj(
+          "organisationName" -> "Pizza for you"
+        ),
+        "email" -> "email@email.com",
+        "phone" -> "0191 111 2222",
+        "mobile" -> "07111111111"
+      )
       )
     )
   )
@@ -650,7 +649,7 @@ val registerWithIDJson = Json.obj(
           )
         )
       )
-    ))
+    )
 
   //Invalid Subscription Json
 
@@ -712,5 +711,5 @@ val registerWithIDJson = Json.obj(
       |  }
       |}
       |""".stripMargin
-    )
+
 }

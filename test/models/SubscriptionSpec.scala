@@ -18,7 +18,7 @@ package models
 
 import base.SpecBase
 import generators.Generators
-import helpers.JsonFixtures._
+import helpers.SubscriptionJsonFixtures._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
@@ -67,5 +67,13 @@ class SubscriptionSpec extends SpecBase
       Json.parse(invalidJsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest] mustBe secondaryContactSubscription
     }
     error.getMessage mustBe "Secondary Contact must have either an organisation or individual element"
+  }
+
+  "must deserialise CreateSubscriptionForDACResponse" in {
+    Json.parse(jsonPayloadCreateSubscriptionForDACResponse).validate[CreateSubscriptionForDACResponse].get mustBe createSubscriptionForDACResponse
+  }
+
+  "must serialise CreateSubscriptionForDACResponse" in {
+    Json.toJson(createSubscriptionForDACResponse) mustBe createSubscriptionForDACResponseJson
   }
 }

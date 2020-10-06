@@ -145,6 +145,47 @@ object CreateSubscriptionForDACRequest {
   implicit val format = Json.format[CreateSubscriptionForDACRequest]
 }
 
+case class ReturnParameters(paramName: String, paramValue: String)
+
+object ReturnParameters {
+  implicit val format: Format[ReturnParameters] = Json.format[ReturnParameters]
+}
+
+case class ResponseCommon(
+                           status: String,
+                           statusText: Option[String],
+                           processingDate: String,
+                           returnParameters: Option[Seq[ReturnParameters]]
+                         )
+object ResponseCommon {
+  implicit val format: Format[ResponseCommon] = Json.format[ResponseCommon]
+}
+
+case class ResponseDetailForDACSubscription(subscriptionID: String)
+object ResponseDetailForDACSubscription {
+  implicit val format: OFormat[ResponseDetailForDACSubscription] = Json.format[ResponseDetailForDACSubscription]
+}
+
+case class SubscriptionForDACResponse(responseCommon: ResponseCommon, responseDetail: ResponseDetailForDACSubscription)
+object SubscriptionForDACResponse {
+  implicit val reads: Reads[SubscriptionForDACResponse] = {
+    import play.api.libs.functional.syntax._
+    (
+      (__ \ "responseCommon").read[ResponseCommon] and
+        (__ \ "responseDetail").read[ResponseDetailForDACSubscription]
+      )((responseCommon, responseDetail) => SubscriptionForDACResponse(responseCommon, responseDetail))
+  }
+
+  implicit val writes: OWrites[SubscriptionForDACResponse] = Json.writes[SubscriptionForDACResponse]
+}
+
+case class CreateSubscriptionForDACResponse(createSubscriptionForDACResponse: SubscriptionForDACResponse)
+object CreateSubscriptionForDACResponse {
+  implicit val format: OFormat[CreateSubscriptionForDACResponse] = Json.format[CreateSubscriptionForDACResponse]
+}
+
+
+
 
 
 

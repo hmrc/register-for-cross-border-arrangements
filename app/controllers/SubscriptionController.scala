@@ -43,7 +43,8 @@ class SubscriptionController @Inject()(
         valid = sub =>
           for {
           response <- subscriptionConnector.sendSubscriptionInformation(sub)
-          } yield convertToResult(response)
+          } yield
+            convertToResult(response)
       )
   }
 

@@ -64,6 +64,7 @@ class RegistrationController @Inject()(val config: AppConfig, registrationConnec
       case OK => Ok(httpResponse.body)
       case BAD_REQUEST => BadRequest(httpResponse.body)
       case FORBIDDEN => Forbidden(httpResponse.body)
+      case NOT_FOUND => NotFound(httpResponse.body)
       case _ => InternalServerError(httpResponse.body)
     }
   }

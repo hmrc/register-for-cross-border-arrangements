@@ -46,8 +46,9 @@ class SubscriptionSpec extends SpecBase
     }
 
     "should marshall correctly from json for organisation" in  {
-      forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+      forAll(validOrgName, validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
+          println(s"$phone\n\n + $orgName\n\n")
           Json.parse(jsonPayloadForOrganisation(
             orgName, phone, mobile)
           ).validate[CreateSubscriptionForDACRequest].get mustBe organisationSubscription(orgName, phone, mobile)
@@ -63,7 +64,7 @@ class SubscriptionSpec extends SpecBase
     }
 
     "should marshall correctly from json for individual with Secondary Contact as org" in  {
-      forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+      forAll(validOrgName, validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
           Json.parse(jsonPayloadForSecondaryContact(
             orgName, phone, mobile
@@ -72,7 +73,7 @@ class SubscriptionSpec extends SpecBase
     }
 
     "marshall into json subscription for individual with Secondary Contact as org" in {
-      forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+      forAll(validOrgName, validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
           Json.toJson(secondaryContactSubscription(
             orgName, phone, mobile)) mustBe secondaryContactSubscriptionJson(orgName, phone, mobile)
@@ -91,7 +92,7 @@ class SubscriptionSpec extends SpecBase
   }
 
   "catch error if neither organisation or individual is present in SecondaryContact" in {
-    forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+    forAll(validOrgName, validContactNumber, validContactNumber) {
       (orgName, phone, mobile) =>
         val error = intercept[Exception] {
           Json.parse(invalidJsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest] mustBe secondaryContactSubscription(orgName, phone, mobile)

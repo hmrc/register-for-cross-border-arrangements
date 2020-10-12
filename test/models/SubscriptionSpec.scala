@@ -23,6 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
+
 class SubscriptionSpec extends SpecBase
   with MockitoSugar
   with Generators
@@ -31,42 +32,72 @@ class SubscriptionSpec extends SpecBase
   "create Subscription for DAC Request" - {
 
     "should marshall correctly from json for individual " in  {
-      Json.parse(jsonPayloadForIndividual).validate[CreateSubscriptionForDACRequest].get mustBe individualSubcription
+      forAll(validContactNumber, validContactNumber) {
+        (phone, mobile) =>
+          Json.parse(jsonPayloadForIndividual(phone, mobile)).validate[CreateSubscriptionForDACRequest].get mustBe individualSubcription(phone, mobile)
+      }
     }
 
     "marshall into json subscription for individual" in {
-      Json.toJson(individualSubcription) mustBe IndividualSubscriptionJson
+      forAll(validContactNumber, validContactNumber) {
+        (phone, mobile) =>
+          Json.toJson(individualSubcription(phone, mobile)) mustBe IndividualSubscriptionJson(phone, mobile)
+      }
     }
 
     "should marshall correctly from json for organisation" in  {
-      Json.parse(jsonPayloadForOrganisation).validate[CreateSubscriptionForDACRequest].get mustBe organisationSubscription
+      forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+        (orgName, phone, mobile) =>
+          Json.parse(jsonPayloadForOrganisation(
+            orgName, phone, mobile)
+          ).validate[CreateSubscriptionForDACRequest].get mustBe organisationSubscription(orgName, phone, mobile)
+      }
     }
 
     "marshall into json subscription for organisation" in {
-      Json.toJson(organisationSubscription) mustBe organisationSubscriptionJson
+      forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+        (orgName, phone, mobile) =>
+        Json.toJson(organisationSubscription(
+          orgName, phone, mobile)) mustBe organisationSubscriptionJson(orgName, phone, mobile)
+      }
     }
 
     "should marshall correctly from json for individual with Secondary Contact as org" in  {
-      Json.parse(jsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest].get mustBe secondaryContactSubscription
+      forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+        (orgName, phone, mobile) =>
+          Json.parse(jsonPayloadForSecondaryContact(
+            orgName, phone, mobile
+          )).validate[CreateSubscriptionForDACRequest].get mustBe secondaryContactSubscription(orgName, phone, mobile)
+      }
     }
 
     "marshall into json subscription for individual with Secondary Contact as org" in {
-      Json.toJson(secondaryContactSubscription) mustBe secondaryContactSubscriptionJson
+      forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+        (orgName, phone, mobile) =>
+          Json.toJson(secondaryContactSubscription(
+            orgName, phone, mobile)) mustBe secondaryContactSubscriptionJson(orgName, phone, mobile)
+      }
     }
   }
 
   "catch error if neither organisation or individual is present in PrimaryContact" in {
-    val error = intercept[Exception] {
-      Json.parse(invalidJsonPayloadForIndividual).validate[CreateSubscriptionForDACRequest] mustBe individualSubcription
+    forAll(validContactNumber, validContactNumber) {
+      (phone, mobile) =>
+        val error = intercept[Exception] {
+          Json.parse(invalidJsonPayloadForIndividual).validate[CreateSubscriptionForDACRequest] mustBe individualSubcription(phone, mobile)
+        }
+        error.getMessage mustBe "Primary Contact must have either an organisation or individual element"
     }
-    error.getMessage mustBe "Primary Contact must have either an organisation or individual element"
   }
 
   "catch error if neither organisation or individual is present in SecondaryContact" in {
-    val error = intercept[Exception] {
-      Json.parse(invalidJsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest] mustBe secondaryContactSubscription
+    forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
+      (orgName, phone, mobile) =>
+        val error = intercept[Exception] {
+          Json.parse(invalidJsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest] mustBe secondaryContactSubscription(orgName, phone, mobile)
+        }
+        error.getMessage mustBe "Secondary Contact must have either an organisation or individual element"
     }
-    error.getMessage mustBe "Secondary Contact must have either an organisation or individual element"
   }
 
   "must deserialise CreateSubscriptionForDACResponse" in {

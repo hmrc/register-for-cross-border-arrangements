@@ -73,7 +73,6 @@ class BusinessMatchingConnectorSpec extends SpecBase
 
       "must return status as INTERNAL_SERVER_ERROR for technical error incurred" in {
 
-
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, ims) =>
             stubResponse(s"/register-for-cross-border-arrangement-stubs/registration/individual/nino/$nino", INTERNAL_SERVER_ERROR)

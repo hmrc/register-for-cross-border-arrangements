@@ -17,13 +17,13 @@
 package helpers
 
 import models._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
 object SubscriptionJsonFixtures {
 
   // Individual Fixtures
-  val jsonPayloadForIndividual: String =
-    """
+  def jsonPayloadForIndividual(phone: String, mobile: String): String =
+    s"""
       |{
       |  "createSubscriptionForDACRequest": {
       |    "requestCommon": {
@@ -46,15 +46,15 @@ object SubscriptionJsonFixtures {
       |          "lastName": "Liquid"
       |        },
       |        "email": "email2@email.com",
-      |        "phone": "01910002222",
-      |        "mobile": "07500000000"
+      |        "phone": "$phone",
+      |        "mobile": "$mobile"
       |      }
       |    }
       |  }
       |}
       |""".stripMargin
 
-  val individualSubcription =
+  def individualSubcription(phone: String, mobile: String) =
     CreateSubscriptionForDACRequest(
       SubscriptionForDACRequest(
         RequestCommonForSubscription(
@@ -75,15 +75,15 @@ object SubscriptionJsonFixtures {
           PrimaryContact(ContactInformationForIndividual(
             IndividualDetails("Fairy", None, "Liquid"),
             "email2@email.com",
-            Some("01910002222"),
-            Some("07500000000"))
+            Some(phone),
+            Some(mobile))
           ),
           None
         )
       )
     )
 
-  val IndividualSubscriptionJson =
+  def IndividualSubscriptionJson(phone: String, mobile: String) =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -106,16 +106,16 @@ object SubscriptionJsonFixtures {
               "lastName" -> "Liquid"
             ),
             "email" -> "email2@email.com",
-            "phone" -> "01910002222",
-            "mobile" -> "07500000000"
+            "phone" -> s"$phone",
+            "mobile" -> s"$mobile"
           )
         )
       )
     )
 
   //Organisation Fixtures
-  val jsonPayloadForOrganisation: String =
-    """
+  def jsonPayloadForOrganisation(orgName: String, phoneNumber: String, mobile: String): String =
+    s"""
       |{
       |  "createSubscriptionForDACRequest": {
       |    "requestCommon": {
@@ -134,18 +134,18 @@ object SubscriptionJsonFixtures {
       |      "isGBUser": true,
       |      "primaryContact": {
       |        "organisation": {
-      |          "organisationName": "Pizza for you"
+      |          "organisationName": "$orgName"
       |        },
       |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
+      |        "phone": "$phoneNumber",
+      |        "mobile": "$mobile"
       |      }
       |    }
       |  }
       |}
       |""".stripMargin
 
-  val organisationSubscription: CreateSubscriptionForDACRequest =
+  def organisationSubscription(orgName: String, phoneNumber: String, mobile: String): CreateSubscriptionForDACRequest =
     CreateSubscriptionForDACRequest(
       SubscriptionForDACRequest(
         RequestCommonForSubscription(
@@ -165,17 +165,17 @@ object SubscriptionJsonFixtures {
           true,
           PrimaryContact(
             ContactInformationForOrganisation(
-              OrganisationDetails("Pizza for you"),
+              OrganisationDetails(orgName),
               "email@email.com",
-              Some("0191 111 2222"),
-              Some("07111111111"))
+              Some(phoneNumber),
+              Some(mobile))
           ),
           None
         )
       )
     )
 
-  val organisationSubscriptionJson =
+  def organisationSubscriptionJson(orgName: String, phoneNumber: String, mobile: String): JsObject =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -194,19 +194,19 @@ object SubscriptionJsonFixtures {
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
-              "organisationName" -> "Pizza for you"
+              "organisationName" -> orgName
             ),
             "email" -> "email@email.com",
-            "phone" -> "0191 111 2222",
-            "mobile" -> "07111111111"
+            "phone" -> phoneNumber,
+            "mobile" -> mobile
           )
         )
       )
     )
 
   // SecondaryContact Fixtures
-  val jsonPayloadForSecondaryContact: String =
-    """
+  def jsonPayloadForSecondaryContact(name: String, phone: String, mobile: String): String =
+    s"""
       |{
       |  "createSubscriptionForDACRequest": {
       |    "requestCommon": {
@@ -228,18 +228,18 @@ object SubscriptionJsonFixtures {
       |      },
       |      "secondaryContact": {
       |        "organisation": {
-      |          "organisationName": "Pizza for you"
+      |          "organisationName": "$name"
       |        },
       |        "email": "email@email.com",
-      |        "phone": "0191 111 2222",
-      |        "mobile": "07111111111"
+      |        "phone": "$phone",
+      |        "mobile": "$mobile"
       |      }
       |    }
       |  }
       |}
       |""".stripMargin
 
-  val secondaryContactSubscription =
+  def secondaryContactSubscription(name: String, phone: String, mobile: String) =
     CreateSubscriptionForDACRequest(
       SubscriptionForDACRequest(
         RequestCommonForSubscription(
@@ -263,18 +263,18 @@ object SubscriptionJsonFixtures {
           Some(SecondaryContact(
             ContactInformationForOrganisation(
               OrganisationDetails(
-                "Pizza for you"
+                name
               ),
               "email@email.com",
-              Some("0191 111 2222"),
-              Some("07111111111")
+              Some(phone),
+              Some(mobile)
             )
           )
           )
         )
       ))
 
-  val secondaryContactSubscriptionJson =
+  def secondaryContactSubscriptionJson(name: String, phone: String, mobile: String) =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
@@ -296,44 +296,18 @@ object SubscriptionJsonFixtures {
           ),
           "secondaryContact" -> Json.obj(
             "organisation" -> Json.obj(
-              "organisationName" -> "Pizza for you"
+              "organisationName" -> name
             ),
             "email" -> "email@email.com",
-            "phone" -> "0191 111 2222",
-            "mobile" -> "07111111111"
-          )
-        )
-      )
-    )
-
-  val subscriptionOrganisationJson =
-    Json.obj(
-      "createSubscriptionForDACRequest" -> Json.obj(
-        "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-12T18:03:45Z",
-          "acknowledgementReference" -> "abcdefghijklmnopqrstuvwxyz123456",
-          "originatingSystem" -> "MDTP"
-        ),
-        "requestDetail" -> Json.obj(
-          "idType" -> "SAFE",
-          "idNumber" -> "AB123456Z",
-          "tradingName" -> "Tools for Traders Limited",
-          "isGBUser" -> true,
-          "primaryContact" -> Json.obj(
-            "organisation" -> Json.obj(
-              "organisationName" -> "Tools for Traders Limited"
-            ),
-            "email" -> "timmy@toolsfortraders.com",
-            "phone" -> "01910000000",
-            "mobile" -> "07123456789"
+            "phone" -> phone,
+            "mobile" -> mobile
           )
         )
       )
     )
 
   //Invalid Subscription Json
-  val invalidJsonPayloadForIndividual: String =
+  def invalidJsonPayloadForIndividual: String =
     """
       |{
       |  "createSubscriptionForDACRequest": {
@@ -361,7 +335,7 @@ object SubscriptionJsonFixtures {
       |}
       |""".stripMargin
 
-  val invalidJsonPayloadForSecondaryContact: String =
+  def invalidJsonPayloadForSecondaryContact: String =
     """
       |{
       |  "createSubscriptionForDACRequest": {

@@ -298,7 +298,6 @@ object JsonFixtures {
       |}
       |}""".stripMargin
 
-
 val registerWithIDJson = Json.obj(
   "registerWithIDRequest" -> Json.obj(
     "requestCommon" -> Json.obj(
@@ -335,5 +334,4 @@ val registerWithIDJson = Json.obj(
       isAnAgent = false,
       WithIDIndividual("Fred", Some("Flintstone"), "Flint", "1999-12-20")))
   )
-
 }

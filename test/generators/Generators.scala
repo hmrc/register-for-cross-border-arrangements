@@ -21,6 +21,7 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 import org.scalacheck.Arbitrary.{arbitrary, _}
 import org.scalacheck.Gen._
 import org.scalacheck.{Gen, Shrink}
+import wolfendale.scalacheck.regexp.RegexpGen
 
 trait Generators extends ModelGenerators {
 
@@ -117,6 +118,12 @@ trait Generators extends ModelGenerators {
         Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
+
+  val apiContactNumberRegex = """[A-Z0-9 )/(\-*#+]{1,25}"""
+  def validContactNumber: Gen[String] = RegexpGen.from(apiContactNumberRegex)
+
+  val apiOrgName = "^([a-zA-Z0-9_.]{1,105})\\$"
+  def validOrgName: Gen[String] = RegexpGen.from(apiOrgName)
 
 }
 

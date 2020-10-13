@@ -25,6 +25,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
 import wolfendale.scalacheck.regexp.RegexpGen
 
+
 trait ModelGenerators {
  self: Generators =>
 
@@ -74,8 +75,6 @@ trait ModelGenerators {
         isAnAgent = false,
         Organisation(organisationName, organisationType))
   }
-
-
 
   implicit val arbitraryEnrolmentRequest: Arbitrary[EnrolmentRequest] = {
     implicit val arbitraryIdentifier: Arbitrary[Identifier] = Arbitrary {
@@ -129,7 +128,6 @@ trait ModelGenerators {
   )
   }
 
-
   implicit val arbitraryRegistration: Arbitrary[Registration] = Arbitrary {for {
     requestCommon <- arbitrary[RequestCommon]
     name <- arbitrary[String]
@@ -150,8 +148,6 @@ trait ModelGenerators {
       )
     )
   }
-
-
 
   implicit val arbitraryAddress: Arbitrary[Address] = Arbitrary {for {
     addressLine1 <- arbitrary[String]
@@ -184,6 +180,119 @@ trait ModelGenerators {
       emailAddress = emailAddress
     )
   }
+
+  implicit val arbitraryRequestCommonForSubscription: Arbitrary[RequestCommonForSubscription] = Arbitrary {
+    for {
+      receiptDate <- stringsWithMaxLength(30)
+      acknowledgementRef <- stringsWithMaxLength(32)
+      originatingSystem <- stringsWithMaxLength(30)
+  } yield RequestCommonForSubscription(
+      receiptDate = receiptDate,
+      regime = "DAC",
+      acknowledgementReference = acknowledgementRef,
+      originatingSystem = originatingSystem,
+      requestParameters = None
+    )
+  }
+
+  implicit val arbitraryIndividualDetails: Arbitrary[IndividualDetails] = Arbitrary {
+    for {
+      firstName <- arbitrary[String]
+      middleName <- Gen.option(arbitrary[String])
+      lastName <- arbitrary[String]
+    } yield
+      IndividualDetails(
+        firstName = firstName,
+        middleName = middleName,
+        lastName = lastName
+      )
+  }
+
+  implicit val arbitraryOrganisationDetails: Arbitrary[OrganisationDetails] = Arbitrary {
+    for {
+      name <- arbitrary[String]
+    } yield
+      OrganisationDetails(
+        organisationName = name)
+  }
+
+  implicit val arbitraryContactInformationForIndividual: Arbitrary[ContactInformationForIndividual] = Arbitrary {
+    for {
+      individual <- arbitrary[IndividualDetails]
+      email <- arbitrary[String]
+      phone <- Gen.option(arbitrary[String])
+      mobile <- Gen.option(arbitrary[String])
+    } yield
+      ContactInformationForIndividual(
+        individual,
+        email,
+        phone,
+        mobile
+      )
+  }
+
+  implicit val arbitraryContactInformationForOrganisation: Arbitrary[ContactInformationForOrganisation] = Arbitrary {
+    for {
+      organisation <- arbitrary[OrganisationDetails]
+      email <- arbitrary[String]
+      phone <- Gen.option(arbitrary[String])
+      mobile <- Gen.option(arbitrary[String])
+    } yield
+      ContactInformationForOrganisation(
+        organisation,
+        email,
+        phone,
+        mobile
+      )
+  }
+
+  implicit val arbitraryPrimaryContact: Arbitrary[PrimaryContact] = Arbitrary {
+    for {
+      contactInformation <- Gen.oneOf(arbitrary[ContactInformationForIndividual], arbitrary[ContactInformationForIndividual])
+    } yield
+      PrimaryContact(contactInformation
+      )
+  }
+
+  implicit val arbitrarySecondaryContact: Arbitrary[SecondaryContact] = Arbitrary {
+    for {
+      contactInformation <- Gen.oneOf(arbitrary[ContactInformationForIndividual], arbitrary[ContactInformationForIndividual])
+    } yield
+      SecondaryContact(contactInformation
+      )
+  }
+
+  implicit val arbitraryRequestDetails: Arbitrary[RequestDetail] = Arbitrary {
+    for {
+      idType <- arbitrary[String]
+      idNumber <- arbitrary[String]
+      tradingName <- Gen.option(arbitrary[String])
+      isGBUser <- arbitrary[Boolean]
+      primaryContact <- arbitrary[PrimaryContact]
+      secondaryContact <- Gen.option(arbitrary[SecondaryContact])
+  } yield
+    RequestDetail(
+      idType = idType,
+      idNumber = idNumber,
+      tradingName = tradingName,
+      isGBUser = isGBUser,
+      primaryContact = primaryContact,
+      secondaryContact = secondaryContact
+    )
+  }
+
+  implicit val arbitrarySubscription: Arbitrary[CreateSubscriptionForDACRequest] = Arbitrary {
+    for {
+      requestCommon <- arbitrary[RequestCommonForSubscription]
+      requestDetail <- arbitrary[RequestDetail]
+  } yield
+      CreateSubscriptionForDACRequest(
+      SubscriptionForDACRequest(
+        requestCommon,
+        requestDetail
+    ))
+  }
+
 
   implicit val arbitraryIdentification: Arbitrary[Identification] = Arbitrary {
     for {

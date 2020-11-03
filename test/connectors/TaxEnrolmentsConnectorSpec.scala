@@ -22,7 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import helpers.WireMockServerHandler
 import models.EnrolmentRequest.SubscriptionInfo
-import models.{EnrolmentRequest, Identifier, Verifier}
+import models.Verifier
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.http.Status._

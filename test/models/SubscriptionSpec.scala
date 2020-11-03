@@ -48,7 +48,6 @@ class SubscriptionSpec extends SpecBase
     "should marshall correctly from json for organisation" in  {
       forAll(validOrgName, validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
-          println(s"$phone\n\n + $orgName\n\n")
           Json.parse(jsonPayloadForOrganisation(
             orgName, phone, mobile)
           ).validate[CreateSubscriptionForDACRequest].get mustBe organisationSubscription(orgName, phone, mobile)

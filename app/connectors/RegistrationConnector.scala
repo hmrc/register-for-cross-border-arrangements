@@ -70,7 +70,8 @@ class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClien
           .getOrElse(UUID.randomUUID().toString)
       },
       "content-type"    -> "application/json",
-      "accept"          -> "application/json"
+      "accept"          -> "application/json",
+      "Environment"      -> config.eisEnvironment
     )
   }
 }

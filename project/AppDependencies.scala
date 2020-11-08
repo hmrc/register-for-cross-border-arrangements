@@ -8,8 +8,8 @@ object AppDependencies {
     "org.reactivemongo" %% "play2-reactivemongo"           % "0.18.6-play27",
     "uk.gov.hmrc"       %% "domain"                        % "5.10.0-play-27",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.3.0-play-26",
-    "uk.gov.hmrc"       %% "bootstrap-health-play-27"      % "2.25.0",
-    "uk.gov.hmrc"       %% "bootstrap-backend-play-27"     % "2.25.0"
+    "uk.gov.hmrc"       %% "bootstrap-health-play-27"      % "3.0.0",
+    "uk.gov.hmrc"       %% "bootstrap-backend-play-27"     % "3.0.0"
   )
 
   val test = Seq(

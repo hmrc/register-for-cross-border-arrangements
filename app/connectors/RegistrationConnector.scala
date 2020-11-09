@@ -60,12 +60,12 @@ class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClien
       "x-forwarded-host" -> "mdtp",
       "date" -> ZonedDateTime.now().format(formatter),
       "x-correlation-id" -> {
-        headerCarrier.sessionId
+        headerCarrier.requestId
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
       },
       "x-conversation-id" -> {
-        headerCarrier.requestId
+        headerCarrier.sessionId
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
       },

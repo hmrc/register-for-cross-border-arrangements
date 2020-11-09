@@ -19,8 +19,9 @@ package controllers
 import config.AppConfig
 import connectors.SubscriptionConnector
 import javax.inject.Inject
-import models.CreateSubscriptionForDACRequest
-import play.api.libs.json.{JsResult, JsValue}
+import models.{CreateSubscriptionForDACRequest, ErrorDetails}
+import play.api.Logger
+import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -32,6 +33,8 @@ class SubscriptionController @Inject()(
   subscriptionConnector: SubscriptionConnector,
   override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext) extends  BackendController(controllerComponents) {
+
+  private val logger: Logger = Logger(this.getClass)
 
   def createSubscription: Action[JsValue] = Action(parse.json).async {
     implicit request =>
@@ -51,10 +54,46 @@ class SubscriptionController @Inject()(
   private def convertToResult(httpResponse: HttpResponse): Result = {
     httpResponse.status match {
       case OK => Ok(httpResponse.body)
-      case BAD_REQUEST => BadRequest(httpResponse.body)
-      case FORBIDDEN => Forbidden(httpResponse.body)
-      case SERVICE_UNAVAILABLE => ServiceUnavailable(httpResponse.body)
-      case _ => InternalServerError(httpResponse.body)
+
+      case BAD_REQUEST => {
+        val error = Json.parse(httpResponse.body).validate[ErrorDetails]
+        error match {
+          case JsSuccess(value, _) =>
+            logger.error(s"Error with submission: ${value.errorDetail.sourceFaultDetail.map(_.detail.mkString).getOrElse("")}")
+          case JsError(errors) => logger.error("Error with submission but return is not a valid json")
+        }
+        BadRequest(httpResponse.body)
+      }
+
+      case FORBIDDEN => {
+        val error = Json.parse(httpResponse.body).validate[ErrorDetails]
+        error match {
+          case JsSuccess(value, _) =>
+            logger.error(s"Error with authenticating submission: ${value.errorDetail.sourceFaultDetail.map(_.detail.mkString).getOrElse("")}")
+          case JsError(errors) => logger.error("Error with authenticating submission but return is not a valid json")
+        }
+        Forbidden(httpResponse.body)
+      }
+
+      case SERVICE_UNAVAILABLE => {
+        val error = Json.parse(httpResponse.body).validate[ErrorDetails]
+        error match {
+          case JsSuccess(value, _) =>
+            logger.error(s"Error with submission: ${value.errorDetail.sourceFaultDetail.map(_.detail.mkString).getOrElse("")}")
+          case JsError(errors) => logger.error("Error with submission but return is not a valid json")
+        }
+        ServiceUnavailable(httpResponse.body)
+      }
+
+      case _ => {
+        val error = Json.parse(httpResponse.body).validate[ErrorDetails]
+        error match {
+          case JsSuccess(value, _) =>
+            logger.error(s"Error with responding to submission: ${value.errorDetail.sourceFaultDetail.map(_.detail.mkString).getOrElse("")}")
+          case JsError(errors) => logger.error("Error with responding to submission but return is not a valid json")
+        }
+        InternalServerError(httpResponse.body)
+      }
 
     }
   }

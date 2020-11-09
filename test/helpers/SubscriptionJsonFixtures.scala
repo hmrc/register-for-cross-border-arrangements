@@ -37,8 +37,8 @@ object SubscriptionJsonFixtures {
       |      }]
       |    },
       |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
+      |      "IDType": "idType",
+      |      "IDNumber": "idNumber",
       |      "isGBUser": true,
       |      "primaryContact": {
       |        "individual": {
@@ -54,7 +54,7 @@ object SubscriptionJsonFixtures {
       |}
       |""".stripMargin
 
-  def individualSubcription(phone: String, mobile: String) =
+  def individualSubscription(phone: String, mobile: String) =
     CreateSubscriptionForDACRequest(
       SubscriptionForDACRequest(
         RequestCommonForSubscription(
@@ -97,8 +97,8 @@ object SubscriptionJsonFixtures {
           )
           )),
         "requestDetail" -> Json.obj(
-          "idType" -> "idType",
-          "idNumber" -> "idNumber",
+          "IDType" -> "idType",
+          "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
@@ -129,8 +129,8 @@ object SubscriptionJsonFixtures {
       |      }]
       |    },
       |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
+      |      "IDType": "idType",
+      |      "IDNumber": "idNumber",
       |      "isGBUser": true,
       |      "primaryContact": {
       |        "organisation": {
@@ -189,8 +189,8 @@ object SubscriptionJsonFixtures {
           ))
         ),
         "requestDetail" -> Json.obj(
-          "idType" -> "idType",
-          "idNumber" -> "idNumber",
+          "IDType" -> "idType",
+          "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
@@ -216,8 +216,8 @@ object SubscriptionJsonFixtures {
       |      "originatingSystem": "MDTP"
       |    },
       |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
+      |      "IDType": "idType",
+      |      "IDNumber": "idNumber",
       |      "isGBUser": true,
       |      "primaryContact": {
       |        "individual": {
@@ -284,8 +284,8 @@ object SubscriptionJsonFixtures {
           "originatingSystem" -> "MDTP"
         ),
         "requestDetail" -> Json.obj(
-          "idType" -> "idType",
-          "idNumber" -> "idNumber",
+          "IDType" -> "idType",
+          "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
@@ -322,8 +322,8 @@ object SubscriptionJsonFixtures {
       |      }]
       |    },
       |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
+      |      "IDType": "idType",
+      |      "IDNumber": "idNumber",
       |      "isGBUser": true,
       |      "primaryContact": {
       |        "email": "email2@email.com",
@@ -346,8 +346,8 @@ object SubscriptionJsonFixtures {
       |      "originatingSystem": "MDTP"
       |    },
       |    "requestDetail": {
-      |      "idType": "idType",
-      |      "idNumber": "idNumber",
+      |      "IDType": "idType",
+      |      "IDNumber": "idNumber",
       |      "isGBUser": true,
       |      "primaryContact": {
       |        "individual": {

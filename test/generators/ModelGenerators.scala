@@ -272,8 +272,8 @@ trait ModelGenerators {
       secondaryContact <- Gen.option(arbitrary[SecondaryContact])
   } yield
     RequestDetail(
-      idType = idType,
-      idNumber = idNumber,
+      IDType = idType,
+      IDNumber = idNumber,
       tradingName = tradingName,
       isGBUser = isGBUser,
       primaryContact = primaryContact,

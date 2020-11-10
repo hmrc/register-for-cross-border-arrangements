@@ -34,14 +34,14 @@ class SubscriptionSpec extends SpecBase
     "should marshall correctly from json for individual " in  {
       forAll(validContactNumber, validContactNumber) {
         (phone, mobile) =>
-          Json.parse(jsonPayloadForIndividual(phone, mobile)).validate[CreateSubscriptionForDACRequest].get mustBe individualSubcription(phone, mobile)
+          Json.parse(jsonPayloadForIndividual(phone, mobile)).validate[CreateSubscriptionForDACRequest].get mustBe individualSubscription(phone, mobile)
       }
     }
 
     "marshall into json subscription for individual" in {
       forAll(validContactNumber, validContactNumber) {
         (phone, mobile) =>
-          Json.toJson(individualSubcription(phone, mobile)) mustBe IndividualSubscriptionJson(phone, mobile)
+          Json.toJson(individualSubscription(phone, mobile)) mustBe IndividualSubscriptionJson(phone, mobile)
       }
     }
 
@@ -84,7 +84,7 @@ class SubscriptionSpec extends SpecBase
     forAll(validContactNumber, validContactNumber) {
       (phone, mobile) =>
         val error = intercept[Exception] {
-          Json.parse(invalidJsonPayloadForIndividual).validate[CreateSubscriptionForDACRequest] mustBe individualSubcription(phone, mobile)
+          Json.parse(invalidJsonPayloadForIndividual).validate[CreateSubscriptionForDACRequest] mustBe individualSubscription(phone, mobile)
         }
         error.getMessage mustBe "Primary Contact must have either an organisation or individual element"
     }

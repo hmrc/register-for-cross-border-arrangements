@@ -103,8 +103,8 @@ object SecondaryContact {
   }
 }
 
-case class RequestDetail(idType: String,
-                         idNumber: String,
+case class RequestDetail(IDType: String,
+                         IDNumber: String,
                          tradingName: Option[String],
                          isGBUser: Boolean,
                          primaryContact: PrimaryContact,

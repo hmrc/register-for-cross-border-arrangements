@@ -188,6 +188,21 @@ class BusinessMatchingControllerSpec extends SpecBase
             status(result) mustEqual FORBIDDEN
         }
       }
+
+      "downstream errors should be recoverable when not in json" in {
+        when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.businessMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.toJson(businessMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual INTERNAL_SERVER_ERROR
+        }
+      }
     }
   }
 

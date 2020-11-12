@@ -140,6 +140,21 @@ class RegistrationControllerSpec extends SpecBase
             status(result) mustEqual FORBIDDEN
         }
       }
+
+      "downstream errors should be recoverable when not in json" in {
+        when(mockRegistrationConnector.sendWithID(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(POST, routes.RegistrationController.withIdRegistration.url)
+                .withJsonBody(Json.toJson(withIdSubscription))
+
+            val result = route(application, request).value
+            status(result) mustEqual INTERNAL_SERVER_ERROR
+        }
+      }
     }
   }
 }

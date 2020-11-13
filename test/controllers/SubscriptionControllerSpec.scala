@@ -109,6 +109,21 @@ class SubscriptionControllerSpec extends SpecBase
             status(result) mustEqual SERVICE_UNAVAILABLE
         }
       }
+
+      "downstream errors should be recoverable when not in json" in {
+        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
+          .thenReturn(Future.successful(HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+          (subscriptionForDacRequest) =>
+            val request =
+              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+                .withJsonBody(Json.toJson(subscriptionForDacRequest))
+
+            val result = route(application, request).value
+            status(result) mustEqual SERVICE_UNAVAILABLE
+        }
+      }
     }
   }
 

@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import connectors.TaxEnrolmentsConnector
+import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
 import models.EnrolmentRequest.SubscriptionInfo
 import org.mockito.Matchers.any
@@ -44,7 +45,8 @@ class TaxEnrolmentsControllerSpec extends SpecBase
   val application: Application = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> "false"))
     .overrides(
-      bind[TaxEnrolmentsConnector].toInstance(mockTaxEnrolmentsConnector)
+      bind[TaxEnrolmentsConnector].toInstance(mockTaxEnrolmentsConnector),
+      bind[AuthAction].to[FakeAuthAction]
     ).build()
 
   "Business Matching Controller" - {

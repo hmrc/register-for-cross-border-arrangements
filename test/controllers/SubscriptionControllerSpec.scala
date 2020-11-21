@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import connectors.SubscriptionConnector
+import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
 import models.CreateSubscriptionForDACRequest
 import org.mockito.Matchers.any
@@ -44,7 +45,8 @@ class SubscriptionControllerSpec extends SpecBase
   val application: Application = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> "false"))
     .overrides(
-      bind[SubscriptionConnector].toInstance(mockSubscriptionConnector)
+      bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+      bind[AuthAction].to[FakeAuthAction]
     ).build()
 
   "SubscriptionController" - {

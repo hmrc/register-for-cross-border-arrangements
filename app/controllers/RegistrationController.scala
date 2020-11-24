@@ -18,6 +18,7 @@ package controllers
 
 import config.AppConfig
 import connectors.RegistrationConnector
+import controllers.auth.AuthAction
 import javax.inject.Inject
 import models.{ErrorDetails, PayloadRegisterWithID, Registration}
 import play.api.Logger
@@ -29,13 +30,16 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
-class RegistrationController @Inject()(val config: AppConfig, registrationConnector: RegistrationConnector,
-                                       override val controllerComponents: ControllerComponents)
-                                         (implicit executionContext: ExecutionContext) extends BackendController(controllerComponents) {
+class RegistrationController @Inject()(val config: AppConfig,
+                                       authenticate: AuthAction,
+                                       registrationConnector: RegistrationConnector,
+                                       override val controllerComponents: ControllerComponents
+                                      )(implicit executionContext: ExecutionContext)
+  extends BackendController(controllerComponents) {
 
   private val logger: Logger = Logger(this.getClass)
 
-  def noIdRegistration: Action[JsValue] = Action(parse.json).async {
+  def noIdRegistration: Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
       val noIdOrganisationRegistration: JsResult[Registration] =
         request.body.validate[Registration]
@@ -49,7 +53,7 @@ class RegistrationController @Inject()(val config: AppConfig, registrationConnec
       )
   }
 
-  def withIdRegistration: Action[JsValue] = Action(parse.json).async {
+  def withIdRegistration: Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
       val withIDRegistration: JsResult[PayloadRegisterWithID] =
         request.body.validate[PayloadRegisterWithID]

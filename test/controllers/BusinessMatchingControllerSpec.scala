@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import connectors.BusinessMatchingConnector
+import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
 import models.{BusinessMatchingSubmission, IndividualMatchingSubmission, Utr}
 import org.mockito.Matchers.any
@@ -45,7 +46,8 @@ class BusinessMatchingControllerSpec extends SpecBase
   val application: Application = new GuiceApplicationBuilder()
       .configure(Configuration("metrics.enabled" -> "false"))
       .overrides(
-        bind[BusinessMatchingConnector].toInstance(mockBusinessMatchingConnector)
+        bind[BusinessMatchingConnector].toInstance(mockBusinessMatchingConnector),
+        bind[AuthAction].to[FakeAuthAction]
       ).build()
 
   "Business Matching Controller" - {

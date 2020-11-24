@@ -17,6 +17,7 @@
 package controllers
 
 import connectors.TaxEnrolmentsConnector
+import controllers.auth.AuthAction
 import javax.inject.Inject
 import models.EnrolmentRequest.SubscriptionInfo
 import play.api.libs.json.{JsResult, JsValue}
@@ -26,12 +27,14 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsController @Inject()(taxEnrolmentsConnector: TaxEnrolmentsConnector,
+class TaxEnrolmentsController @Inject()(
+                                         authenticate: AuthAction,
+                                         taxEnrolmentsConnector: TaxEnrolmentsConnector,
                                         override val controllerComponents: ControllerComponents)
                                        (implicit executionContext: ExecutionContext) extends
   BackendController(controllerComponents) {
 
-  def createEnrolment: Action[JsValue] = Action(parse.json).async {
+  def createEnrolment: Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
       val enrolmentInfoJs: JsResult[SubscriptionInfo] =
         request.body.validate[SubscriptionInfo]

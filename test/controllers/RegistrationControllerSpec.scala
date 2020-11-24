@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import connectors.RegistrationConnector
+import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
 import models.{PayloadRegisterWithID, Registration}
 import org.mockito.Matchers.any
@@ -44,7 +45,8 @@ class RegistrationControllerSpec extends SpecBase
   val application: Application = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> "false"))
     .overrides(
-      bind[RegistrationConnector].toInstance(mockRegistrationConnector)
+      bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+      bind[AuthAction].to[FakeAuthAction]
     ).build()
 
   "Registration Controller" - {

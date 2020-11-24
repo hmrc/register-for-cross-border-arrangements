@@ -18,6 +18,7 @@ package controllers
 
 import config.AppConfig
 import connectors.SubscriptionConnector
+import controllers.auth.AuthAction
 import javax.inject.Inject
 import models.{CreateSubscriptionForDACRequest, ErrorDetails}
 import play.api.Logger
@@ -31,13 +32,14 @@ import scala.util.{Success, Try}
 
 class SubscriptionController @Inject()(
   val config: AppConfig,
+  authenticate: AuthAction,
   subscriptionConnector: SubscriptionConnector,
   override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext) extends  BackendController(controllerComponents) {
 
   private val logger: Logger = Logger(this.getClass)
 
-  def createSubscription: Action[JsValue] = Action(parse.json).async {
+  def createSubscription: Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
       val subscriptionSubmissionResult: JsResult[CreateSubscriptionForDACRequest] =
         request.body.validate[CreateSubscriptionForDACRequest]

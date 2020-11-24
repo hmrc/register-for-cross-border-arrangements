@@ -17,6 +17,7 @@
 package controllers
 
 import connectors.BusinessMatchingConnector
+import controllers.auth.AuthAction
 import javax.inject.Inject
 import models.{BusinessMatchingSubmission, ErrorDetails, IndividualMatchingSubmission}
 import play.api.Logger
@@ -30,14 +31,16 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
 class BusinessMatchingController @Inject()(
+                                            authenticate: AuthAction,
                                             businessMatchingConnector: BusinessMatchingConnector,
-                                            override val controllerComponents: ControllerComponents)
+                                            override val controllerComponents: ControllerComponents
+                                          )
                                           (implicit executionContext: ExecutionContext) extends
   BackendController(controllerComponents) {
 
   private val logger: Logger = Logger(this.getClass)
 
-  def individualMatchingSubmission(nino: Nino): Action[JsValue] = Action(parse.json).async {
+  def individualMatchingSubmission(nino: Nino): Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
       val individualMatchingSubmissionResult: JsResult[IndividualMatchingSubmission] =
         request.body.validate[IndividualMatchingSubmission]
@@ -52,7 +55,7 @@ class BusinessMatchingController @Inject()(
       )
   }
 
-  def soleProprietorMatchingSubmission(utr: String): Action[JsValue] = Action(parse.json).async {
+  def soleProprietorMatchingSubmission(utr: String): Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
       //Note: ETMP data suggests sole trader business partner accounts are individual records
       val soleProprietorMatchingSubmission: JsResult[BusinessMatchingSubmission] =
@@ -68,7 +71,7 @@ class BusinessMatchingController @Inject()(
       )
   }
 
-  def businessMatchingSubmission(utr: String): Action[JsValue] = Action(parse.json).async {
+  def businessMatchingSubmission(utr: String): Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
       val businessMatchingSubmissionResult: JsResult[BusinessMatchingSubmission] =
         request.body.validate[BusinessMatchingSubmission]

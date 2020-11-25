@@ -42,10 +42,6 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
     .build()
 
   lazy val connector: TaxEnrolmentsConnector = app.injector.instanceOf[TaxEnrolmentsConnector]
-  val dac6Id = "XNDAC0000000025"
-
-
-  val enrolmentInfo = SubscriptionInfo(safeID = "safeId", saUtr = Some("utr"), dac6Id = dac6Id)
 
   "TaxEnrolmentsConnector" - {
 

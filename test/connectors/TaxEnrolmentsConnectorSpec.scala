@@ -43,85 +43,109 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
   lazy val connector: TaxEnrolmentsConnector = app.injector.instanceOf[TaxEnrolmentsConnector]
 
-  val enrolmentInfo = SubscriptionInfo(safeID = "safeId", saUtr = Some("utr"))
-
   "TaxEnrolmentsConnector" - {
 
     "createEnrolment" - {
 
       "must return status as 204 for successful Tax Enrolment call" in {
+        forAll(validSafeID, validSubscriptionID, validUtr) {
+          (safeID, subID, utr) =>
 
-        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", NO_CONTENT)
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
 
-        val result = connector.createEnrolment(enrolmentInfo)
-        result.futureValue.status mustBe NO_CONTENT
+            stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", NO_CONTENT)
+
+            val result = connector.createEnrolment(enrolmentInfo)
+            result.futureValue.status mustBe NO_CONTENT
+        }
       }
 
       "must return status as 401 for unauthorized request" in {
 
-        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", UNAUTHORIZED)
+        forAll(validSafeID, validSubscriptionID, validUtr) {
+          (safeID, subID, utr) =>
 
-        val result = connector.createEnrolment(enrolmentInfo)
-        result.futureValue.status mustBe UNAUTHORIZED
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
+
+            stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", UNAUTHORIZED)
+
+            val result = connector.createEnrolment(enrolmentInfo)
+            result.futureValue.status mustBe UNAUTHORIZED
+        }
       }
 
       "must return status as 400 for a bad request" in {
 
-        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", BAD_REQUEST)
+        forAll(validSafeID, validSubscriptionID, validUtr) {
+          (safeID, subID, utr) =>
 
-        val result = connector.createEnrolment(enrolmentInfo)
-        result.futureValue.status mustBe BAD_REQUEST
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
+            stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", BAD_REQUEST)
+
+            val result = connector.createEnrolment(enrolmentInfo)
+            result.futureValue.status mustBe BAD_REQUEST
+        }
       }
 
       "must return status as 503 for unsuccessful Tax Enrolment call" in {
+        forAll(validSafeID, validSubscriptionID, validUtr) {
+          (safeID, subID, utr) =>
 
-        stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", SERVICE_UNAVAILABLE)
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
+            stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", SERVICE_UNAVAILABLE)
 
-        val result = connector.createEnrolment(enrolmentInfo)
-        result.futureValue.status mustBe SERVICE_UNAVAILABLE
+            val result = connector.createEnrolment(enrolmentInfo)
+            result.futureValue.status mustBe SERVICE_UNAVAILABLE
+        }
       }
     }
+
     "createEnrolmentRequest" - {
 
       "must return correct EnrolmentRequest nino provided" in {
+        forAll(validSafeID, validSubscriptionID, validNino) {
+          (safeID, subID, nino) =>
 
-      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
-                                        nino = Some("nino"))
-
-
-        val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
-                                    Verifier("NINO", enrolmentInfo.nino.get))
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID, nino = Some(nino), dac6Id = subID)
 
 
-      enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
+            val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
+              Verifier("NINO", enrolmentInfo.nino.get))
 
+
+            enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
+
+        }
       }
-
      "must return correct EnrolmentRequest when saUtr provided as verifier" in {
 
-      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
-                                        saUtr = Some("utr"))
+       forAll(validSafeID, validSubscriptionID, validUtr) {
+         (safeID, subID, utr) =>
+           val enrolmentInfo = SubscriptionInfo(safeID = safeID,
+             saUtr = Some(utr), dac6Id = subID)
 
-        val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
-                                    Verifier("SAUTR", enrolmentInfo.saUtr.get))
+           val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
+             Verifier("SAUTR", enrolmentInfo.saUtr.get))
 
 
-
-       enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
-      }
+           enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
+       }
+     }
 
       "must return correct EnrolmentRequest when ctUtr provided as verifier" in {
 
-      val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
-                                        ctUtr = Some("utr"))
+        forAll(validSafeID, validSubscriptionID, validUtr) {
+          (safeID, subID, utr) =>
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID,
+              ctUtr = Some(utr), dac6Id = subID)
 
-        val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
-                                    Verifier("CTUTR", enrolmentInfo.ctUtr.get))
+            val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
+              Verifier("CTUTR", enrolmentInfo.ctUtr.get))
 
 
-       enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
+            enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
+        }
       }
-
     }
   }
   private def stubResponseForPutRequest(expectedUrl: String, expectedStatus: Int): StubMapping =

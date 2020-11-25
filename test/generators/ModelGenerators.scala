@@ -106,6 +106,8 @@ trait ModelGenerators {
     ctUtr <- Gen.option(arbitrary[String])
     nino <- Gen.option(arbitrary[String])
     nonUkPostcode <- Gen.option(arbitrary[String])
+    dac6Id <- arbitrary[String]
+
 
   } yield
     SubscriptionInfo(
@@ -113,7 +115,8 @@ trait ModelGenerators {
       saUtr = saUtr,
       ctUtr = ctUtr,
       nino = nino,
-      nonUkPostcode = nonUkPostcode)
+      nonUkPostcode = nonUkPostcode,
+      dac6Id = dac6Id)
   }
 
   implicit val arbitraryRequestCommon: Arbitrary[RequestCommon] = Arbitrary {for {

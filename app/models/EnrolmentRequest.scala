@@ -65,11 +65,12 @@ object EnrolmentRequest {
                               saUtr: Option[String] = None,
                               ctUtr: Option[String] = None,
                               nino: Option[String] = None,
-                              nonUkPostcode: Option[String] = None) {
+                              nonUkPostcode: Option[String] = None,
+                              dac6Id: String) {
 
     def convertToEnrolmentRequest: EnrolmentRequest = {
 
-      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", Random.alphanumeric.take(10).mkString("").toUpperCase)),
+      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", dac6Id)),
                         verifiers = buildVerifiers)
     }
 

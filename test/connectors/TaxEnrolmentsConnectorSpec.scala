@@ -42,8 +42,9 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
     .build()
 
   lazy val connector: TaxEnrolmentsConnector = app.injector.instanceOf[TaxEnrolmentsConnector]
+  val dac6Id = "XNDAC0000000025"
 
-  val enrolmentInfo = SubscriptionInfo(safeID = "safeId", saUtr = Some("utr"))
+  val enrolmentInfo = SubscriptionInfo(safeID = "safeId", saUtr = Some("utr"), dac6Id = dac6Id)
 
   "TaxEnrolmentsConnector" - {
 
@@ -86,7 +87,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
       "must return correct EnrolmentRequest nino provided" in {
 
       val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
-                                        nino = Some("nino"))
+                                        nino = Some("nino"), dac6Id = dac6Id)
 
 
         val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
@@ -100,7 +101,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
      "must return correct EnrolmentRequest when saUtr provided as verifier" in {
 
       val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
-                                        saUtr = Some("utr"))
+                                        saUtr = Some("utr"), dac6Id = dac6Id)
 
         val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
                                     Verifier("SAUTR", enrolmentInfo.saUtr.get))
@@ -113,7 +114,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
       "must return correct EnrolmentRequest when ctUtr provided as verifier" in {
 
       val enrolmentInfo = SubscriptionInfo(safeID = "safeId",
-                                        ctUtr = Some("utr"))
+                                        ctUtr = Some("utr"), dac6Id = dac6Id)
 
         val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
                                     Verifier("CTUTR", enrolmentInfo.ctUtr.get))

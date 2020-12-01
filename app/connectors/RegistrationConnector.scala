@@ -57,7 +57,6 @@ class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClien
     val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
 
     Seq(
-      "x-forwarded-host" -> "mdtp",
       "date" -> ZonedDateTime.now().format(formatter),
       "x-correlation-id" -> {
         headerCarrier.requestId

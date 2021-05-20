@@ -20,7 +20,8 @@ import base.SpecBase
 import connectors.SubscriptionConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
-import models.CreateSubscriptionForDACRequest
+import models.{CreateSubscriptionForDACRequest, ErrorDetail, ErrorDetails, SourceFaultDetail}
+import org.joda.time.DateTime
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -64,6 +65,19 @@ class SubscriptionControllerSpec extends SpecBase
 
             val result = route(application, request).value
             status(result) mustEqual OK
+        }
+      }
+
+      "should return BAD_REQUEST when subscriptionForDacRequest ia invalid" in {
+        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
+          .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
+
+            val request =
+              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
         }
       }
 
@@ -112,6 +126,38 @@ class SubscriptionControllerSpec extends SpecBase
         }
       }
 
+      "should return CONFLICT when one occurs" in {
+        val errorDetails = ErrorDetails(ErrorDetail(DateTime.now().toString,"xx","409","CONFLICT","", Some(SourceFaultDetail(Seq("a","b")))))
+        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
+          .thenReturn(Future.successful(HttpResponse(409, Json.toJson(errorDetails), Map.empty[String, Seq[String]])))
+
+
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+          (subscriptionForDacRequest) =>
+            val request =
+              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+              .withJsonBody(Json.toJson(subscriptionForDacRequest))
+
+            val result = route(application, request).value
+            status(result) mustEqual CONFLICT
+        }
+      }
+
+      "should return INTERNAL_SERVER_ERROR for unspecified errors" in {
+        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
+          .thenReturn(Future.successful(HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+          (subscriptionForDacRequest) =>
+            val request =
+              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+              .withJsonBody(Json.toJson(subscriptionForDacRequest))
+
+            val result = route(application, request).value
+            status(result) mustEqual INTERNAL_SERVER_ERROR
+        }
+      }
+
       "downstream errors should be recoverable when not in json" in {
         when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
           .thenReturn(Future.successful(HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])))
@@ -129,4 +175,4 @@ class SubscriptionControllerSpec extends SpecBase
     }
   }
 
-}
+

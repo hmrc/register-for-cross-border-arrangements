@@ -65,49 +65,36 @@ class TaxEnrolmentsControllerSpec extends SpecBase
       }
     }
 
+  "should return error when invalid json encountered" in {
 
-    "should return authorisation errors when one is encountered" in {
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(401, Json.obj(), Map.empty[String, Seq[String]])))
+        .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
-      forAll(arbitrary[SubscriptionInfo]){
-        (enrolmentInfo) =>
           val request =
             FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
-              .withJsonBody(Json.toJson(enrolmentInfo))
-
-          val result  = route(application, request).value
-          status(result) mustEqual UNAUTHORIZED
-      }
-    }
-
-    "should return bad request when one is encountered" in {
-      when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
-
-      forAll(arbitrary[SubscriptionInfo]){
-        (enrolmentInfo) =>
-          val request =
-            FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
-              .withJsonBody(Json.toJson(enrolmentInfo))
+              .withJsonBody(Json.parse("""{"field": "value"}"""))
 
           val result  = route(application, request).value
           status(result) mustEqual BAD_REQUEST
-      }
-    }
+  }
 
-    "should return gateway timeout when one is encountered" in {
-      when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(504, Json.obj(), Map.empty[String, Seq[String]])))
+    "should handle range of expected http responses" in {
+      val expectedResponses = List(NO_CONTENT , NOT_FOUND , BAD_REQUEST, UNAUTHORIZED , SERVICE_UNAVAILABLE, BAD_GATEWAY, GATEWAY_TIMEOUT, INTERNAL_SERVER_ERROR )
 
-      forAll(arbitrary[SubscriptionInfo]){
-        (enrolmentInfo) =>
-          val request =
-            FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
-              .withJsonBody(Json.toJson(enrolmentInfo))
+      expectedResponses foreach  { responseStatus =>
 
-          val result  = route(application, request).value
-          status(result) mustEqual GATEWAY_TIMEOUT
+        when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(responseStatus, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[SubscriptionInfo]){
+          (enrolmentInfo) =>
+            val request =
+              FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
+                .withJsonBody(Json.toJson(enrolmentInfo))
+
+            val result  = route(application, request).value
+            status(result) mustEqual responseStatus
+        }
       }
     }
   }

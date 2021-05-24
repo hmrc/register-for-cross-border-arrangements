@@ -20,7 +20,8 @@ import base.SpecBase
 import connectors.BusinessMatchingConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
-import models.{BusinessMatchingSubmission, IndividualMatchingSubmission, Utr}
+import models.{BusinessMatchingSubmission, ErrorDetail, ErrorDetails, IndividualMatchingSubmission, SourceFaultDetail, Utr}
+import org.joda.time.DateTime
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -76,6 +77,21 @@ class BusinessMatchingControllerSpec extends SpecBase
             val request =
               FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
                 .withJsonBody(Json.toJson(individualMatchingSubmission))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
+        }
+      }
+
+      "should return bad request json cannot be parsed" in {
+        when(mockBusinessMatchingConnector.sendIndividualMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
+          (nino, individualMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.individualMatchingSubmission(nino).url)
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
 
             val result = route(application, request).value
             status(result) mustEqual BAD_REQUEST
@@ -144,6 +160,21 @@ class BusinessMatchingControllerSpec extends SpecBase
         }
       }
 
+      "should return bad request when json cannot be parsed" in {
+        when(mockBusinessMatchingConnector.sendSoleProprietorMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.soleProprietorMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
+        }
+      }
+
       "should return forbidden error from security layer when authorisation is invalid, missing parameters etc." in {
         when(mockBusinessMatchingConnector.sendSoleProprietorMatchingInformation(any(), any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
@@ -177,8 +208,9 @@ class BusinessMatchingControllerSpec extends SpecBase
       }
 
       "should return forbidden error from security layer when authorisation is invalid, missing parameters etc." in {
+        val errorDetails = ErrorDetails(ErrorDetail(DateTime.now().toString,"xx","403","FORBIDDEN","", Some(SourceFaultDetail(Seq("a","b")))))
         when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
+          .thenReturn(Future.successful(HttpResponse(403, Json.toJson(errorDetails), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
           (utr, businessMatchingSubmission) =>
@@ -188,6 +220,21 @@ class BusinessMatchingControllerSpec extends SpecBase
 
             val result = route(application, request).value
             status(result) mustEqual FORBIDDEN
+        }
+      }
+
+      "should return bad  request when json cannot be parsed." in {
+        when(mockBusinessMatchingConnector.sendBusinessMatchingInformation(any(), any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Utr], arbitrary[BusinessMatchingSubmission]) {
+          (utr, businessMatchingSubmission) =>
+            val request =
+              FakeRequest(POST, routes.BusinessMatchingController.businessMatchingSubmission(utr.value).url)
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
         }
       }
 

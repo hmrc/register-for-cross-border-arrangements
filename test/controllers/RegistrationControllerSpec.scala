@@ -20,7 +20,8 @@ import base.SpecBase
 import connectors.RegistrationConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
-import models.{PayloadRegisterWithID, Registration}
+import models.{ErrorDetail, ErrorDetails, PayloadRegisterWithID, Registration, SourceFaultDetail}
+import org.joda.time.DateTime
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
@@ -81,6 +82,36 @@ class RegistrationControllerSpec extends SpecBase
         }
       }
 
+      "should return bad request when Json cannot be validated" in {
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Registration]) {
+          individualNoIdSubscription =>
+            val request =
+            FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
+              .withJsonBody(Json.parse("""{"value": "field"}"""))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
+        }
+      }
+
+      "should return not found when one is encountered" in {
+        when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[Registration]) {
+          individualNoIdSubscription =>
+            val request =
+              FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
+                .withJsonBody(Json.toJson(individualNoIdSubscription))
+
+            val result = route(application, request).value
+            status(result) mustEqual NOT_FOUND
+        }
+      }
+
       "should return forbidden error when authorisation is invalid" in {
         when(mockRegistrationConnector.sendWithoutIDInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
@@ -128,9 +159,40 @@ class RegistrationControllerSpec extends SpecBase
         }
       }
 
-      "should return forbidden error when authorisation is invalid" in {
+      "should return bad request when Json cannot be validated" in {
         when(mockRegistrationConnector.sendWithID(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
+          .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(POST, routes.RegistrationController.withIdRegistration.url)
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
+
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
+        }
+      }
+
+      "should return not found when one is encountered" in {
+        when(mockRegistrationConnector.sendWithID(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])))
+
+        forAll(arbitrary[PayloadRegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(POST, routes.RegistrationController.withIdRegistration.url)
+                .withJsonBody(Json.toJson(withIdSubscription))
+
+            val result = route(application, request).value
+            status(result) mustEqual NOT_FOUND
+        }
+      }
+
+      "should return forbidden error when authorisation is invalid" in {
+        val errorDetails = ErrorDetails(ErrorDetail(DateTime.now().toString,"xx","403","FORBIDDEN","", Some(SourceFaultDetail(Seq("a","b")))))
+        when(mockRegistrationConnector.sendWithID(any())(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(403,  Json.toJson(errorDetails), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[PayloadRegisterWithID]) {
           withIdSubscription =>

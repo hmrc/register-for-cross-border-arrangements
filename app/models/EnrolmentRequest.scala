@@ -18,8 +18,6 @@ package models
 
 import play.api.libs.json.{Json, OWrites}
 
-import scala.util.Random
-
 case class Identifier(key: String, value: String)
 
 object Identifier {

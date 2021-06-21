@@ -6,21 +6,22 @@ object AppDependencies {
   val compile = Seq(
     play.sbt.PlayImport.ws,
     "uk.gov.hmrc"       %% "domain"                        % "5.11.0-play-27",
-    "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.4.0-play-26",
-    "uk.gov.hmrc"       %% "bootstrap-health-play-27"      % "3.4.0",
-    "uk.gov.hmrc"       %% "bootstrap-backend-play-27"     % "3.4.0"
+    "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.6.0-play-27",
+    "uk.gov.hmrc"       %% "bootstrap-health-play-28"      % "5.4.0",
+    "uk.gov.hmrc"       %% "bootstrap-backend-play-28"     % "5.4.0"
   )
 
   val test = Seq(
-    "org.scalatest"               %% "scalatest"               % "3.0.8",
-    "org.scalatestplus.play"      %% "scalatestplus-play"      % "4.0.3",
-    "org.pegdown"                 %  "pegdown"                 % "1.6.0",
-    "org.jsoup"                   %  "jsoup"                   % "1.12.1",
-    "com.typesafe.play"           %% "play-test"               % PlayVersion.current,
-    "org.mockito"                 %  "mockito-all"             % "1.10.19",
-    "com.github.tomakehurst"      %  "wiremock-standalone"     % "2.25.0",
-    "org.scalacheck"              %% "scalacheck"              % "1.14.3",
-    "wolfendale"                  %% "scalacheck-gen-regexp"   % "0.1.2"
+    "org.scalatest"               %% "scalatest"                % "3.1.0",
+    "org.scalatestplus.play"      %% "scalatestplus-play"       % "5.1.0",
+    "org.pegdown"                 %  "pegdown"                  % "1.6.0",
+    "org.jsoup"                   %  "jsoup"                    % "1.12.1",
+    "com.typesafe.play"           %% "play-test"                % PlayVersion.current,
+    "org.mockito"                 %%  "mockito-scala"            % "1.16.34",
+    "com.github.tomakehurst"      %  "wiremock-standalone"      % "2.27.0",
+    "org.scalatestplus"           %% "scalatestplus-scalacheck" % "3.1.0.0-RC2",
+    "wolfendale"                  %% "scalacheck-gen-regexp"    % "0.1.2",
+    "com.vladsch.flexmark"        %  "flexmark-all"             % "0.35.10"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test

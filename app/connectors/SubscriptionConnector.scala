@@ -23,8 +23,7 @@ import java.util.UUID
 import config.AppConfig
 import javax.inject.Inject
 import models.CreateSubscriptionForDACRequest
-import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 

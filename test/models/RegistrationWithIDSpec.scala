@@ -19,12 +19,10 @@ package models
 import base.SpecBase
 import generators.Generators
 import helpers.JsonFixtures.{registerWithIDJson, registerWithIDPayload, registrationWithRequest}
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
 class RegistrationWithIDSpec extends SpecBase
-  with MockitoSugar
   with Generators
   with ScalaCheckPropertyChecks {
 

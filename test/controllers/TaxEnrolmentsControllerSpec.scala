@@ -21,10 +21,8 @@ import connectors.TaxEnrolmentsConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
 import models.EnrolmentRequest.SubscriptionInfo
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -37,7 +35,6 @@ import uk.gov.hmrc.http.HttpResponse
 import scala.concurrent.Future
 
 class TaxEnrolmentsControllerSpec extends SpecBase
-  with MockitoSugar
   with Generators
   with ScalaCheckPropertyChecks {
 

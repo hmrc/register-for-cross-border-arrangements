@@ -17,9 +17,10 @@
 package controllers.auth
 
 import com.google.inject.ImplementedBy
-import controllers.Assets.Status
+
 import javax.inject.Inject
 import play.api.http.Status.UNAUTHORIZED
+import play.api.mvc.Results.Status
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, NoActiveSession}
 import uk.gov.hmrc.http.HeaderCarrier

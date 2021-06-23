@@ -18,7 +18,7 @@ package connectors
 
 import config.AppConfig
 import models.{PayloadRegisterWithID, Registration}
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HeaderNames, HttpClient, HttpResponse}
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -31,23 +31,21 @@ class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClien
   def sendWithoutIDInformation(registration: Registration)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[Registration, HttpResponse](config.registerUrl, registration)(wts = Registration.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[Registration, HttpResponse](config.registerUrl, registration, headers = extraHeaders)(wts = Registration.format, rds = httpReads, hc = hc, ec = ec)
   }
 
   def sendWithID(registration: PayloadRegisterWithID)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[PayloadRegisterWithID, HttpResponse](config.registerWithIDUrl, registration)(wts = PayloadRegisterWithID.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[PayloadRegisterWithID, HttpResponse](config.registerWithIDUrl, registration, headers = extraHeaders)(wts = PayloadRegisterWithID.format, rds = httpReads, hc = hc, ec = ec)
   }
 
+  private def extraHeaders(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
+    val newHeaders = headerCarrier
+      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
+
+    newHeaders.headers(Seq(HeaderNames.authorisation)) ++ addHeaders
+  }
 
   private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
 

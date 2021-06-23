@@ -19,11 +19,11 @@ package connectors
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
-
 import config.AppConfig
+
 import javax.inject.Inject
 import models.CreateSubscriptionForDACRequest
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HeaderNames, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,9 +35,9 @@ class SubscriptionConnector @Inject()(val config: AppConfig, val http: HttpClien
 
     val newHeaders = hc
       .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
+      val extraHeaders = newHeaders.headers(Seq(HeaderNames.authorisation)) ++ addHeaders
 
-    http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription)(wts =
+    http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription, headers = extraHeaders)(wts =
       CreateSubscriptionForDACRequest.format, rds = httpReads, hc = newHeaders, ec = ec)
   }
 

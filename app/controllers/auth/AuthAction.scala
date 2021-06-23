@@ -24,7 +24,7 @@ import play.api.mvc.Results.Status
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, NoActiveSession}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +35,7 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
 
   override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
     implicit val hc: HeaderCarrier =
-      HeaderCarrierConverter.fromHeadersAndSession(request.headers)
+      HeaderCarrierConverter.fromRequest(request)
 
     authorised() {
       block(request)

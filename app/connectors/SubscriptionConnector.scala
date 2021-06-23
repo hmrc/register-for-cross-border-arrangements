@@ -16,15 +16,11 @@
 
 package connectors
 
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.UUID
-
 import config.AppConfig
-import javax.inject.Inject
 import models.CreateSubscriptionForDACRequest
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionConnector @Inject()(val config: AppConfig, val http: HttpClient) {
@@ -33,35 +29,7 @@ class SubscriptionConnector @Inject()(val config: AppConfig, val http: HttpClien
     subscription: CreateSubscriptionForDACRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription)(wts =
-      CreateSubscriptionForDACRequest.format, rds = httpReads, hc = newHeaders, ec = ec)
-  }
-
-  private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String,String)] = {
-
-    //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
-    val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
-
-    Seq(
-      "x-forwarded-host" -> "mdtp",
-      "date" -> ZonedDateTime.now().format(formatter),
-      "x-correlation-id" -> {
-        headerCarrier.requestId
-          .map(_.value)
-          .getOrElse(UUID.randomUUID().toString)
-      },
-      "x-conversation-id" -> {
-        headerCarrier.sessionId
-          .map(_.value)
-          .getOrElse(UUID.randomUUID().toString)
-      },
-      "content-type"    -> "application/json",
-      "accept"          -> "application/json",
-      "Environment"      -> config.eisEnvironment
-    )
+    http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription, headers = extraHeaders(config))(wts =
+      CreateSubscriptionForDACRequest.format, rds = httpReads, hc = hc, ec = ec)
   }
 }

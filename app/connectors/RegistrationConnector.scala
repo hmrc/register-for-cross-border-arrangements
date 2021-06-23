@@ -18,11 +18,8 @@ package connectors
 
 import config.AppConfig
 import models.{PayloadRegisterWithID, Registration}
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,45 +28,14 @@ class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClien
   def sendWithoutIDInformation(registration: Registration)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[Registration, HttpResponse](config.registerUrl, registration)(wts = Registration.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[Registration, HttpResponse](config.registerUrl, registration, headers = extraHeaders(config))(wts = Registration.format, rds = httpReads, hc = hc, ec = ec)
   }
 
   def sendWithID(registration: PayloadRegisterWithID)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[PayloadRegisterWithID, HttpResponse](config.registerWithIDUrl, registration)(wts = PayloadRegisterWithID.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[PayloadRegisterWithID, HttpResponse](config.registerWithIDUrl, registration, headers = extraHeaders(config))(wts = PayloadRegisterWithID.format, rds = httpReads, hc = hc, ec = ec)
   }
 
 
-  private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
-
-    //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
-    val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
-
-    Seq(
-      "x-forwarded-host" -> "mdtp",
-      "date" -> ZonedDateTime.now().format(formatter),
-      "x-correlation-id" -> {
-        headerCarrier.requestId
-          .map(_.value)
-          .getOrElse(UUID.randomUUID().toString)
-      },
-      "x-conversation-id" -> {
-        headerCarrier.sessionId
-          .map(_.value)
-          .getOrElse(UUID.randomUUID().toString)
-      },
-      "content-type"    -> "application/json",
-      "accept"          -> "application/json",
-      "Environment"      -> config.eisEnvironment
-    )
-  }
 }

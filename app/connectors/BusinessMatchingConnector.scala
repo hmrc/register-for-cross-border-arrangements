@@ -19,11 +19,8 @@ package connectors
 import config.AppConfig
 import models.{BusinessMatchingSubmission, IndividualMatchingSubmission}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,57 +30,20 @@ class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpC
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val submissionUrl = s"${config.businessMatchingUrl}/registration/individual/nino/$nino"
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[IndividualMatchingSubmission, HttpResponse](submissionUrl, individualSubmission)(wts = IndividualMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[IndividualMatchingSubmission, HttpResponse](submissionUrl, individualSubmission, headers = extraHeaders(config))(wts = IndividualMatchingSubmission.format, rds = httpReads, hc = hc, ec = ec)
   }
 
   def sendSoleProprietorMatchingInformation(utr: String, soleProprietorSubmission: BusinessMatchingSubmission)
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val submissionUrl = s"${config.businessMatchingUrl}/registration/individual/utr/$utr"
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, soleProprietorSubmission)(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, soleProprietorSubmission, headers = extraHeaders(config))(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = hc, ec = ec)
   }
 
   def sendBusinessMatchingInformation(utr: String, businessSubmission: BusinessMatchingSubmission)
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val submissionUrl = s"${config.businessMatchingUrl}/registration/organisation/utr/$utr"
 
-    val newHeaders = hc
-      .copy(authorization = Some(Authorization(s"Bearer ${config.bearerToken}")))
-      .withExtraHeaders(addHeaders(): _*)
-
-    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission)(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = newHeaders, ec = ec)
+    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission, headers = extraHeaders(config))(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = hc, ec = ec)
   }
-
-  private def addHeaders()(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
-
-    //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
-    val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
-
-    Seq(
-      "x-forwarded-host" -> "mdtp",
-      "date" -> ZonedDateTime.now().format(formatter),
-      "x-correlation-id" -> {
-        headerCarrier.requestId
-          .map(_.value)
-          .getOrElse(UUID.randomUUID().toString)
-      },
-      "x-conversation-id" -> {
-        headerCarrier.sessionId
-          .map(_.value)
-          .getOrElse(UUID.randomUUID().toString)
-      },
-      "content-type"    -> "application/json",
-      "accept"          -> "application/json",
-      "Environment"      -> config.eisEnvironment
-    )
-  }
-
 }

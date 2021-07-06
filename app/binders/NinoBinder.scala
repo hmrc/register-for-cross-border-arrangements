@@ -20,7 +20,9 @@ import play.api.mvc.PathBindable
 import uk.gov.hmrc.domain.Nino
 
 object NinoBinder {
+
   implicit lazy val pathBindable: PathBindable[Nino] = new PathBindable[Nino] {
+
     override def bind(key: String, value: String): Either[String, Nino] =
       implicitly[PathBindable[String]].bind(key, value).right.map(Nino(_))
 

@@ -27,12 +27,11 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsController @Inject()(
-                                         authenticate: AuthAction,
+class TaxEnrolmentsController @Inject() (authenticate: AuthAction,
                                          taxEnrolmentsConnector: TaxEnrolmentsConnector,
-                                        override val controllerComponents: ControllerComponents)
-                                       (implicit executionContext: ExecutionContext) extends
-  BackendController(controllerComponents) {
+                                         override val controllerComponents: ControllerComponents
+)(implicit executionContext: ExecutionContext)
+    extends BackendController(controllerComponents) {
 
   def createEnrolment: Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
@@ -49,17 +48,16 @@ class TaxEnrolmentsController @Inject()(
       )
   }
 
-  private def convertToResult(httpResponse: HttpResponse): Result = {
+  private def convertToResult(httpResponse: HttpResponse): Result =
     httpResponse.status match {
-      case OK => Ok(httpResponse.body)
-      case NO_CONTENT => NoContent
-      case NOT_FOUND => NotFound(httpResponse.body)
-      case BAD_REQUEST => BadRequest(httpResponse.body)
-      case UNAUTHORIZED => Unauthorized(httpResponse.body)
+      case OK                  => Ok(httpResponse.body)
+      case NO_CONTENT          => NoContent
+      case NOT_FOUND           => NotFound(httpResponse.body)
+      case BAD_REQUEST         => BadRequest(httpResponse.body)
+      case UNAUTHORIZED        => Unauthorized(httpResponse.body)
       case SERVICE_UNAVAILABLE => ServiceUnavailable(httpResponse.body)
-      case BAD_GATEWAY => BadGateway(httpResponse.body)
-      case GATEWAY_TIMEOUT => GatewayTimeout(httpResponse.body)
-      case _ => InternalServerError(httpResponse.body)
+      case BAD_GATEWAY         => BadGateway(httpResponse.body)
+      case GATEWAY_TIMEOUT     => GatewayTimeout(httpResponse.body)
+      case _                   => InternalServerError(httpResponse.body)
     }
-  }
 }

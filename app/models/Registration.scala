@@ -20,15 +20,15 @@ import java.time.LocalDate
 
 import play.api.libs.json._
 
-
 case class NoIdIndividual(name: Name, dateOfBirth: LocalDate)
 
 object NoIdIndividual {
+
   implicit lazy val writes: OWrites[NoIdIndividual] = OWrites[NoIdIndividual] {
     individual =>
       Json.obj(
-        "firstName" -> individual.name.firstName,
-        "lastName" -> individual.name.secondName,
+        "firstName"   -> individual.name.firstName,
+        "lastName"    -> individual.name.secondName,
         "dateOfBirth" -> individual.dateOfBirth.toString
       )
   }
@@ -39,7 +39,9 @@ object NoIdIndividual {
       (__ \ "firstName").read[String] and
         (__ \ "lastName").read[String] and
         (__ \ "dateOfBirth").read[LocalDate]
-      ) ((firstName, secondName, dob) => NoIdIndividual(Name(firstName, secondName), dob))
+    )(
+      (firstName, secondName, dob) => NoIdIndividual(Name(firstName, secondName), dob)
+    )
   }
 }
 
@@ -51,7 +53,13 @@ object NoIdOrganisation {
 
 }
 
-case class Address(addressLine1: String, addressLine2: Option[String], addressLine3: String, addressLine4: Option[String], postalCode: Option[String], countryCode: String)
+case class Address(addressLine1: String,
+                   addressLine2: Option[String],
+                   addressLine3: String,
+                   addressLine4: Option[String],
+                   postalCode: Option[String],
+                   countryCode: String
+)
 
 object Address {
   implicit val addressFormat = Json.format[Address]
@@ -69,7 +77,6 @@ object Identification {
   implicit val indentifierFormats = Json.format[Identification]
 }
 
-
 case class RequestParameter(paramName: String, paramValue: String)
 
 object RequestParameter {
@@ -77,23 +84,23 @@ object RequestParameter {
 }
 
 case class RequestCommon(
-                          receiptDate: String,
-                          regime: String,
-                          acknowledgementReference: String,
-                          requestParameters: Option[Seq[RequestParameter]]
-                        )
+  receiptDate: String,
+  regime: String,
+  acknowledgementReference: String,
+  requestParameters: Option[Seq[RequestParameter]]
+)
 
 object RequestCommon {
   implicit val requestCommonFormats = Json.format[RequestCommon]
 }
 
 case class RequestDetails(
-                           organisation: Option[NoIdOrganisation],
-                           individual: Option[NoIdIndividual],
-                           address: Address,
-                           contactDetails: ContactDetails,
-                           identification: Option[Identification]
-                         )
+  organisation: Option[NoIdOrganisation],
+  individual: Option[NoIdIndividual],
+  address: Address,
+  contactDetails: ContactDetails,
+  identification: Option[Identification]
+)
 
 object RequestDetails {
 
@@ -107,12 +114,13 @@ object RequestDetails {
         (__ \ "address").read[Address] and
         (__ \ "contactDetails").read[ContactDetails] and
         (__ \ "identification").readNullable[Identification]
-      ) (
-      (organisation, individual, address, contactDetails, identification) => (organisation, individual) match {
-        case (None, None) => throw new Exception("Request Details must have either an organisation or individual element")
-        case (Some(_), Some(_)) => throw new Exception("Request details cannot have both and organisation or individual element")
-        case (organisation, individual) => RequestDetails(organisation, individual, address, contactDetails, identification)
-      }
+    )(
+      (organisation, individual, address, contactDetails, identification) =>
+        (organisation, individual) match {
+          case (None, None)               => throw new Exception("Request Details must have either an organisation or individual element")
+          case (Some(_), Some(_))         => throw new Exception("Request details cannot have both and organisation or individual element")
+          case (organisation, individual) => RequestDetails(organisation, individual, address, contactDetails, identification)
+        }
     )
   }
 }
@@ -124,8 +132,8 @@ object RegisterWithoutIDRequest {
 }
 
 case class Registration(
-                         registerWithoutIDRequest: RegisterWithoutIDRequest
-                       )
+  registerWithoutIDRequest: RegisterWithoutIDRequest
+)
 
 object Registration {
   implicit val format = Json.format[Registration]

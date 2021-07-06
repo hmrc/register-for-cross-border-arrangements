@@ -30,12 +30,13 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
-class SubscriptionController @Inject()(
+class SubscriptionController @Inject() (
   val config: AppConfig,
   authenticate: AuthAction,
   subscriptionConnector: SubscriptionConnector,
   override val controllerComponents: ControllerComponents
-)(implicit executionContext: ExecutionContext) extends  BackendController(controllerComponents) {
+)(implicit executionContext: ExecutionContext)
+    extends BackendController(controllerComponents) {
 
   private val logger: Logger = Logger(this.getClass)
 
@@ -48,48 +49,41 @@ class SubscriptionController @Inject()(
         invalid = _ => Future.successful(BadRequest("")),
         valid = sub =>
           for {
-          response <- subscriptionConnector.sendSubscriptionInformation(sub)
-          } yield
-            convertToResult(response)
+            response <- subscriptionConnector.sendSubscriptionInformation(sub)
+          } yield convertToResult(response)
       )
   }
 
-  private def convertToResult(httpResponse: HttpResponse): Result = {
+  private def convertToResult(httpResponse: HttpResponse): Result =
     httpResponse.status match {
       case OK => Ok(httpResponse.body)
 
-      case BAD_REQUEST => {
+      case BAD_REQUEST =>
         logDownStreamError(httpResponse.body)
 
         BadRequest(httpResponse.body)
-      }
 
-      case FORBIDDEN => {
+      case FORBIDDEN =>
         logDownStreamError(httpResponse.body)
 
         Forbidden(httpResponse.body)
-      }
 
-      case SERVICE_UNAVAILABLE => {
+      case SERVICE_UNAVAILABLE =>
         logDownStreamError(httpResponse.body)
 
         ServiceUnavailable(httpResponse.body)
-      }
 
-      case CONFLICT => {
+      case CONFLICT =>
         logDownStreamError(httpResponse.body)
 
         Conflict(httpResponse.body)
-      }
 
-      case _ => {
+      case _ =>
         logDownStreamError(httpResponse.body)
 
         InternalServerError(httpResponse.body)
-      }
 
     }
-  }
 
   private def logDownStreamError(body: String): Unit = {
     val error = Try(Json.parse(body).validate[ErrorDetails])

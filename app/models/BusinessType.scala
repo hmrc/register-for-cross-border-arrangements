@@ -19,36 +19,41 @@ package models
 import play.api.libs.json._
 
 sealed trait BusinessType {
-  val value:String
+  val value: String
 }
 
 case object partnerShip extends BusinessType {
   override val value: String = "Partnership"
 }
+
 case object limitedLiability extends BusinessType {
   override val value: String = "LLP"
 }
+
 case object corporateBody extends BusinessType {
   override val value: String = "Corporate Body"
 }
+
 case object unIncorporatedBody extends BusinessType {
   override val value: String = "Unincorporated Body"
 }
+
 case object other extends BusinessType {
   override val value: String = "Not Specified"
 }
 
 object BusinessType {
+
   implicit lazy val writes: Writes[BusinessType] = Writes {
     businessType => JsString(businessType.value)
   }
 
   implicit lazy val reads: Reads[BusinessType] = {
-    case JsString("Partnership") => JsSuccess(partnerShip)
-    case JsString("LLP") => JsSuccess(limitedLiability)
-    case JsString("Corporate Body") => JsSuccess(corporateBody)
+    case JsString("Partnership")         => JsSuccess(partnerShip)
+    case JsString("LLP")                 => JsSuccess(limitedLiability)
+    case JsString("Corporate Body")      => JsSuccess(corporateBody)
     case JsString("Unincorporated Body") => JsSuccess(unIncorporatedBody)
-    case JsString("Not Specified") => JsSuccess(other)
-    case _ => JsError()
+    case JsString("Not Specified")       => JsSuccess(other)
+    case _                               => JsError()
   }
 }

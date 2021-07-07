@@ -26,7 +26,7 @@ object Identifier {
   implicit lazy val writes: OWrites[Identifier] = OWrites[Identifier] {
     identifier =>
       Json.obj(
-        "key" -> identifier.key,
+        "key"   -> identifier.key,
         "value" -> identifier.value
       )
   }
@@ -40,7 +40,7 @@ object Verifier {
   implicit lazy val writes: OWrites[Verifier] = OWrites[Verifier] {
     verifier =>
       Json.obj(
-        "key" -> verifier.key,
+        "key"   -> verifier.key,
         "value" -> verifier.value
       )
   }
@@ -55,7 +55,7 @@ object EnrolmentRequest {
     enrolmentRequest =>
       Json.obj(
         "identifiers" -> enrolmentRequest.identifiers,
-        "verifiers" -> enrolmentRequest.verifiers
+        "verifiers"   -> enrolmentRequest.verifiers
       )
   }
 
@@ -64,15 +64,13 @@ object EnrolmentRequest {
                               ctUtr: Option[String] = None,
                               nino: Option[String] = None,
                               nonUkPostcode: Option[String] = None,
-                              dac6Id: String) {
+                              dac6Id: String
+  ) {
 
-    def convertToEnrolmentRequest: EnrolmentRequest = {
+    def convertToEnrolmentRequest: EnrolmentRequest =
+      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", dac6Id)), verifiers = buildVerifiers)
 
-      EnrolmentRequest(identifiers = Seq(Identifier("DAC6ID", dac6Id)),
-                        verifiers = buildVerifiers)
-    }
-
-     def buildVerifiers: Seq[Verifier] = {
+    def buildVerifiers: Seq[Verifier] = {
 
       val mandatoryVerifiers = Seq(Verifier("SAFEID", safeID))
 
@@ -84,12 +82,15 @@ object EnrolmentRequest {
 
     }
 
-     def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] = {
-      optionalInfo.map(info => Verifier(key, info)).toSeq
-
-    }
+    def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] =
+      optionalInfo
+        .map(
+          info => Verifier(key, info)
+        )
+        .toSeq
 
   }
+
   object SubscriptionInfo {
     implicit val format = Json.format[SubscriptionInfo]
 

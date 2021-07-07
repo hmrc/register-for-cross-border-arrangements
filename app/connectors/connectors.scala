@@ -22,8 +22,10 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 package object connectors {
+
   implicit val httpReads: HttpReads[HttpResponse] =
     new HttpReads[HttpResponse] {
+
       override def read(method: String, url: String, response: HttpResponse): HttpResponse =
         response
     }
@@ -42,7 +44,7 @@ package object connectors {
 
     Seq(
       "x-forwarded-host" -> "mdtp",
-      "date" -> ZonedDateTime.now().format(formatter),
+      "date"             -> ZonedDateTime.now().format(formatter),
       "x-correlation-id" -> {
         headerCarrier.requestId
           .map(_.value)
@@ -53,9 +55,9 @@ package object connectors {
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
       },
-      "content-type"    -> "application/json",
-      "accept"          -> "application/json",
-      "Environment"      -> eisEnvironment
+      "content-type" -> "application/json",
+      "accept"       -> "application/json",
+      "Environment"  -> eisEnvironment
     )
   }
 }

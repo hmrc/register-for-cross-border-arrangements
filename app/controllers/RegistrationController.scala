@@ -30,12 +30,12 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
-class RegistrationController @Inject()(val config: AppConfig,
-                                       authenticate: AuthAction,
-                                       registrationConnector: RegistrationConnector,
-                                       override val controllerComponents: ControllerComponents
-                                      )(implicit executionContext: ExecutionContext)
-  extends BackendController(controllerComponents) {
+class RegistrationController @Inject() (val config: AppConfig,
+                                        authenticate: AuthAction,
+                                        registrationConnector: RegistrationConnector,
+                                        override val controllerComponents: ControllerComponents
+)(implicit executionContext: ExecutionContext)
+    extends BackendController(controllerComponents) {
 
   private val logger: Logger = Logger(this.getClass)
 
@@ -67,29 +67,25 @@ class RegistrationController @Inject()(val config: AppConfig,
       )
   }
 
-  private def convertToResult(httpResponse: HttpResponse): Result = {
+  private def convertToResult(httpResponse: HttpResponse): Result =
     httpResponse.status match {
-      case OK => Ok(httpResponse.body)
+      case OK        => Ok(httpResponse.body)
       case NOT_FOUND => NotFound(httpResponse.body)
 
-      case BAD_REQUEST => {
+      case BAD_REQUEST =>
         logDownStreamError(httpResponse.body)
 
         BadRequest(httpResponse.body)
-      }
 
-      case FORBIDDEN => {
+      case FORBIDDEN =>
         logDownStreamError(httpResponse.body)
 
         Forbidden(httpResponse.body)
-      }
 
-      case _ => {
+      case _ =>
         logDownStreamError(httpResponse.body)
         InternalServerError(httpResponse.body)
-      }
     }
-  }
 
   private def logDownStreamError(body: String): Unit = {
     val error = Try(Json.parse(body).validate[ErrorDetails])

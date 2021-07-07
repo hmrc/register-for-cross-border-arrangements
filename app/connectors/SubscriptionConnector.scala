@@ -23,13 +23,15 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubscriptionConnector @Inject()(val config: AppConfig, val http: HttpClient) {
+class SubscriptionConnector @Inject() (val config: AppConfig, val http: HttpClient) {
 
   def sendSubscriptionInformation(
     subscription: CreateSubscriptionForDACRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-
-    http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription, headers = extraHeaders(config))(wts =
-      CreateSubscriptionForDACRequest.format, rds = httpReads, hc = hc, ec = ec)
-  }
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
+    http.POST[CreateSubscriptionForDACRequest, HttpResponse](config.subscriptionURL, subscription, headers = extraHeaders(config))(
+      wts = CreateSubscriptionForDACRequest.format,
+      rds = httpReads,
+      hc = hc,
+      ec = ec
+    )
 }

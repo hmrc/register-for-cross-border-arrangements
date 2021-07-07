@@ -23,19 +23,20 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationConnector @Inject()(val config: AppConfig, val http: HttpClient) {
+class RegistrationConnector @Inject() (val config: AppConfig, val http: HttpClient) {
 
-  def sendWithoutIDInformation(registration: Registration)
-                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def sendWithoutIDInformation(registration: Registration)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
+    http.POST[Registration, HttpResponse](config.registerUrl, registration, headers = extraHeaders(config))(wts = Registration.format,
+                                                                                                            rds = httpReads,
+                                                                                                            hc = hc,
+                                                                                                            ec = ec
+    )
 
-    http.POST[Registration, HttpResponse](config.registerUrl, registration, headers = extraHeaders(config))(wts = Registration.format, rds = httpReads, hc = hc, ec = ec)
-  }
-
-  def sendWithID(registration: PayloadRegisterWithID)
-                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-
-    http.POST[PayloadRegisterWithID, HttpResponse](config.registerWithIDUrl, registration, headers = extraHeaders(config))(wts = PayloadRegisterWithID.format, rds = httpReads, hc = hc, ec = ec)
-  }
-
+  def sendWithID(registration: PayloadRegisterWithID)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
+    http.POST[PayloadRegisterWithID, HttpResponse](config.registerWithIDUrl, registration, headers = extraHeaders(config))(wts = PayloadRegisterWithID.format,
+                                                                                                                           rds = httpReads,
+                                                                                                                           hc = hc,
+                                                                                                                           ec = ec
+    )
 
 }

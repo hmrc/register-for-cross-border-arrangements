@@ -24,26 +24,47 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessMatchingConnector @Inject()(val config: AppConfig, val http: HttpClient) {
+class BusinessMatchingConnector @Inject() (val config: AppConfig, val http: HttpClient) {
 
-  def sendIndividualMatchingInformation(nino: Nino, individualSubmission: IndividualMatchingSubmission)
-                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def sendIndividualMatchingInformation(nino: Nino, individualSubmission: IndividualMatchingSubmission)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[HttpResponse] = {
     val submissionUrl = s"${config.businessMatchingUrl}/registration/individual/nino/$nino"
 
-    http.POST[IndividualMatchingSubmission, HttpResponse](submissionUrl, individualSubmission, headers = extraHeaders(config))(wts = IndividualMatchingSubmission.format, rds = httpReads, hc = hc, ec = ec)
+    http.POST[IndividualMatchingSubmission, HttpResponse](submissionUrl, individualSubmission, headers = extraHeaders(config))(
+      wts = IndividualMatchingSubmission.format,
+      rds = httpReads,
+      hc = hc,
+      ec = ec
+    )
   }
 
-  def sendSoleProprietorMatchingInformation(utr: String, soleProprietorSubmission: BusinessMatchingSubmission)
-                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def sendSoleProprietorMatchingInformation(utr: String, soleProprietorSubmission: BusinessMatchingSubmission)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[HttpResponse] = {
     val submissionUrl = s"${config.businessMatchingUrl}/registration/individual/utr/$utr"
 
-    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, soleProprietorSubmission, headers = extraHeaders(config))(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = hc, ec = ec)
+    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, soleProprietorSubmission, headers = extraHeaders(config))(
+      wts = BusinessMatchingSubmission.format,
+      rds = httpReads,
+      hc = hc,
+      ec = ec
+    )
   }
 
-  def sendBusinessMatchingInformation(utr: String, businessSubmission: BusinessMatchingSubmission)
-                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def sendBusinessMatchingInformation(utr: String, businessSubmission: BusinessMatchingSubmission)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[HttpResponse] = {
     val submissionUrl = s"${config.businessMatchingUrl}/registration/organisation/utr/$utr"
 
-    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission, headers = extraHeaders(config))(wts = BusinessMatchingSubmission.format, rds = httpReads, hc = hc, ec = ec)
+    http.POST[BusinessMatchingSubmission, HttpResponse](submissionUrl, businessSubmission, headers = extraHeaders(config))(wts =
+                                                                                                                             BusinessMatchingSubmission.format,
+                                                                                                                           rds = httpReads,
+                                                                                                                           hc = hc,
+                                                                                                                           ec = ec
+    )
   }
 }

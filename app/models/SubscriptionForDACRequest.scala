@@ -32,25 +32,24 @@ object IndividualDetails {
   implicit val format = Json.format[IndividualDetails]
 }
 
+case class ContactInformationForIndividual(individual: IndividualDetails, email: String, phone: Option[String], mobile: Option[String])
+    extends ContactInformation
 
-case class ContactInformationForIndividual(individual: IndividualDetails,
-                                           email: String,
-                                           phone: Option[String],
-                                           mobile: Option[String]) extends ContactInformation
 object ContactInformationForIndividual {
   implicit val format: OFormat[ContactInformationForIndividual] = Json.format[ContactInformationForIndividual]
 }
 
-case class ContactInformationForOrganisation(organisation: OrganisationDetails,
-                                             email: String,
-                                             phone: Option[String],
-                                             mobile: Option[String]) extends ContactInformation
+case class ContactInformationForOrganisation(organisation: OrganisationDetails, email: String, phone: Option[String], mobile: Option[String])
+    extends ContactInformation
+
 object ContactInformationForOrganisation {
   implicit val format: OFormat[ContactInformationForOrganisation] = Json.format[ContactInformationForOrganisation]
 }
 
 case class PrimaryContact(contactInformation: ContactInformation)
+
 object PrimaryContact {
+
   implicit lazy val reads: Reads[PrimaryContact] = {
     import play.api.libs.functional.syntax._
     (
@@ -59,25 +58,28 @@ object PrimaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-      )((organisation, individual, email, phone, mobile) =>
-      (organisation.isDefined, individual.isDefined)  match {
-        case (true, false) => PrimaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
-        case (false, true) => PrimaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
-        case _ => throw new Exception("Primary Contact must have either an organisation or individual element")
-      }
+    )(
+      (organisation, individual, email, phone, mobile) =>
+        (organisation.isDefined, individual.isDefined) match {
+          case (true, false) => PrimaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
+          case (false, true) => PrimaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+          case _             => throw new Exception("Primary Contact must have either an organisation or individual element")
+        }
     )
   }
 
   implicit lazy val writes: OWrites[PrimaryContact] = {
-    case PrimaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+    case PrimaryContact(contactInformationForInd @ ContactInformationForIndividual(_, _, _, _)) =>
       Json.toJsObject(contactInformationForInd)
-    case PrimaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+    case PrimaryContact(contactInformationForOrg @ ContactInformationForOrganisation(_, _, _, _)) =>
       Json.toJsObject(contactInformationForOrg)
   }
 }
 
 case class SecondaryContact(contactInformation: ContactInformation)
+
 object SecondaryContact {
+
   implicit lazy val reads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
     (
@@ -86,19 +88,20 @@ object SecondaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-      )((organisation, individual, email, phone, mobile) =>
-      (organisation.isDefined, individual.isDefined)  match {
-        case (true, false) => SecondaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
-        case (false, true) => SecondaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
-        case _ => throw new Exception("Secondary Contact must have either an organisation or individual element")
-      }
+    )(
+      (organisation, individual, email, phone, mobile) =>
+        (organisation.isDefined, individual.isDefined) match {
+          case (true, false) => SecondaryContact(ContactInformationForOrganisation(organisation.get, email, phone, mobile))
+          case (false, true) => SecondaryContact(ContactInformationForIndividual(individual.get, email, phone, mobile))
+          case _             => throw new Exception("Secondary Contact must have either an organisation or individual element")
+        }
     )
   }
 
   implicit lazy val writes: OWrites[SecondaryContact] = {
-    case SecondaryContact(contactInformationForInd@ContactInformationForIndividual(_, _, _, _)) =>
+    case SecondaryContact(contactInformationForInd @ ContactInformationForIndividual(_, _, _, _)) =>
       Json.toJsObject(contactInformationForInd)
-    case SecondaryContact(contactInformationForOrg@ContactInformationForOrganisation(_, _, _, _)) =>
+    case SecondaryContact(contactInformationForOrg @ ContactInformationForOrganisation(_, _, _, _)) =>
       Json.toJsObject(contactInformationForOrg)
   }
 }
@@ -108,7 +111,9 @@ case class RequestDetail(IDType: String,
                          tradingName: Option[String],
                          isGBUser: Boolean,
                          primaryContact: PrimaryContact,
-                         secondaryContact: Option[SecondaryContact])
+                         secondaryContact: Option[SecondaryContact]
+)
+
 object RequestDetail {
 
   implicit val requestDetailFormats = Json.format[RequestDetail]
@@ -122,10 +127,11 @@ object RequestParameters {
 }
 
 case class RequestCommonForSubscription(regime: String,
-                         receiptDate: String,
-                         acknowledgementReference: String,
-                         originatingSystem: String,
-                         requestParameters: Option[Seq[RequestParameters]])
+                                        receiptDate: String,
+                                        acknowledgementReference: String,
+                                        originatingSystem: String,
+                                        requestParameters: Option[Seq[RequestParameters]]
+)
 
 object RequestCommonForSubscription {
   implicit val requestCommonForSubscriptionFormats = Json.format[RequestCommonForSubscription]
@@ -152,40 +158,41 @@ object ReturnParameters {
 }
 
 case class ResponseCommon(
-                           status: String,
-                           statusText: Option[String],
-                           processingDate: String,
-                           returnParameters: Option[Seq[ReturnParameters]]
-                         )
+  status: String,
+  statusText: Option[String],
+  processingDate: String,
+  returnParameters: Option[Seq[ReturnParameters]]
+)
+
 object ResponseCommon {
   implicit val format: Format[ResponseCommon] = Json.format[ResponseCommon]
 }
 
 case class ResponseDetailForDACSubscription(subscriptionID: String)
+
 object ResponseDetailForDACSubscription {
   implicit val format: OFormat[ResponseDetailForDACSubscription] = Json.format[ResponseDetailForDACSubscription]
 }
 
 case class SubscriptionForDACResponse(responseCommon: ResponseCommon, responseDetail: ResponseDetailForDACSubscription)
+
 object SubscriptionForDACResponse {
+
   implicit val reads: Reads[SubscriptionForDACResponse] = {
     import play.api.libs.functional.syntax._
     (
       (__ \ "responseCommon").read[ResponseCommon] and
         (__ \ "responseDetail").read[ResponseDetailForDACSubscription]
-      )((responseCommon, responseDetail) => SubscriptionForDACResponse(responseCommon, responseDetail))
+    )(
+      (responseCommon, responseDetail) => SubscriptionForDACResponse(responseCommon, responseDetail)
+    )
   }
 
   implicit val writes: OWrites[SubscriptionForDACResponse] = Json.writes[SubscriptionForDACResponse]
 }
 
 case class CreateSubscriptionForDACResponse(createSubscriptionForDACResponse: SubscriptionForDACResponse)
+
 object CreateSubscriptionForDACResponse {
   implicit val format: OFormat[CreateSubscriptionForDACResponse] = Json.format[CreateSubscriptionForDACResponse]
 }
-
-
-
-
-
-

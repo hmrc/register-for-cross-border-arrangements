@@ -32,10 +32,7 @@ import wolfendale.scalacheck.regexp.RegexpGen
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class BusinessMatchingConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class BusinessMatchingConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
@@ -49,7 +46,6 @@ class BusinessMatchingConnectorSpec extends SpecBase
     "for an individual matching submission" - {
       "must return status as OK for submission of valid Individual Matching Submission" in {
 
-
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, ims) =>
             stubResponse(s"/register-for-cross-border-arrangement-stubs/registration/individual/nino/$nino", OK)
@@ -60,7 +56,6 @@ class BusinessMatchingConnectorSpec extends SpecBase
       }
 
       "must return status as BAD_REQUEST for submission of invalid arrival notification" in {
-
 
         forAll(arbitrary[Nino], arbitrary[IndividualMatchingSubmission]) {
           (nino, ims) =>
@@ -121,7 +116,6 @@ class BusinessMatchingConnectorSpec extends SpecBase
     "for an business matching submission" - {
       "must return status as OK for submission of valid Business Matching Submission" in {
 
-
         forAll(RegexpGen.from(Utr.regex), arbitrary[BusinessMatchingSubmission]) {
           (utr, bms) =>
             stubResponse(s"/register-for-cross-border-arrangement-stubs/registration/organisation/utr/$utr", OK)
@@ -133,7 +127,6 @@ class BusinessMatchingConnectorSpec extends SpecBase
 
       "must return status as BAD_REQUEST for submission of invalid arrival notification" in {
 
-
         forAll(RegexpGen.from(Utr.regex), arbitrary[BusinessMatchingSubmission]) {
           (utr, bms) =>
             stubResponse(s"/register-for-cross-border-arrangement-stubs/registration/organisation/utr/$utr", BAD_REQUEST)
@@ -144,7 +137,6 @@ class BusinessMatchingConnectorSpec extends SpecBase
       }
 
       "must return status as INTERNAL_SERVER_ERROR for technical error incurred" in {
-
 
         forAll(RegexpGen.from(Utr.regex), arbitrary[BusinessMatchingSubmission]) {
           (utr, bms) =>
@@ -166,4 +158,3 @@ class BusinessMatchingConnectorSpec extends SpecBase
         )
     )
 }
-

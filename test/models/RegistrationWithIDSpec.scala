@@ -22,9 +22,7 @@ import helpers.JsonFixtures.{registerWithIDJson, registerWithIDPayload, registra
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class RegistrationWithIDSpec extends SpecBase
-  with Generators
-  with ScalaCheckPropertyChecks {
+class RegistrationWithIDSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   "Business partner matching" - {
     "marshal from Json Registration with ID" in {

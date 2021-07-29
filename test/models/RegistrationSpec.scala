@@ -22,9 +22,7 @@ import helpers.JsonFixtures._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class RegistrationSpec extends SpecBase
-  with Generators
-  with ScalaCheckPropertyChecks {
+class RegistrationSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   "Subscription" - {
     "marshal from Json individual" in {

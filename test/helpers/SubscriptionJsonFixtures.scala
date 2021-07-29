@@ -62,22 +62,21 @@ object SubscriptionJsonFixtures {
           "2020-09-23T16:12:11Z",
           "AB123c",
           "MDTP",
-          Some(Seq(RequestParameters(
-            "Name",
-            "Value"
-          )))
+          Some(
+            Seq(
+              RequestParameters(
+                "Name",
+                "Value"
+              )
+            )
+          )
         ),
         RequestDetail(
           "idType",
           "idNumber",
           None,
           true,
-          PrimaryContact(ContactInformationForIndividual(
-            IndividualDetails("Fairy", None, "Liquid"),
-            "email2@email.com",
-            Some(phone),
-            Some(mobile))
-          ),
+          PrimaryContact(ContactInformationForIndividual(IndividualDetails("Fairy", None, "Liquid"), "email2@email.com", Some(phone), Some(mobile))),
           None
         )
       )
@@ -87,26 +86,28 @@ object SubscriptionJsonFixtures {
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
-          "originatingSystem" -> "MDTP",
-          "requestParameters" -> Seq(Json.obj(
-            "paramName" -> "Name",
-            "paramValue" -> "Value"
+          "originatingSystem"        -> "MDTP",
+          "requestParameters" -> Seq(
+            Json.obj(
+              "paramName"  -> "Name",
+              "paramValue" -> "Value"
+            )
           )
-          )),
+        ),
         "requestDetail" -> Json.obj(
-          "IDType" -> "idType",
+          "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
               "firstName" -> "Fairy",
-              "lastName" -> "Liquid"
+              "lastName"  -> "Liquid"
             ),
-            "email" -> "email2@email.com",
-            "phone" -> s"$phone",
+            "email"  -> "email2@email.com",
+            "phone"  -> s"$phone",
             "mobile" -> s"$mobile"
           )
         )
@@ -153,10 +154,14 @@ object SubscriptionJsonFixtures {
           "2020-09-23T16:12:11Z",
           "AB123c",
           "MDTP",
-          Some(Seq(RequestParameters(
-            "Name",
-            "Value"
-          )))
+          Some(
+            Seq(
+              RequestParameters(
+                "Name",
+                "Value"
+              )
+            )
+          )
         ),
         RequestDetail(
           "idType",
@@ -164,11 +169,7 @@ object SubscriptionJsonFixtures {
           None,
           true,
           PrimaryContact(
-            ContactInformationForOrganisation(
-              OrganisationDetails(orgName),
-              "email@email.com",
-              Some(phoneNumber),
-              Some(mobile))
+            ContactInformationForOrganisation(OrganisationDetails(orgName), "email@email.com", Some(phoneNumber), Some(mobile))
           ),
           None
         )
@@ -179,25 +180,27 @@ object SubscriptionJsonFixtures {
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
-          "originatingSystem" -> "MDTP",
-          "requestParameters" -> Seq(Json.obj(
-            "paramName" -> "Name",
-            "paramValue" -> "Value"
-          ))
+          "originatingSystem"        -> "MDTP",
+          "requestParameters" -> Seq(
+            Json.obj(
+              "paramName"  -> "Name",
+              "paramValue" -> "Value"
+            )
+          )
         ),
         "requestDetail" -> Json.obj(
-          "IDType" -> "idType",
+          "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "organisation" -> Json.obj(
               "organisationName" -> orgName
             ),
-            "email" -> "email@email.com",
-            "phone" -> phoneNumber,
+            "email"  -> "email@email.com",
+            "phone"  -> phoneNumber,
             "mobile" -> mobile
           )
         )
@@ -242,55 +245,48 @@ object SubscriptionJsonFixtures {
   def secondaryContactSubscription(name: String, phone: String, mobile: String) =
     CreateSubscriptionForDACRequest(
       SubscriptionForDACRequest(
-        RequestCommonForSubscription(
-          "DAC",
-          "2020-09-23T16:12:11Z",
-          "AB123c",
-          "MDTP",
-          None),
+        RequestCommonForSubscription("DAC", "2020-09-23T16:12:11Z", "AB123c", "MDTP", None),
         RequestDetail(
           "idType",
           "idNumber",
           None,
           true,
           PrimaryContact(
-            ContactInformationForIndividual(
-              IndividualDetails("Fairy", None, "Liquid"),
-              "email2@email.com",
-              None,
-              None)
+            ContactInformationForIndividual(IndividualDetails("Fairy", None, "Liquid"), "email2@email.com", None, None)
           ),
-          Some(SecondaryContact(
-            ContactInformationForOrganisation(
-              OrganisationDetails(
-                name
-              ),
-              "email@email.com",
-              Some(phone),
-              Some(mobile)
+          Some(
+            SecondaryContact(
+              ContactInformationForOrganisation(
+                OrganisationDetails(
+                  name
+                ),
+                "email@email.com",
+                Some(phone),
+                Some(mobile)
+              )
             )
           )
-          )
         )
-      ))
+      )
+    )
 
   def secondaryContactSubscriptionJson(name: String, phone: String, mobile: String) =
     Json.obj(
       "createSubscriptionForDACRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime" -> "DAC",
-          "receiptDate" -> "2020-09-23T16:12:11Z",
+          "regime"                   -> "DAC",
+          "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
-          "originatingSystem" -> "MDTP"
+          "originatingSystem"        -> "MDTP"
         ),
         "requestDetail" -> Json.obj(
-          "IDType" -> "idType",
+          "IDType"   -> "idType",
           "IDNumber" -> "idNumber",
           "isGBUser" -> true,
           "primaryContact" -> Json.obj(
             "individual" -> Json.obj(
               "firstName" -> "Fairy",
-              "lastName" -> "Liquid"
+              "lastName"  -> "Liquid"
             ),
             "email" -> "email2@email.com"
           ),
@@ -298,8 +294,8 @@ object SubscriptionJsonFixtures {
             "organisation" -> Json.obj(
               "organisationName" -> name
             ),
-            "email" -> "email@email.com",
-            "phone" -> phone,
+            "email"  -> "email@email.com",
+            "phone"  -> phone,
             "mobile" -> mobile
           )
         )
@@ -390,12 +386,12 @@ object SubscriptionJsonFixtures {
   val createSubscriptionForDACResponseJson = Json.obj(
     "createSubscriptionForDACResponse" -> Json.obj(
       "responseCommon" -> Json.obj(
-        "status" -> "OK",
-        "statusText" -> "status",
+        "status"         -> "OK",
+        "statusText"     -> "status",
         "processingDate" -> "2020-09-01T01:00:00Z",
         "returnParameters" -> Json.arr(
           Json.obj(
-            "paramName" -> "Name",
+            "paramName"  -> "Name",
             "paramValue" -> "Value"
           )
         )
@@ -410,11 +406,11 @@ object SubscriptionJsonFixtures {
     CreateSubscriptionForDACResponse(
       SubscriptionForDACResponse(
         ResponseCommon(status = "OK",
-          statusText = Some("status"),
-          processingDate = "2020-09-01T01:00:00Z",
-          returnParameters = Some(Seq(ReturnParameters("Name", "Value")))),
-        ResponseDetailForDACSubscription(
-          subscriptionID = "XADAC0000123456")
+                       statusText = Some("status"),
+                       processingDate = "2020-09-01T01:00:00Z",
+                       returnParameters = Some(Seq(ReturnParameters("Name", "Value")))
+        ),
+        ResponseDetailForDACSubscription(subscriptionID = "XADAC0000123456")
       )
     )
 

@@ -21,9 +21,7 @@ import generators.Generators
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class BusinessMatchingSubmissionSpec extends SpecBase
-  with Generators
-  with ScalaCheckPropertyChecks {
+class BusinessMatchingSubmissionSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   "BusinessMatchingSubmission" - {
     "should marshall correctly from json for individual" in {
@@ -39,13 +37,8 @@ class BusinessMatchingSubmissionSpec extends SpecBase
           |}""".stripMargin
 
       Json.parse(jsonPayload).validate[BusinessMatchingSubmission].get mustBe
-        BusinessMatchingSubmission(
-          "DACSIX",
-          requiresNameMatch = true,
-          isAnAgent = false,
-          Organisation("AAAA", limitedLiability))
+        BusinessMatchingSubmission("DACSIX", requiresNameMatch = true, isAnAgent = false, Organisation("AAAA", limitedLiability))
     }
   }
-
 
 }

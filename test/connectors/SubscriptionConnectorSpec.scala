@@ -30,11 +30,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
-class SubscriptionConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
@@ -46,20 +42,22 @@ class SubscriptionConnectorSpec extends SpecBase
 
   "SubscriptionConnector" - {
     "for a create DAC6 subscription submission" - {
-     "must return status OK for valid subscription details" in {
+      "must return status OK for valid subscription details" in {
 
-       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-         sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", OK)
+        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+          sub =>
+            stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", OK)
 
-           val result = connector.sendSubscriptionInformation(sub)
-           result.futureValue.status mustBe OK
-       }
-     }
+            val result = connector.sendSubscriptionInformation(sub)
+            result.futureValue.status mustBe OK
+        }
+      }
 
       "must return status BAD_REQUEST for invalid subscription details" in {
 
         forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", BAD_REQUEST)
+          sub =>
+            stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", BAD_REQUEST)
 
             val result = connector.sendSubscriptionInformation(sub)
             result.futureValue.status mustBe BAD_REQUEST
@@ -69,7 +67,8 @@ class SubscriptionConnectorSpec extends SpecBase
       "must return status INTERNAL_SERVER_ERROR for technical error" in {
 
         forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", INTERNAL_SERVER_ERROR)
+          sub =>
+            stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", INTERNAL_SERVER_ERROR)
 
             val result = connector.sendSubscriptionInformation(sub)
             result.futureValue.status mustBe INTERNAL_SERVER_ERROR
@@ -79,7 +78,8 @@ class SubscriptionConnectorSpec extends SpecBase
       "must return status SERVICE_UNAVAILABLE for unexpected technical issue" in {
 
         forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          sub => stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", SERVICE_UNAVAILABLE)
+          sub =>
+            stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct03/v1", SERVICE_UNAVAILABLE)
 
             val result = connector.sendSubscriptionInformation(sub)
             result.futureValue.status mustBe SERVICE_UNAVAILABLE

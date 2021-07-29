@@ -30,10 +30,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegistrationConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
@@ -47,7 +44,6 @@ class RegistrationConnectorSpec extends SpecBase
     "for a registration without id submission" - {
       "must return status as OK for submission of Subscription" in {
 
-
         forAll(arbitrary[Registration]) {
           sub =>
             stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct01/v1", OK)
@@ -59,7 +55,6 @@ class RegistrationConnectorSpec extends SpecBase
 
       "must return status as BAD_REQUEST for submission of invalid subscription" in {
 
-
         forAll(arbitrary[Registration]) {
           sub =>
             stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct01/v1", BAD_REQUEST)
@@ -70,7 +65,6 @@ class RegistrationConnectorSpec extends SpecBase
       }
 
       "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
-
 
         forAll(arbitrary[Registration]) {
           sub =>
@@ -85,7 +79,6 @@ class RegistrationConnectorSpec extends SpecBase
     "for a registration with id submission" - {
       "must return status as OK for submission of Subscription" in {
 
-
         forAll(arbitrary[PayloadRegisterWithID]) {
           sub =>
             stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct02/v1", OK)
@@ -96,7 +89,6 @@ class RegistrationConnectorSpec extends SpecBase
       }
 
       "must return status as BAD_REQUEST for submission of invalid subscription" in {
-
 
         forAll(arbitrary[PayloadRegisterWithID]) {
           sub =>
@@ -109,7 +101,6 @@ class RegistrationConnectorSpec extends SpecBase
 
       "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
 
-
         forAll(arbitrary[PayloadRegisterWithID]) {
           sub =>
             stubResponse("/register-for-cross-border-arrangement-stubs/dac6/dct02/v1", INTERNAL_SERVER_ERROR)
@@ -121,13 +112,12 @@ class RegistrationConnectorSpec extends SpecBase
     }
   }
 
-      private def stubResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
-        server.stubFor(
-          post(urlEqualTo(expectedUrl))
-            .willReturn(
-              aResponse()
-                .withStatus(expectedStatus)
-            )
+  private def stubResponse(expectedUrl: String, expectedStatus: Int): StubMapping =
+    server.stubFor(
+      post(urlEqualTo(expectedUrl))
+        .willReturn(
+          aResponse()
+            .withStatus(expectedStatus)
         )
+    )
 }
-

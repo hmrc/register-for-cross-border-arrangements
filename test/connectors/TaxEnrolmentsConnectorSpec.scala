@@ -30,10 +30,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class TaxEnrolmentsConnectorSpec extends SpecBase
-  with WireMockServerHandler
-  with Generators
-  with ScalaCheckPropertyChecks {
+class TaxEnrolmentsConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
@@ -50,7 +47,6 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
       "must return status as 204 for successful Tax Enrolment call" in {
         forAll(validSafeID, validSubscriptionID, validUtr) {
           (safeID, subID, utr) =>
-
             val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
 
             stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", NO_CONTENT)
@@ -64,7 +60,6 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
         forAll(validSafeID, validSubscriptionID, validUtr) {
           (safeID, subID, utr) =>
-
             val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
 
             stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", UNAUTHORIZED)
@@ -78,7 +73,6 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
 
         forAll(validSafeID, validSubscriptionID, validUtr) {
           (safeID, subID, utr) =>
-
             val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
             stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", BAD_REQUEST)
 
@@ -90,7 +84,6 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
       "must return status as 503 for unsuccessful Tax Enrolment call" in {
         forAll(validSafeID, validSubscriptionID, validUtr) {
           (safeID, subID, utr) =>
-
             val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
             stubResponseForPutRequest("/tax-enrolments/service/HMRC-DAC6-ORG/enrolment", SERVICE_UNAVAILABLE)
 
@@ -105,49 +98,40 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
       "must return correct EnrolmentRequest nino provided" in {
         forAll(validSafeID, validSubscriptionID, validNino) {
           (safeID, subID, nino) =>
-
             val enrolmentInfo = SubscriptionInfo(safeID = safeID, nino = Some(nino), dac6Id = subID)
 
-
-            val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
-              Verifier("NINO", enrolmentInfo.nino.get))
-
+            val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID), Verifier("NINO", enrolmentInfo.nino.get))
 
             enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
 
         }
       }
-     "must return correct EnrolmentRequest when saUtr provided as verifier" in {
+      "must return correct EnrolmentRequest when saUtr provided as verifier" in {
 
-       forAll(validSafeID, validSubscriptionID, validUtr) {
-         (safeID, subID, utr) =>
-           val enrolmentInfo = SubscriptionInfo(safeID = safeID,
-             saUtr = Some(utr), dac6Id = subID)
+        forAll(validSafeID, validSubscriptionID, validUtr) {
+          (safeID, subID, utr) =>
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), dac6Id = subID)
 
-           val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
-             Verifier("SAUTR", enrolmentInfo.saUtr.get))
+            val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID), Verifier("SAUTR", enrolmentInfo.saUtr.get))
 
-
-           enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
-       }
-     }
+            enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
+        }
+      }
 
       "must return correct EnrolmentRequest when ctUtr provided as verifier" in {
 
         forAll(validSafeID, validSubscriptionID, validUtr) {
           (safeID, subID, utr) =>
-            val enrolmentInfo = SubscriptionInfo(safeID = safeID,
-              ctUtr = Some(utr), dac6Id = subID)
+            val enrolmentInfo = SubscriptionInfo(safeID = safeID, ctUtr = Some(utr), dac6Id = subID)
 
-            val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID),
-              Verifier("CTUTR", enrolmentInfo.ctUtr.get))
-
+            val expectedVerifiers = Seq(Verifier("SAFEID", enrolmentInfo.safeID), Verifier("CTUTR", enrolmentInfo.ctUtr.get))
 
             enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
         }
       }
     }
   }
+
   private def stubResponseForPutRequest(expectedUrl: String, expectedStatus: Int): StubMapping =
     server.stubFor(
       put(urlEqualTo(expectedUrl))
@@ -157,4 +141,3 @@ class TaxEnrolmentsConnectorSpec extends SpecBase
         )
     )
 }
-

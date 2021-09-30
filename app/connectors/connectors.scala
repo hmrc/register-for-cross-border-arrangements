@@ -54,6 +54,7 @@ package object connectors {
         headerCarrier.sessionId
           .map(_.value)
           .getOrElse(UUID.randomUUID().toString)
+          .replace("session-", "")
       },
       "content-type" -> "application/json",
       "accept"       -> "application/json",

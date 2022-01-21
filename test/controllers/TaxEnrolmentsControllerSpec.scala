@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,64 +34,64 @@ import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
 
-class TaxEnrolmentsControllerSpec extends SpecBase
-  with Generators
-  with ScalaCheckPropertyChecks {
+class TaxEnrolmentsControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   val mockTaxEnrolmentsConnector: TaxEnrolmentsConnector = mock[TaxEnrolmentsConnector]
+
   val application: Application = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> "false"))
     .overrides(
       bind[TaxEnrolmentsConnector].toInstance(mockTaxEnrolmentsConnector),
       bind[AuthAction].to[FakeAuthAction]
-    ).build()
+    )
+    .build()
 
   "Business Matching Controller" - {
     "should return a found business partner match when one is found" in {
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
-      forAll(arbitrary[SubscriptionInfo]){
-        (enrolmentInfo) =>
+      forAll(arbitrary[SubscriptionInfo]) {
+        enrolmentInfo =>
           val request =
             FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
               .withJsonBody(Json.toJson(enrolmentInfo))
 
-          val result  = route(application, request).value
+          val result = route(application, request).value
           status(result) mustEqual OK
       }
     }
 
-  "should return error when invalid json encountered" in {
+    "should return error when invalid json encountered" in {
 
       when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
-          val request =
-            FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
-              .withJsonBody(Json.parse("""{"field": "value"}"""))
+      val request =
+        FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
+          .withJsonBody(Json.parse("""{"field": "value"}"""))
 
-          val result  = route(application, request).value
-          status(result) mustEqual BAD_REQUEST
-  }
+      val result = route(application, request).value
+      status(result) mustEqual BAD_REQUEST
+    }
 
     "should handle range of expected http responses" in {
-      val expectedResponses = List(NO_CONTENT , NOT_FOUND , BAD_REQUEST, UNAUTHORIZED , SERVICE_UNAVAILABLE, BAD_GATEWAY, GATEWAY_TIMEOUT, INTERNAL_SERVER_ERROR )
+      val expectedResponses = List(NO_CONTENT, NOT_FOUND, BAD_REQUEST, UNAUTHORIZED, SERVICE_UNAVAILABLE, BAD_GATEWAY, GATEWAY_TIMEOUT, INTERNAL_SERVER_ERROR)
 
-      expectedResponses foreach  { responseStatus =>
+      expectedResponses foreach {
+        responseStatus =>
+          when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
+            .thenReturn(Future.successful(HttpResponse(responseStatus, Json.obj(), Map.empty[String, Seq[String]])))
 
-        when(mockTaxEnrolmentsConnector.createEnrolment(any())(any(), any()))
-        .thenReturn(Future.successful(HttpResponse(responseStatus, Json.obj(), Map.empty[String, Seq[String]])))
+          forAll(arbitrary[SubscriptionInfo]) {
+            enrolmentInfo =>
+              val request =
+                FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
+                  .withJsonBody(Json.toJson(enrolmentInfo))
 
-        forAll(arbitrary[SubscriptionInfo]){
-          (enrolmentInfo) =>
-            val request =
-              FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
-                .withJsonBody(Json.toJson(enrolmentInfo))
-
-            val result  = route(application, request).value
-            status(result) mustEqual responseStatus
-        }
+              val result = route(application, request).value
+              status(result) mustEqual responseStatus
+          }
       }
     }
   }

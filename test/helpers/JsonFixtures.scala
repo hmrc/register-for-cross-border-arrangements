@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import models._
 import play.api.libs.json.Json
 
 object JsonFixtures {
+
   val jsonPayload =
     """{
       |"registerWithoutIDRequest": {
@@ -122,7 +123,7 @@ object JsonFixtures {
       |}
       |}""".stripMargin
 
-  val jsonSubWithOrg  =
+  val jsonSubWithOrg =
     """{
       |"registerWithoutIDRequest": {
       |"requestCommon": {
@@ -159,10 +160,12 @@ object JsonFixtures {
       RequestCommon("2001-12-17", "DAC", "ec031b045855445e96f98569ds56cd22", None),
       RequestDetails(
         None,
-        Some(NoIdIndividual(
-          Name("FIRST NAME", "LAST NAME"),
-          LocalDate.parse("1999-01-23")
-        )),
+        Some(
+          NoIdIndividual(
+            Name("FIRST NAME", "LAST NAME"),
+            LocalDate.parse("1999-01-23")
+          )
+        ),
         Address(
           "ADDRESS1",
           Some("ADDRESS2"),
@@ -211,14 +214,14 @@ object JsonFixtures {
     "registerWithoutIDRequest" -> Json.obj(
       "requestCommon" ->
         Json.obj(
-          "receiptDate" -> "2001-12-17",
-          "regime" -> "DAC",
+          "receiptDate"              -> "2001-12-17",
+          "regime"                   -> "DAC",
           "acknowledgementReference" -> "ec031b045855445e96f98569ds56cd22"
         ),
       "requestDetail" -> Json.obj(
         "individual" -> Json.obj(
-          "firstName" -> "FIRST NAME",
-          "lastName" -> "LAST NAME",
+          "firstName"   -> "FIRST NAME",
+          "lastName"    -> "LAST NAME",
           "dateOfBirth" -> "1999-01-23"
         ),
         "address" -> Json.obj(
@@ -226,16 +229,15 @@ object JsonFixtures {
           "addressLine2" -> "ADDRESS2",
           "addressLine3" -> "ADDRESS3",
           "addressLine4" -> "ADDRESS4",
-          "postalCode" -> "bh1 3fg",
-          "countryCode" -> "GB"
+          "postalCode"   -> "bh1 3fg",
+          "countryCode"  -> "GB"
         ),
         "contactDetails" -> Json.obj(
-          "phoneNumber" -> "878798798798",
+          "phoneNumber"  -> "878798798798",
           "mobileNumber" -> "7698908090",
-          "faxNumber" -> "837587345",
+          "faxNumber"    -> "837587345",
           "emailAddress" -> "ABC@YAHOO.COM"
         )
-
       )
     )
   )
@@ -244,8 +246,8 @@ object JsonFixtures {
     "registerWithoutIDRequest" -> Json.obj(
       "requestCommon" ->
         Json.obj(
-          "receiptDate" -> "2001-12-17",
-          "regime" -> "DAC",
+          "receiptDate"              -> "2001-12-17",
+          "regime"                   -> "DAC",
           "acknowledgementReference" -> "ec031b045855445e96f98569ds56cd22"
         ),
       "requestDetail" -> Json.obj(
@@ -255,19 +257,19 @@ object JsonFixtures {
           "addressLine2" -> "ADDRESS2",
           "addressLine3" -> "ADDRESS3",
           "addressLine4" -> "ADDRESS4",
-          "postalCode" -> "bh1 3fg",
-          "countryCode" -> "GB"
+          "postalCode"   -> "bh1 3fg",
+          "countryCode"  -> "GB"
         ),
         "contactDetails" -> Json.obj(
-          "phoneNumber" -> "878798798798",
+          "phoneNumber"  -> "878798798798",
           "mobileNumber" -> "7698908090",
-          "faxNumber" -> "837587345",
+          "faxNumber"    -> "837587345",
           "emailAddress" -> "ABC@YAHOO.COM"
         )
-
       )
     )
   )
+
   val registerWithIDPayload =
     """
       |{
@@ -298,40 +300,43 @@ object JsonFixtures {
       |}
       |}""".stripMargin
 
-val registerWithIDJson = Json.obj(
-  "registerWithIDRequest" -> Json.obj(
-    "requestCommon" -> Json.obj(
-        "regime" -> "DAC",
-              "receiptDate" -> "2016-08-16T15:55:30Z",
-              "acknowledgementReference" -> "ec031b045855445e96f98a569ds56cd2",
-              "requestParameters" -> Json.arr( Json.obj(
-                "paramName" -> "REGIME",
-                "paramValue" -> "DAC"
-              ))
-        ),
+  val registerWithIDJson = Json.obj(
+    "registerWithIDRequest" -> Json.obj(
+      "requestCommon" -> Json.obj(
+        "regime"                   -> "DAC",
+        "receiptDate"              -> "2016-08-16T15:55:30Z",
+        "acknowledgementReference" -> "ec031b045855445e96f98a569ds56cd2",
+        "requestParameters" -> Json.arr(
+          Json.obj(
+            "paramName"  -> "REGIME",
+            "paramValue" -> "DAC"
+          )
+        )
+      ),
       "requestDetail" -> Json.obj(
-        "IDType" -> "NINO",
-        "IDNumber" -> "0123456789",
+        "IDType"            -> "NINO",
+        "IDNumber"          -> "0123456789",
         "requiresNameMatch" -> true,
-        "isAnAgent" -> false,
+        "isAnAgent"         -> false,
         "individual" -> Json.obj(
-          "firstName" -> "Fred",
-          "middleName" -> "Flintstone",
-          "lastName" -> "Flint",
+          "firstName"   -> "Fred",
+          "middleName"  -> "Flintstone",
+          "lastName"    -> "Flint",
           "dateOfBirth" -> "1999-12-20"
         )
       )
     )
   )
 
-  val registrationWithRequest = PayloadRegisterWithID(RegisterWithIDRequest(
-    RequestCommon("2016-08-16T15:55:30Z", "DAC", "ec031b045855445e96f98a569ds56cd2",
-  Some(Seq(RequestParameter("REGIME", "DAC")))),
-    RequestWithIDDetails(
-      "NINO",
-      "0123456789",
-      requiresNameMatch = true,
-      isAnAgent = false,
-      WithIDIndividual("Fred", Some("Flintstone"), "Flint", "1999-12-20")))
+  val registrationWithRequest = PayloadRegisterWithID(
+    RegisterWithIDRequest(
+      RequestCommon("2016-08-16T15:55:30Z", "DAC", "ec031b045855445e96f98a569ds56cd2", Some(Seq(RequestParameter("REGIME", "DAC")))),
+      RequestWithIDDetails("NINO",
+                           "0123456789",
+                           requiresNameMatch = true,
+                           isAnAgent = false,
+                           WithIDIndividual("Fred", Some("Flintstone"), "Flint", "1999-12-20")
+      )
+    )
   )
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,17 @@ import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
 
-class SubscriptionControllerSpec extends SpecBase
-  with Generators
-  with ScalaCheckPropertyChecks {
+class SubscriptionControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
+
   val application: Application = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> "false"))
     .overrides(
       bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
       bind[AuthAction].to[FakeAuthAction]
-    ).build()
+    )
+    .build()
 
   "SubscriptionController" - {
     "for user with subscription details" - {
@@ -55,7 +55,7 @@ class SubscriptionControllerSpec extends SpecBase
           .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          (subscriptionForDACRequest) =>
+          subscriptionForDACRequest =>
             val request =
               FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
                 .withJsonBody(Json.toJson(subscriptionForDACRequest))
@@ -66,110 +66,107 @@ class SubscriptionControllerSpec extends SpecBase
       }
 
       "should return BAD_REQUEST when subscriptionForDacRequest ia invalid" in {
-        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
+        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
           .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
-            val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
-                .withJsonBody(Json.parse("""{"value": "field"}"""))
+        val request =
+          FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+            .withJsonBody(Json.parse("""{"value": "field"}"""))
 
-            val result = route(application, request).value
-            status(result) mustEqual BAD_REQUEST
-        }
+        val result = route(application, request).value
+        status(result) mustEqual BAD_REQUEST
       }
+    }
 
-      "should return BAD_REQUEST when one is encountered" in {
-        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
-          .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
+    "should return BAD_REQUEST when one is encountered" in {
+      when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          (subscriptionForDacRequest) =>
-            val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+      forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+        subscriptionForDacRequest =>
+          val request =
+            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual BAD_REQUEST
-        }
+          val result = route(application, request).value
+          status(result) mustEqual BAD_REQUEST
       }
+    }
 
-      "should return FORBIDDEN when authorisation is invalid" in {
-        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
-          .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
+    "should return FORBIDDEN when authorisation is invalid" in {
+      when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          (subscriptionForDacRequest) =>
-            val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+      forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+        subscriptionForDacRequest =>
+          val request =
+            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual FORBIDDEN
-        }
+          val result = route(application, request).value
+          status(result) mustEqual FORBIDDEN
       }
+    }
 
-      "should return SERVICE_UNAVAILABLE when EIS becomes unavailable" in {
-        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
-          .thenReturn(Future.successful(HttpResponse(503, Json.obj(), Map.empty[String, Seq[String]])))
+    "should return SERVICE_UNAVAILABLE when EIS becomes unavailable" in {
+      when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(503, Json.obj(), Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          (subscriptionForDacRequest) =>
-            val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+      forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+        subscriptionForDacRequest =>
+          val request =
+            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual SERVICE_UNAVAILABLE
-        }
+          val result = route(application, request).value
+          status(result) mustEqual SERVICE_UNAVAILABLE
       }
+    }
 
-      "should return CONFLICT when one occurs" in {
-        val errorDetails = ErrorDetails(ErrorDetail(DateTime.now().toString,"xx","409","CONFLICT","", Some(SourceFaultDetail(Seq("a","b")))))
-        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
-          .thenReturn(Future.successful(HttpResponse(409, Json.toJson(errorDetails), Map.empty[String, Seq[String]])))
+    "should return CONFLICT when one occurs" in {
+      val errorDetails = ErrorDetails(ErrorDetail(DateTime.now().toString, Some("xx"), "409", "CONFLICT", "", Some(SourceFaultDetail(Seq("a", "b")))))
+      when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(409, Json.toJson(errorDetails), Map.empty[String, Seq[String]])))
 
-
-        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          (subscriptionForDacRequest) =>
-            val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+      forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+        subscriptionForDacRequest =>
+          val request =
+            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual CONFLICT
-        }
+          val result = route(application, request).value
+          status(result) mustEqual CONFLICT
       }
+    }
 
-      "should return INTERNAL_SERVER_ERROR for unspecified errors" in {
-        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
-          .thenReturn(Future.successful(HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])))
+    "should return INTERNAL_SERVER_ERROR for unspecified errors" in {
+      when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          (subscriptionForDacRequest) =>
-            val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+      forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+        subscriptionForDacRequest =>
+          val request =
+            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual INTERNAL_SERVER_ERROR
-        }
+          val result = route(application, request).value
+          status(result) mustEqual INTERNAL_SERVER_ERROR
       }
+    }
 
-      "downstream errors should be recoverable when not in json" in {
-        when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(),any()))
-          .thenReturn(Future.successful(HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])))
+    "downstream errors should be recoverable when not in json" in {
+      when(mockSubscriptionConnector.sendSubscriptionInformation(any())(any(), any()))
+        .thenReturn(Future.successful(HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])))
 
-        forAll(arbitrary[CreateSubscriptionForDACRequest]) {
-          (subscriptionForDacRequest) =>
-            val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
-                .withJsonBody(Json.toJson(subscriptionForDacRequest))
+      forAll(arbitrary[CreateSubscriptionForDACRequest]) {
+        subscriptionForDacRequest =>
+          val request =
+            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+              .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual SERVICE_UNAVAILABLE
-        }
+          val result = route(application, request).value
+          status(result) mustEqual SERVICE_UNAVAILABLE
       }
     }
   }
-
-
+}

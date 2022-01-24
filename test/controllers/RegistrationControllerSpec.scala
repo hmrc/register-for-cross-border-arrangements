@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,17 @@ import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
 
-class RegistrationControllerSpec extends SpecBase
-  with Generators
-  with ScalaCheckPropertyChecks {
+class RegistrationControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
   val application: Application = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> "false"))
     .overrides(
       bind[RegistrationConnector].toInstance(mockRegistrationConnector),
       bind[AuthAction].to[FakeAuthAction]
-    ).build()
+    )
+    .build()
 
   "Registration Controller" - {
     "for a user without id" - {
@@ -86,8 +86,8 @@ class RegistrationControllerSpec extends SpecBase
         forAll(arbitrary[Registration]) {
           individualNoIdSubscription =>
             val request =
-            FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
-              .withJsonBody(Json.parse("""{"value": "field"}"""))
+              FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
 
             val result = route(application, request).value
             status(result) mustEqual BAD_REQUEST
@@ -187,9 +187,9 @@ class RegistrationControllerSpec extends SpecBase
       }
 
       "should return forbidden error when authorisation is invalid" in {
-        val errorDetails = ErrorDetails(ErrorDetail(DateTime.now().toString,"xx","403","FORBIDDEN","", Some(SourceFaultDetail(Seq("a","b")))))
+        val errorDetails = ErrorDetails(ErrorDetail(DateTime.now().toString, Some("xx"), "403", "FORBIDDEN", "", Some(SourceFaultDetail(Seq("a", "b")))))
         when(mockRegistrationConnector.sendWithID(any())(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(403,  Json.toJson(errorDetails), Map.empty[String, Seq[String]])))
+          .thenReturn(Future.successful(HttpResponse(403, Json.toJson(errorDetails), Map.empty[String, Seq[String]])))
 
         forAll(arbitrary[PayloadRegisterWithID]) {
           withIdSubscription =>

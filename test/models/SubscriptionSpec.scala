@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,11 @@ import helpers.SubscriptionJsonFixtures._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-
-class SubscriptionSpec extends SpecBase
-  with Generators
-  with ScalaCheckPropertyChecks {
+class SubscriptionSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   "create Subscription for DAC Request" - {
 
-    "should marshall correctly from json for individual " in  {
+    "should marshall correctly from json for individual " in {
       forAll(validContactNumber, validContactNumber) {
         (phone, mobile) =>
           Json.parse(jsonPayloadForIndividual(phone, mobile)).validate[CreateSubscriptionForDACRequest].get mustBe individualSubscription(phone, mobile)
@@ -43,37 +40,43 @@ class SubscriptionSpec extends SpecBase
       }
     }
 
-    "should marshall correctly from json for organisation" in  {
+    "should marshall correctly from json for organisation" in {
       forAll(validOrgName, validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
-          Json.parse(jsonPayloadForOrganisation(
-            orgName, phone, mobile)
-          ).validate[CreateSubscriptionForDACRequest].get mustBe organisationSubscription(orgName, phone, mobile)
+          Json.parse(jsonPayloadForOrganisation(orgName, phone, mobile)).validate[CreateSubscriptionForDACRequest].get mustBe organisationSubscription(orgName,
+                                                                                                                                                       phone,
+                                                                                                                                                       mobile
+          )
       }
     }
 
     "marshall into json subscription for organisation" in {
       forAll(stringsWithMaxLength(105), validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
-        Json.toJson(organisationSubscription(
-          orgName, phone, mobile)) mustBe organisationSubscriptionJson(orgName, phone, mobile)
+          Json.toJson(organisationSubscription(orgName, phone, mobile)) mustBe organisationSubscriptionJson(orgName, phone, mobile)
       }
     }
 
-    "should marshall correctly from json for individual with Secondary Contact as org" in  {
+    "should marshall correctly from json for individual with Secondary Contact as org" in {
       forAll(validOrgName, validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
-          Json.parse(jsonPayloadForSecondaryContact(
-            orgName, phone, mobile
-          )).validate[CreateSubscriptionForDACRequest].get mustBe secondaryContactSubscription(orgName, phone, mobile)
+          Json
+            .parse(
+              jsonPayloadForSecondaryContact(
+                orgName,
+                phone,
+                mobile
+              )
+            )
+            .validate[CreateSubscriptionForDACRequest]
+            .get mustBe secondaryContactSubscription(orgName, phone, mobile)
       }
     }
 
     "marshall into json subscription for individual with Secondary Contact as org" in {
       forAll(validOrgName, validContactNumber, validContactNumber) {
         (orgName, phone, mobile) =>
-          Json.toJson(secondaryContactSubscription(
-            orgName, phone, mobile)) mustBe secondaryContactSubscriptionJson(orgName, phone, mobile)
+          Json.toJson(secondaryContactSubscription(orgName, phone, mobile)) mustBe secondaryContactSubscriptionJson(orgName, phone, mobile)
       }
     }
   }
@@ -92,7 +95,10 @@ class SubscriptionSpec extends SpecBase
     forAll(validOrgName, validContactNumber, validContactNumber) {
       (orgName, phone, mobile) =>
         val error = intercept[Exception] {
-          Json.parse(invalidJsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest] mustBe secondaryContactSubscription(orgName, phone, mobile)
+          Json.parse(invalidJsonPayloadForSecondaryContact).validate[CreateSubscriptionForDACRequest] mustBe secondaryContactSubscription(orgName,
+                                                                                                                                          phone,
+                                                                                                                                          mobile
+          )
         }
         error.getMessage mustBe "Secondary Contact must have either an organisation or individual element"
     }

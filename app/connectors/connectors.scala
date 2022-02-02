@@ -46,9 +46,7 @@ package object connectors {
       "x-forwarded-host" -> "mdtp",
       "date"             -> ZonedDateTime.now().format(formatter),
       "x-correlation-id" -> {
-        headerCarrier.requestId
-          .map(_.value)
-          .getOrElse(UUID.randomUUID().toString)
+        UUID.randomUUID().toString
       },
       "x-conversation-id" -> {
         headerCarrier.sessionId

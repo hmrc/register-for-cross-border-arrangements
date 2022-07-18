@@ -56,7 +56,7 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
         forAll(arbitrary[Registration]) {
           individualNoIdRegistration =>
             val request =
-              FakeRequest(POST, routes.RegistrationController.noIdRegistration().url)
+              FakeRequest(POST, routes.RegistrationController.noIdRegistration.url)
                 .withJsonBody(Json.toJson(individualNoIdRegistration))
 
             val result = route(application, request).value

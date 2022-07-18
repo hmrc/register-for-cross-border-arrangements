@@ -54,7 +54,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase with Generators with ScalaChe
       forAll(arbitrary[SubscriptionInfo]) {
         enrolmentInfo =>
           val request =
-            FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
+            FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment.url)
               .withJsonBody(Json.toJson(enrolmentInfo))
 
           val result = route(application, request).value
@@ -68,7 +68,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase with Generators with ScalaChe
         .thenReturn(Future.successful(HttpResponse(200, Json.obj(), Map.empty[String, Seq[String]])))
 
       val request =
-        FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
+        FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment.url)
           .withJsonBody(Json.parse("""{"field": "value"}"""))
 
       val result = route(application, request).value
@@ -86,7 +86,7 @@ class TaxEnrolmentsControllerSpec extends SpecBase with Generators with ScalaChe
           forAll(arbitrary[SubscriptionInfo]) {
             enrolmentInfo =>
               val request =
-                FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment().url)
+                FakeRequest(PUT, routes.TaxEnrolmentsController.createEnrolment.url)
                   .withJsonBody(Json.toJson(enrolmentInfo))
 
               val result = route(application, request).value

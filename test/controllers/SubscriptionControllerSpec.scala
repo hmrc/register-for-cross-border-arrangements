@@ -57,7 +57,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
         forAll(arbitrary[CreateSubscriptionForDACRequest]) {
           subscriptionForDACRequest =>
             val request =
-              FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+              FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
                 .withJsonBody(Json.toJson(subscriptionForDACRequest))
 
             val result = route(application, request).value
@@ -70,7 +70,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
           .thenReturn(Future.successful(HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])))
 
         val request =
-          FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+          FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
             .withJsonBody(Json.parse("""{"value": "field"}"""))
 
         val result = route(application, request).value
@@ -85,7 +85,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
         subscriptionForDacRequest =>
           val request =
-            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+            FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
           val result = route(application, request).value
@@ -100,7 +100,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
         subscriptionForDacRequest =>
           val request =
-            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+            FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
           val result = route(application, request).value
@@ -115,7 +115,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
         subscriptionForDacRequest =>
           val request =
-            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+            FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
           val result = route(application, request).value
@@ -131,7 +131,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
         subscriptionForDacRequest =>
           val request =
-            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+            FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
           val result = route(application, request).value
@@ -146,7 +146,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
         subscriptionForDacRequest =>
           val request =
-            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+            FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
           val result = route(application, request).value
@@ -161,7 +161,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       forAll(arbitrary[CreateSubscriptionForDACRequest]) {
         subscriptionForDacRequest =>
           val request =
-            FakeRequest(POST, routes.SubscriptionController.createSubscription().url)
+            FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
               .withJsonBody(Json.toJson(subscriptionForDacRequest))
 
           val result = route(application, request).value

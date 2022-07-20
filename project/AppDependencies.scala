@@ -8,7 +8,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "domain"                        % "6.2.0-play-28",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.9.0-play-28",
     "uk.gov.hmrc"       %% "bootstrap-health-play-28"      % "5.4.0",
-    "uk.gov.hmrc"       %% "bootstrap-backend-play-28"     % "5.4.0"
+    "uk.gov.hmrc"       %% "bootstrap-backend-play-28"     % "5.24.0"
   )
 
   val test = Seq(

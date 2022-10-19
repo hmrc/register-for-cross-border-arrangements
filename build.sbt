@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
   .settings(
     name := appName,
     scalaVersion := "2.12.12",
-    scalafmtOnCompile in ThisBuild := true,
+    ThisBuild / scalafmtOnCompile := true,
     RoutesKeys.routesImport ++= Seq("uk.gov.hmrc.domain.Nino", "binders.NinoBinder._"),
     PlayKeys.playDefaultPort := 9756,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*repositories.*;" +
@@ -30,7 +30,7 @@ lazy val root = (project in file("."))
     scalacOptions ++= Seq("-feature"),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
-    evictionWarningOptions in update :=
+    update / evictionWarningOptions :=
       EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     resolvers += Resolver.jcenterRepo
   )
